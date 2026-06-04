@@ -38,7 +38,7 @@ function ClustersPage() {
                   <ActionsColumn items={[
                     { title: "Scale nodes" },
                     { title: "Upgrade" },
-                    { title: (<><DownloadIcon /> Download kubeconfig</>) as any },
+                    { title: "Download kubeconfig" },
                     { isSeparator: true },
                     { title: "Delete" },
                   ]} />
