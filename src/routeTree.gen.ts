@@ -12,6 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppVmsRouteImport } from './routes/app.vms'
+import { Route as AppConsoleRouteImport } from './routes/app.console'
+import { Route as AppClustersRouteImport } from './routes/app.clusters'
+import { Route as AppCatalogRouteImport } from './routes/app.catalog'
+import { Route as AppActivityRouteImport } from './routes/app.activity'
 
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
@@ -28,34 +34,108 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppVmsRoute = AppVmsRouteImport.update({
+  id: '/vms',
+  path: '/vms',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConsoleRoute = AppConsoleRouteImport.update({
+  id: '/console',
+  path: '/console',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppClustersRoute = AppClustersRouteImport.update({
+  id: '/clusters',
+  path: '/clusters',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCatalogRoute = AppCatalogRouteImport.update({
+  id: '/catalog',
+  path: '/catalog',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppActivityRoute = AppActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/app': typeof AppRoute
+  '/app': typeof AppRouteWithChildren
   '/sign-in': typeof SignInRoute
+  '/app/activity': typeof AppActivityRoute
+  '/app/catalog': typeof AppCatalogRoute
+  '/app/clusters': typeof AppClustersRoute
+  '/app/console': typeof AppConsoleRoute
+  '/app/vms': typeof AppVmsRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/app': typeof AppRoute
   '/sign-in': typeof SignInRoute
+  '/app/activity': typeof AppActivityRoute
+  '/app/catalog': typeof AppCatalogRoute
+  '/app/clusters': typeof AppClustersRoute
+  '/app/console': typeof AppConsoleRoute
+  '/app/vms': typeof AppVmsRoute
+  '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/app': typeof AppRoute
+  '/app': typeof AppRouteWithChildren
   '/sign-in': typeof SignInRoute
+  '/app/activity': typeof AppActivityRoute
+  '/app/catalog': typeof AppCatalogRoute
+  '/app/clusters': typeof AppClustersRoute
+  '/app/console': typeof AppConsoleRoute
+  '/app/vms': typeof AppVmsRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/sign-in'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/sign-in'
+    | '/app/activity'
+    | '/app/catalog'
+    | '/app/clusters'
+    | '/app/console'
+    | '/app/vms'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app' | '/sign-in'
-  id: '__root__' | '/' | '/app' | '/sign-in'
+  to:
+    | '/'
+    | '/sign-in'
+    | '/app/activity'
+    | '/app/catalog'
+    | '/app/clusters'
+    | '/app/console'
+    | '/app/vms'
+    | '/app'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/sign-in'
+    | '/app/activity'
+    | '/app/catalog'
+    | '/app/clusters'
+    | '/app/console'
+    | '/app/vms'
+    | '/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppRoute: typeof AppRoute
+  AppRoute: typeof AppRouteWithChildren
   SignInRoute: typeof SignInRoute
 }
 
@@ -82,12 +162,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/vms': {
+      id: '/app/vms'
+      path: '/vms'
+      fullPath: '/app/vms'
+      preLoaderRoute: typeof AppVmsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/console': {
+      id: '/app/console'
+      path: '/console'
+      fullPath: '/app/console'
+      preLoaderRoute: typeof AppConsoleRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/clusters': {
+      id: '/app/clusters'
+      path: '/clusters'
+      fullPath: '/app/clusters'
+      preLoaderRoute: typeof AppClustersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/catalog': {
+      id: '/app/catalog'
+      path: '/catalog'
+      fullPath: '/app/catalog'
+      preLoaderRoute: typeof AppCatalogRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/activity': {
+      id: '/app/activity'
+      path: '/activity'
+      fullPath: '/app/activity'
+      preLoaderRoute: typeof AppActivityRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppActivityRoute: typeof AppActivityRoute
+  AppCatalogRoute: typeof AppCatalogRoute
+  AppClustersRoute: typeof AppClustersRoute
+  AppConsoleRoute: typeof AppConsoleRoute
+  AppVmsRoute: typeof AppVmsRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppActivityRoute: AppActivityRoute,
+  AppCatalogRoute: AppCatalogRoute,
+  AppClustersRoute: AppClustersRoute,
+  AppConsoleRoute: AppConsoleRoute,
+  AppVmsRoute: AppVmsRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppRoute: AppRoute,
+  AppRoute: AppRouteWithChildren,
   SignInRoute: SignInRoute,
 }
 export const routeTree = rootRouteImport
