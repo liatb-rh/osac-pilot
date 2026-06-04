@@ -70,7 +70,7 @@ function VmsPage() {
                     { title: "Restart" },
                     { title: "Clone" },
                     { isSeparator: true },
-                    { title: <Link to="/app/console" search={{ vm: v.name }}><TerminalIcon /> Launch console</Link> as any },
+                    { title: "Launch console", onClick: () => { window.location.href = `/app/console?vm=${v.name}`; } },
                     { isSeparator: true },
                     { title: "Delete" },
                   ]} />
