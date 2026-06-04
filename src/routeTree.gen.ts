@@ -18,6 +18,11 @@ import { Route as AppConsoleRouteImport } from './routes/app.console'
 import { Route as AppClustersRouteImport } from './routes/app.clusters'
 import { Route as AppCatalogRouteImport } from './routes/app.catalog'
 import { Route as AppActivityRouteImport } from './routes/app.activity'
+import { Route as AppAdminIndexRouteImport } from './routes/app.admin.index'
+import { Route as AppAdminUsersRouteImport } from './routes/app.admin.users'
+import { Route as AppAdminQuotaRouteImport } from './routes/app.admin.quota'
+import { Route as AppAdminNetworksRouteImport } from './routes/app.admin.networks'
+import { Route as AppAdminClusterOfferingsRouteImport } from './routes/app.admin.cluster-offerings'
 
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
@@ -64,6 +69,32 @@ const AppActivityRoute = AppActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminQuotaRoute = AppAdminQuotaRouteImport.update({
+  id: '/admin/quota',
+  path: '/admin/quota',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminNetworksRoute = AppAdminNetworksRouteImport.update({
+  id: '/admin/networks',
+  path: '/admin/networks',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminClusterOfferingsRoute =
+  AppAdminClusterOfferingsRouteImport.update({
+    id: '/admin/cluster-offerings',
+    path: '/admin/cluster-offerings',
+    getParentRoute: () => AppRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +106,11 @@ export interface FileRoutesByFullPath {
   '/app/console': typeof AppConsoleRoute
   '/app/vms': typeof AppVmsRoute
   '/app/': typeof AppIndexRoute
+  '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRoute
+  '/app/admin/networks': typeof AppAdminNetworksRoute
+  '/app/admin/quota': typeof AppAdminQuotaRoute
+  '/app/admin/users': typeof AppAdminUsersRoute
+  '/app/admin/': typeof AppAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -85,6 +121,11 @@ export interface FileRoutesByTo {
   '/app/console': typeof AppConsoleRoute
   '/app/vms': typeof AppVmsRoute
   '/app': typeof AppIndexRoute
+  '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRoute
+  '/app/admin/networks': typeof AppAdminNetworksRoute
+  '/app/admin/quota': typeof AppAdminQuotaRoute
+  '/app/admin/users': typeof AppAdminUsersRoute
+  '/app/admin': typeof AppAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -97,6 +138,11 @@ export interface FileRoutesById {
   '/app/console': typeof AppConsoleRoute
   '/app/vms': typeof AppVmsRoute
   '/app/': typeof AppIndexRoute
+  '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRoute
+  '/app/admin/networks': typeof AppAdminNetworksRoute
+  '/app/admin/quota': typeof AppAdminQuotaRoute
+  '/app/admin/users': typeof AppAdminUsersRoute
+  '/app/admin/': typeof AppAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -110,6 +156,11 @@ export interface FileRouteTypes {
     | '/app/console'
     | '/app/vms'
     | '/app/'
+    | '/app/admin/cluster-offerings'
+    | '/app/admin/networks'
+    | '/app/admin/quota'
+    | '/app/admin/users'
+    | '/app/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -120,6 +171,11 @@ export interface FileRouteTypes {
     | '/app/console'
     | '/app/vms'
     | '/app'
+    | '/app/admin/cluster-offerings'
+    | '/app/admin/networks'
+    | '/app/admin/quota'
+    | '/app/admin/users'
+    | '/app/admin'
   id:
     | '__root__'
     | '/'
@@ -131,6 +187,11 @@ export interface FileRouteTypes {
     | '/app/console'
     | '/app/vms'
     | '/app/'
+    | '/app/admin/cluster-offerings'
+    | '/app/admin/networks'
+    | '/app/admin/quota'
+    | '/app/admin/users'
+    | '/app/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -204,6 +265,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppActivityRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/admin/': {
+      id: '/app/admin/'
+      path: '/admin'
+      fullPath: '/app/admin/'
+      preLoaderRoute: typeof AppAdminIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/users': {
+      id: '/app/admin/users'
+      path: '/admin/users'
+      fullPath: '/app/admin/users'
+      preLoaderRoute: typeof AppAdminUsersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/quota': {
+      id: '/app/admin/quota'
+      path: '/admin/quota'
+      fullPath: '/app/admin/quota'
+      preLoaderRoute: typeof AppAdminQuotaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/networks': {
+      id: '/app/admin/networks'
+      path: '/admin/networks'
+      fullPath: '/app/admin/networks'
+      preLoaderRoute: typeof AppAdminNetworksRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/cluster-offerings': {
+      id: '/app/admin/cluster-offerings'
+      path: '/admin/cluster-offerings'
+      fullPath: '/app/admin/cluster-offerings'
+      preLoaderRoute: typeof AppAdminClusterOfferingsRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -214,6 +310,11 @@ interface AppRouteChildren {
   AppConsoleRoute: typeof AppConsoleRoute
   AppVmsRoute: typeof AppVmsRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppAdminClusterOfferingsRoute: typeof AppAdminClusterOfferingsRoute
+  AppAdminNetworksRoute: typeof AppAdminNetworksRoute
+  AppAdminQuotaRoute: typeof AppAdminQuotaRoute
+  AppAdminUsersRoute: typeof AppAdminUsersRoute
+  AppAdminIndexRoute: typeof AppAdminIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -223,6 +324,11 @@ const AppRouteChildren: AppRouteChildren = {
   AppConsoleRoute: AppConsoleRoute,
   AppVmsRoute: AppVmsRoute,
   AppIndexRoute: AppIndexRoute,
+  AppAdminClusterOfferingsRoute: AppAdminClusterOfferingsRoute,
+  AppAdminNetworksRoute: AppAdminNetworksRoute,
+  AppAdminQuotaRoute: AppAdminQuotaRoute,
+  AppAdminUsersRoute: AppAdminUsersRoute,
+  AppAdminIndexRoute: AppAdminIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
