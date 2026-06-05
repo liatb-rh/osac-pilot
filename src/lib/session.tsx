@@ -17,6 +17,7 @@ export interface Session {
 }
 
 interface SessionCtx extends Session {
+  hydrated: boolean;
   setPersona: (role: RoleId, tenant: TenantId) => void;
   signIn: (user: { name: string; email: string }) => void;
   signOut: () => void;
@@ -27,12 +28,14 @@ const KEY = "osac.session";
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [s, setS] = useState<Session>({ role: null, tenant: null, user: null, signedIn: false });
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
       if (raw) setS(JSON.parse(raw));
     } catch {}
+    setHydrated(true);
   }, []);
 
   useEffect(() => {
@@ -41,6 +44,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const value: SessionCtx = {
     ...s,
+    hydrated,
     setPersona: (role, tenant) => setS((p) => ({ ...p, role, tenant, signedIn: false })),
     signIn: (user) => setS((p) => ({ ...p, user, signedIn: true })),
     signOut: () => setS({ role: null, tenant: null, user: null, signedIn: false }),
