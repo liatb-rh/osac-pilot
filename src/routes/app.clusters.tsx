@@ -30,7 +30,7 @@ function ClustersPage() {
           <Tbody>
             {SEED.map((c) => (
               <Tr key={c.name}>
-                <Td><strong>{c.name}</strong></Td>
+                <Td><Link to="/app/clusters/$name" params={{ name: c.name }} style={{ color: "#0066cc", fontWeight: 600 }}>{c.name}</Link></Td>
                 <Td><span className="osac-status-dot" data-s={c.status} /><span style={{ textTransform: "capitalize" }}>{c.status}</span></Td>
                 <Td>{c.version}</Td>
                 <Td>{c.nodes} workers</Td>
