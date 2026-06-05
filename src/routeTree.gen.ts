@@ -47,8 +47,6 @@ import { Route as AppProviderTenantsIdRouteImport } from './routes/app.provider.
 import { Route as AppProviderStorageTiersIdRouteImport } from './routes/app.provider.storage-tiers.$id'
 import { Route as AppProviderAgentsHostRouteImport } from './routes/app.provider.agents.$host'
 import { Route as AppAdminClusterOfferingsIdRouteImport } from './routes/app.admin.cluster-offerings.$id'
-import { Route as AppProviderTenantsIndexRouteImport } from './routes/app.provider.tenants.index'
-import { Route as AppProviderTenantsIdRouteImport } from './routes/app.provider.tenants.$id'
 
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
@@ -246,6 +244,16 @@ const AppAdminClusterOfferingsIdRoute =
     path: '/$id',
     getParentRoute: () => AppAdminClusterOfferingsRoute,
   } as any)
+const AppProviderTenantsIndexRoute = AppProviderTenantsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppProviderTenantsRoute,
+} as any)
+const AppProviderTenantsIdRoute = AppProviderTenantsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppProviderTenantsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
