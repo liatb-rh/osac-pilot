@@ -47,6 +47,8 @@ import { Route as AppProviderTenantsIdRouteImport } from './routes/app.provider.
 import { Route as AppProviderStorageTiersIdRouteImport } from './routes/app.provider.storage-tiers.$id'
 import { Route as AppProviderAgentsHostRouteImport } from './routes/app.provider.agents.$host'
 import { Route as AppAdminClusterOfferingsIdRouteImport } from './routes/app.admin.cluster-offerings.$id'
+import { Route as AppProviderTenantsIndexRouteImport } from './routes/app.provider.tenants.index'
+import { Route as AppProviderTenantsIdRouteImport } from './routes/app.provider.tenants.$id'
 
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
