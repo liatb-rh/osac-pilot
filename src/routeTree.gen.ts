@@ -25,8 +25,13 @@ import { Route as AppProviderVmsRouteImport } from './routes/app.provider.vms'
 import { Route as AppProviderTenantsRouteImport } from './routes/app.provider.tenants'
 import { Route as AppProviderTemplatesRouteImport } from './routes/app.provider.templates'
 import { Route as AppProviderStorageTiersRouteImport } from './routes/app.provider.storage-tiers'
+import { Route as AppProviderRbacRouteImport } from './routes/app.provider.rbac'
+import { Route as AppProviderOrganizationsRouteImport } from './routes/app.provider.organizations'
+import { Route as AppProviderOnboardingRouteImport } from './routes/app.provider.onboarding'
 import { Route as AppProviderInfrastructureRouteImport } from './routes/app.provider.infrastructure'
 import { Route as AppProviderClustersRouteImport } from './routes/app.provider.clusters'
+import { Route as AppProviderCatalogItemsRouteImport } from './routes/app.provider.catalog-items'
+import { Route as AppProviderAnsibleRouteImport } from './routes/app.provider.ansible'
 import { Route as AppProviderAgentsRouteImport } from './routes/app.provider.agents'
 import { Route as AppClustersNameRouteImport } from './routes/app.clusters.$name'
 import { Route as AppAdminUsersRouteImport } from './routes/app.admin.users'
@@ -115,6 +120,22 @@ const AppProviderStorageTiersRoute = AppProviderStorageTiersRouteImport.update({
   path: '/provider/storage-tiers',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProviderRbacRoute = AppProviderRbacRouteImport.update({
+  id: '/provider/rbac',
+  path: '/provider/rbac',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProviderOrganizationsRoute =
+  AppProviderOrganizationsRouteImport.update({
+    id: '/provider/organizations',
+    path: '/provider/organizations',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppProviderOnboardingRoute = AppProviderOnboardingRouteImport.update({
+  id: '/provider/onboarding',
+  path: '/provider/onboarding',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProviderInfrastructureRoute =
   AppProviderInfrastructureRouteImport.update({
     id: '/provider/infrastructure',
@@ -124,6 +145,16 @@ const AppProviderInfrastructureRoute =
 const AppProviderClustersRoute = AppProviderClustersRouteImport.update({
   id: '/provider/clusters',
   path: '/provider/clusters',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProviderCatalogItemsRoute = AppProviderCatalogItemsRouteImport.update({
+  id: '/provider/catalog-items',
+  path: '/provider/catalog-items',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProviderAnsibleRoute = AppProviderAnsibleRouteImport.update({
+  id: '/provider/ansible',
+  path: '/provider/ansible',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProviderAgentsRoute = AppProviderAgentsRouteImport.update({
@@ -180,8 +211,13 @@ export interface FileRoutesByFullPath {
   '/app/admin/users': typeof AppAdminUsersRoute
   '/app/clusters/$name': typeof AppClustersNameRoute
   '/app/provider/agents': typeof AppProviderAgentsRoute
+  '/app/provider/ansible': typeof AppProviderAnsibleRoute
+  '/app/provider/catalog-items': typeof AppProviderCatalogItemsRoute
   '/app/provider/clusters': typeof AppProviderClustersRoute
   '/app/provider/infrastructure': typeof AppProviderInfrastructureRoute
+  '/app/provider/onboarding': typeof AppProviderOnboardingRoute
+  '/app/provider/organizations': typeof AppProviderOrganizationsRoute
+  '/app/provider/rbac': typeof AppProviderRbacRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
@@ -206,8 +242,13 @@ export interface FileRoutesByTo {
   '/app/admin/users': typeof AppAdminUsersRoute
   '/app/clusters/$name': typeof AppClustersNameRoute
   '/app/provider/agents': typeof AppProviderAgentsRoute
+  '/app/provider/ansible': typeof AppProviderAnsibleRoute
+  '/app/provider/catalog-items': typeof AppProviderCatalogItemsRoute
   '/app/provider/clusters': typeof AppProviderClustersRoute
   '/app/provider/infrastructure': typeof AppProviderInfrastructureRoute
+  '/app/provider/onboarding': typeof AppProviderOnboardingRoute
+  '/app/provider/organizations': typeof AppProviderOrganizationsRoute
+  '/app/provider/rbac': typeof AppProviderRbacRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
@@ -234,8 +275,13 @@ export interface FileRoutesById {
   '/app/admin/users': typeof AppAdminUsersRoute
   '/app/clusters/$name': typeof AppClustersNameRoute
   '/app/provider/agents': typeof AppProviderAgentsRoute
+  '/app/provider/ansible': typeof AppProviderAnsibleRoute
+  '/app/provider/catalog-items': typeof AppProviderCatalogItemsRoute
   '/app/provider/clusters': typeof AppProviderClustersRoute
   '/app/provider/infrastructure': typeof AppProviderInfrastructureRoute
+  '/app/provider/onboarding': typeof AppProviderOnboardingRoute
+  '/app/provider/organizations': typeof AppProviderOrganizationsRoute
+  '/app/provider/rbac': typeof AppProviderRbacRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
@@ -263,8 +309,13 @@ export interface FileRouteTypes {
     | '/app/admin/users'
     | '/app/clusters/$name'
     | '/app/provider/agents'
+    | '/app/provider/ansible'
+    | '/app/provider/catalog-items'
     | '/app/provider/clusters'
     | '/app/provider/infrastructure'
+    | '/app/provider/onboarding'
+    | '/app/provider/organizations'
+    | '/app/provider/rbac'
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
@@ -289,8 +340,13 @@ export interface FileRouteTypes {
     | '/app/admin/users'
     | '/app/clusters/$name'
     | '/app/provider/agents'
+    | '/app/provider/ansible'
+    | '/app/provider/catalog-items'
     | '/app/provider/clusters'
     | '/app/provider/infrastructure'
+    | '/app/provider/onboarding'
+    | '/app/provider/organizations'
+    | '/app/provider/rbac'
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
@@ -316,8 +372,13 @@ export interface FileRouteTypes {
     | '/app/admin/users'
     | '/app/clusters/$name'
     | '/app/provider/agents'
+    | '/app/provider/ansible'
+    | '/app/provider/catalog-items'
     | '/app/provider/clusters'
     | '/app/provider/infrastructure'
+    | '/app/provider/onboarding'
+    | '/app/provider/organizations'
+    | '/app/provider/rbac'
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
@@ -448,6 +509,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProviderStorageTiersRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/provider/rbac': {
+      id: '/app/provider/rbac'
+      path: '/provider/rbac'
+      fullPath: '/app/provider/rbac'
+      preLoaderRoute: typeof AppProviderRbacRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/provider/organizations': {
+      id: '/app/provider/organizations'
+      path: '/provider/organizations'
+      fullPath: '/app/provider/organizations'
+      preLoaderRoute: typeof AppProviderOrganizationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/provider/onboarding': {
+      id: '/app/provider/onboarding'
+      path: '/provider/onboarding'
+      fullPath: '/app/provider/onboarding'
+      preLoaderRoute: typeof AppProviderOnboardingRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/provider/infrastructure': {
       id: '/app/provider/infrastructure'
       path: '/provider/infrastructure'
@@ -460,6 +542,20 @@ declare module '@tanstack/react-router' {
       path: '/provider/clusters'
       fullPath: '/app/provider/clusters'
       preLoaderRoute: typeof AppProviderClustersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/provider/catalog-items': {
+      id: '/app/provider/catalog-items'
+      path: '/provider/catalog-items'
+      fullPath: '/app/provider/catalog-items'
+      preLoaderRoute: typeof AppProviderCatalogItemsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/provider/ansible': {
+      id: '/app/provider/ansible'
+      path: '/provider/ansible'
+      fullPath: '/app/provider/ansible'
+      preLoaderRoute: typeof AppProviderAnsibleRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/provider/agents': {
@@ -563,8 +659,13 @@ interface AppRouteChildren {
   AppAdminQuotaRoute: typeof AppAdminQuotaRoute
   AppAdminUsersRoute: typeof AppAdminUsersRoute
   AppProviderAgentsRoute: typeof AppProviderAgentsRoute
+  AppProviderAnsibleRoute: typeof AppProviderAnsibleRoute
+  AppProviderCatalogItemsRoute: typeof AppProviderCatalogItemsRoute
   AppProviderClustersRoute: typeof AppProviderClustersRoute
   AppProviderInfrastructureRoute: typeof AppProviderInfrastructureRoute
+  AppProviderOnboardingRoute: typeof AppProviderOnboardingRoute
+  AppProviderOrganizationsRoute: typeof AppProviderOrganizationsRoute
+  AppProviderRbacRoute: typeof AppProviderRbacRoute
   AppProviderStorageTiersRoute: typeof AppProviderStorageTiersRoute
   AppProviderTemplatesRoute: typeof AppProviderTemplatesRoute
   AppProviderTenantsRoute: typeof AppProviderTenantsRoute
@@ -585,8 +686,13 @@ const AppRouteChildren: AppRouteChildren = {
   AppAdminQuotaRoute: AppAdminQuotaRoute,
   AppAdminUsersRoute: AppAdminUsersRoute,
   AppProviderAgentsRoute: AppProviderAgentsRoute,
+  AppProviderAnsibleRoute: AppProviderAnsibleRoute,
+  AppProviderCatalogItemsRoute: AppProviderCatalogItemsRoute,
   AppProviderClustersRoute: AppProviderClustersRoute,
   AppProviderInfrastructureRoute: AppProviderInfrastructureRoute,
+  AppProviderOnboardingRoute: AppProviderOnboardingRoute,
+  AppProviderOrganizationsRoute: AppProviderOrganizationsRoute,
+  AppProviderRbacRoute: AppProviderRbacRoute,
   AppProviderStorageTiersRoute: AppProviderStorageTiersRoute,
   AppProviderTemplatesRoute: AppProviderTemplatesRoute,
   AppProviderTenantsRoute: AppProviderTenantsRoute,
