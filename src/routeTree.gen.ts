@@ -18,6 +18,7 @@ import { Route as AppConsoleRouteImport } from './routes/app.console'
 import { Route as AppClustersRouteImport } from './routes/app.clusters'
 import { Route as AppCatalogRouteImport } from './routes/app.catalog'
 import { Route as AppActivityRouteImport } from './routes/app.activity'
+import { Route as AppVmsIndexRouteImport } from './routes/app.vms.index'
 import { Route as AppProviderIndexRouteImport } from './routes/app.provider.index'
 import { Route as AppClustersIndexRouteImport } from './routes/app.clusters.index'
 import { Route as AppAdminIndexRouteImport } from './routes/app.admin.index'
@@ -85,6 +86,11 @@ const AppActivityRoute = AppActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
   getParentRoute: () => AppRoute,
+} as any)
+const AppVmsIndexRoute = AppVmsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppVmsRoute,
 } as any)
 const AppProviderIndexRoute = AppProviderIndexRouteImport.update({
   id: '/provider/',
@@ -232,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/app/admin/': typeof AppAdminIndexRoute
   '/app/clusters/': typeof AppClustersIndexRoute
   '/app/provider/': typeof AppProviderIndexRoute
+  '/app/vms/': typeof AppVmsIndexRoute
   '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
 }
 export interface FileRoutesByTo {
@@ -240,7 +247,6 @@ export interface FileRoutesByTo {
   '/app/activity': typeof AppActivityRoute
   '/app/catalog': typeof AppCatalogRoute
   '/app/console': typeof AppConsoleRoute
-  '/app/vms': typeof AppVmsRouteWithChildren
   '/app': typeof AppIndexRoute
   '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRouteWithChildren
   '/app/admin/networks': typeof AppAdminNetworksRoute
@@ -263,6 +269,7 @@ export interface FileRoutesByTo {
   '/app/admin': typeof AppAdminIndexRoute
   '/app/clusters': typeof AppClustersIndexRoute
   '/app/provider': typeof AppProviderIndexRoute
+  '/app/vms': typeof AppVmsIndexRoute
   '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
 }
 export interface FileRoutesById {
@@ -297,6 +304,7 @@ export interface FileRoutesById {
   '/app/admin/': typeof AppAdminIndexRoute
   '/app/clusters/': typeof AppClustersIndexRoute
   '/app/provider/': typeof AppProviderIndexRoute
+  '/app/vms/': typeof AppVmsIndexRoute
   '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
 }
 export interface FileRouteTypes {
@@ -332,6 +340,7 @@ export interface FileRouteTypes {
     | '/app/admin/'
     | '/app/clusters/'
     | '/app/provider/'
+    | '/app/vms/'
     | '/app/admin/cluster-offerings/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -340,7 +349,6 @@ export interface FileRouteTypes {
     | '/app/activity'
     | '/app/catalog'
     | '/app/console'
-    | '/app/vms'
     | '/app'
     | '/app/admin/cluster-offerings'
     | '/app/admin/networks'
@@ -363,6 +371,7 @@ export interface FileRouteTypes {
     | '/app/admin'
     | '/app/clusters'
     | '/app/provider'
+    | '/app/vms'
     | '/app/admin/cluster-offerings/$id'
   id:
     | '__root__'
@@ -396,6 +405,7 @@ export interface FileRouteTypes {
     | '/app/admin/'
     | '/app/clusters/'
     | '/app/provider/'
+    | '/app/vms/'
     | '/app/admin/cluster-offerings/$id'
   fileRoutesById: FileRoutesById
 }
@@ -469,6 +479,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/activity'
       preLoaderRoute: typeof AppActivityRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/app/vms/': {
+      id: '/app/vms/'
+      path: '/'
+      fullPath: '/app/vms/'
+      preLoaderRoute: typeof AppVmsIndexRouteImport
+      parentRoute: typeof AppVmsRoute
     }
     '/app/provider/': {
       id: '/app/provider/'
@@ -643,10 +660,12 @@ const AppClustersRouteWithChildren = AppClustersRoute._addFileChildren(
 
 interface AppVmsRouteChildren {
   AppVmsNameRoute: typeof AppVmsNameRoute
+  AppVmsIndexRoute: typeof AppVmsIndexRoute
 }
 
 const AppVmsRouteChildren: AppVmsRouteChildren = {
   AppVmsNameRoute: AppVmsNameRoute,
+  AppVmsIndexRoute: AppVmsIndexRoute,
 }
 
 const AppVmsRouteWithChildren =
@@ -730,3 +749,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
