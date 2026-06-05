@@ -157,7 +157,7 @@ function ClusterDetail() {
         </Tab>
 
         <Tab eventKey="addons" title={<TabTitleText>Add-ons</TabTitleText>}>
-          <div style={{ paddingTop: 16 }} className="osac-panel" style={{ padding: 0 }}>
+          <div style={{ paddingTop: 16 }} className="osac-panel">
             <Table>
               <Thead><Tr><Th>Add-on</Th><Th>Version</Th><Th>Status</Th><Th /></Tr></Thead>
               <Tbody>
