@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHeader } from "@/components/osac/Primitives";
 import { Button, Modal, ModalVariant, ModalHeader, ModalBody, Form, FormGroup, TextInput } from "@patternfly/react-core";
