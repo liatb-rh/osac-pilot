@@ -58,7 +58,7 @@ function TenantDetail() {
 
       <PageHeader
         title={dir.name}
-        subtitle={<>Tenant <code>{id}</code> · realm <code>{dir.realm}</code></>}
+        subtitle={`Tenant ${id} · realm ${dir.realm}`}
         actions={
           <>
             <Button variant="secondary">Audit log</Button>
