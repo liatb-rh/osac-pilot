@@ -284,7 +284,7 @@ function PermissionsModal({ role, onClose }: { role: RbacRole | null; onClose: (
             <div style={{ display: "flex", gap: 12, marginBottom: 12, alignItems: "center" }}>
               <SearchInput placeholder="Filter permissions" value={query} onChange={(_, v) => setQuery(v)} onClear={() => setQuery("")} />
               <Badge isRead>{selected.size} granted</Badge>
-              {totalChanged > 0 && <Label color="gold" isCompact>{totalChanged} pending change{totalChanged === 1 ? "" : "s"}</Label>}
+              {totalChanged > 0 && <Label color="orange" isCompact>{totalChanged} pending change{totalChanged === 1 ? "" : "s"}</Label>}
               {role.readOnly && <Label color="grey" isCompact>read-only role</Label>}
             </div>
 
