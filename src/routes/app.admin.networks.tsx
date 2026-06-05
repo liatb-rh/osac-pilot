@@ -22,35 +22,28 @@ type Network = {
   subnets: Subnet[];
 };
 
-const INITIAL: Network[] = [
-  {
-    n: "vn-prod", cidr: "10.10.0.0/16", sg: 6, egress: "restricted", dns: true,
-    desc: "Production workloads",
-    subnets: [
-      { name: "sn-app", cidr: "10.10.4.0/24", zone: "zone-a" },
-      { name: "sn-db", cidr: "10.10.5.0/24", zone: "zone-b" },
-      { name: "sn-edge", cidr: "10.10.6.0/24", zone: "zone-a" },
-      { name: "sn-mgmt", cidr: "10.10.7.0/24", zone: "zone-c" },
-    ],
-  },
-  {
-    n: "vn-dev", cidr: "10.20.0.0/16", sg: 3, egress: "open", dns: true,
-    desc: "Developer sandbox",
-    subnets: [
-      { name: "sn-app", cidr: "10.20.1.0/24", zone: "zone-a" },
-      { name: "sn-db", cidr: "10.20.2.0/24", zone: "zone-a" },
-    ],
-  },
-  {
-    n: "vn-data", cidr: "10.30.0.0/16", sg: 4, egress: "none", dns: false,
-    desc: "Air-gapped data plane",
-    subnets: [
-      { name: "sn-warehouse", cidr: "10.30.1.0/24", zone: "zone-a" },
-      { name: "sn-stream", cidr: "10.30.2.0/24", zone: "zone-b" },
-      { name: "sn-archive", cidr: "10.30.3.0/24", zone: "zone-c" },
-    ],
-  },
-];
+import { VIRTUAL_NETWORKS, SUBNETS, vnetSimpleStatus } from "@/lib/osac-api";
+
+const INITIAL: Network[] = VIRTUAL_NETWORKS.map((vn) => {
+  const subs = SUBNETS.filter((s) => s.spec.virtual_network === vn.id);
+  return {
+    n: vn.metadata.name,
+    cidr: vn.spec.ipv4_cidr ?? vn.spec.ipv6_cidr ?? "—",
+    sg: subs.length + 2,
+    egress: "restricted" as const,
+    dns: true,
+    desc: vn.metadata.annotations["description"] ?? "",
+    subnets: subs.map((s) => ({
+      name: s.metadata.name,
+      cidr: s.spec.ipv4_cidr ?? s.spec.ipv6_cidr ?? "—",
+      zone: "zone-a",
+    })),
+  };
+});
+
+const NETWORK_STATE: Record<string, ReturnType<typeof vnetSimpleStatus>> = Object.fromEntries(
+  VIRTUAL_NETWORKS.map((vn) => [vn.metadata.name, vnetSimpleStatus(vn.status.state)]),
+);
 
 const NODES = [
   { id: "vn-prod", x: 60, y: 50, label: "vn-prod", sub: "10.10.0.0/16" },
