@@ -72,11 +72,14 @@ function NetworksPage() {
 
       <div className="osac-panel" style={{ marginBottom: 16, padding: 0, overflow: "hidden" }}>
         <Table>
-          <Thead><Tr><Th>Name</Th><Th>CIDR</Th><Th>Subnets</Th><Th>Security groups</Th><Th /></Tr></Thead>
+          <Thead><Tr><Th>Name</Th><Th>State</Th><Th>CIDR</Th><Th>Subnets</Th><Th>Security groups</Th><Th /></Tr></Thead>
           <Tbody>
-            {networks.map((n) => (
+            {networks.map((n) => {
+              const st = NETWORK_STATE[n.n] ?? "ready";
+              return (
               <Tr key={n.n}>
                 <Td><strong>{n.n}</strong></Td>
+                <Td><span className="osac-status-dot" data-s={st} /><span style={{ textTransform: "capitalize" }}>{st === "ready" ? "Ready" : st === "progressing" ? "Pending" : "Failed"}</span></Td>
                 <Td><code>{n.cidr}</code></Td>
                 <Td><Label isCompact>{n.subnets.length}</Label></Td>
                 <Td><Label isCompact color="blue">{n.sg}</Label></Td>
