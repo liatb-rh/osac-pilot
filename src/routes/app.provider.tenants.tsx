@@ -4,7 +4,7 @@ import { PageHeader, Kpi } from "@/components/osac/Primitives";
 import {
   Button, Label, Modal, ModalVariant, ModalHeader, ModalBody,
   Wizard, WizardStep, Form, FormGroup, TextInput, TextArea, FormSelect, FormSelectOption,
-  Switch, Checkbox, Alert, Slider, NumberInput, Chip, ChipGroup,
+  Switch, Checkbox, Alert, Slider, NumberInput,
 } from "@patternfly/react-core";
 import { Table, Thead, Tr, Th, Tbody, Td, ActionsColumn } from "@patternfly/react-table";
 import { PlusCircleIcon, BuildingIcon } from "@patternfly/react-icons";
@@ -138,7 +138,7 @@ function OnboardTenantWizard({
                 <TextInput id="n" value={name} onChange={(_, v) => setName(v)} />
               </FormGroup>
               <FormGroup label="Tenant ID" isRequired fieldId="tid"
-                helperText="Immutable. Used in URLs, labels, VAST view prefixes, and Authorino claims.">
+               >
                 <TextInput id="tid" value={id} onChange={(_, v) => setId(v.toLowerCase().replace(/[^a-z0-9-]/g, ""))} />
               </FormGroup>
               <FormGroup label="Keycloak realm" isRequired fieldId="r">
@@ -167,7 +167,7 @@ function OnboardTenantWizard({
                 <TextInput id="cid" value={idpClientId} onChange={(_, v) => setIdpClientId(v)} />
               </FormGroup>
               <FormGroup label="Group claim" fieldId="gc"
-                helperText="Mapped to OSAC roles via Keycloak group-to-role mappers.">
+               >
                 <TextInput id="gc" value={groupClaim} onChange={(_, v) => setGroupClaim(v)} />
               </FormGroup>
               <Alert variant="info" isInline isPlain
@@ -199,7 +199,7 @@ function OnboardTenantWizard({
                 </FormGroup>
               </div>
               <FormGroup label="Storage tiers (TiB per tier)" fieldId="tiers"
-                helperText="Selected tiers will reconcile a per-tenant StorageClass + VolumeSnapshotClass when the tenant's first cluster reaches Ready.">
+               >
                 <div style={{ display: "grid", gap: 8 }}>
                   {STORAGE_TIERS.map((t) => {
                     const enabled = t.id in tiers;
@@ -233,7 +233,7 @@ function OnboardTenantWizard({
           <WizardStep name="RBAC & access" id="t-rbac">
             <Form>
               <FormGroup label="Initial Tenant Admin email" isRequired fieldId="ae"
-                helperText="A Keycloak user will be created and assigned the tenantAdmin role.">
+               >
                 <TextInput id="ae" type="email" value={adminEmail} onChange={(_, v) => setAdminEmail(v)} />
               </FormGroup>
               <FormGroup fieldId="seed">
