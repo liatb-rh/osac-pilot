@@ -9,20 +9,28 @@ import {
 import { Table, Thead, Tr, Th, Tbody, Td, ActionsColumn } from "@patternfly/react-table";
 import { PlusCircleIcon, TerminalIcon } from "@patternfly/react-icons";
 
+import { COMPUTE_INSTANCES, vmSimpleStatus } from "@/lib/osac-api";
+
 export const Route = createFileRoute("/app/vms")({
   component: VmsPage,
 });
 
 interface VM { name: string; status: "running" | "stopped" | "progressing" | "failed"; os: string; cpu: number; ram: number; ip: string; }
 
-const SEED: VM[] = [
-  { name: "bnk-app-01", status: "running", os: "RHEL 9", cpu: 4, ram: 16, ip: "10.10.4.21" },
-  { name: "bnk-app-02", status: "running", os: "RHEL 9", cpu: 8, ram: 32, ip: "10.10.4.22" },
-  { name: "bnk-warehouse", status: "stopped", os: "Ubuntu 22", cpu: 16, ram: 64, ip: "10.10.4.23" },
-  { name: "bnk-app-04", status: "progressing", os: "RHEL 9", cpu: 4, ram: 16, ip: "—" },
-  { name: "bnk-api-01", status: "running", os: "RHEL 9", cpu: 2, ram: 8, ip: "10.10.4.31" },
-  { name: "bnk-ml-01", status: "failed", os: "Ubuntu 22", cpu: 32, ram: 128, ip: "—" },
-];
+const SEED: VM[] = COMPUTE_INSTANCES.map((ci) => {
+  const s = vmSimpleStatus(ci.status.state);
+  const ui: VM["status"] = s === "ready" ? "running" : s === "stopped" ? "stopped" : s === "failed" ? "failed" : "progressing";
+  const osRef = ci.spec.image?.source_ref ?? "";
+  const os = osRef.includes("ubuntu") ? "Ubuntu 22" : "RHEL 9";
+  return {
+    name: ci.metadata.name,
+    status: ui,
+    os,
+    cpu: ci.spec.cores,
+    ram: ci.spec.memory_gib,
+    ip: ci.status.internal_ip_address || "—",
+  };
+});
 
 function VmsPage() {
   const [filter, setFilter] = useState<"all" | "running" | "stopped">("all");

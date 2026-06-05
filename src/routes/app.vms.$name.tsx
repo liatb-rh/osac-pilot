@@ -12,6 +12,8 @@ import {
   CopyIcon, PlayIcon, TrashIcon,
 } from "@patternfly/react-icons";
 
+import { findVM, vmSimpleStatus } from "@/lib/osac-api";
+
 export const Route = createFileRoute("/app/vms/$name")({ component: VmDetail });
 
 interface VMInfo {
@@ -20,18 +22,23 @@ interface VMInfo {
   template: string; created: string; project: string; node: string;
 }
 
-const VM_INDEX: Record<string, VMInfo> = {
-  "bnk-app-01": { name: "bnk-app-01", status: "running", os: "RHEL 9.4", cpu: 4, ram: 16, ip: "10.10.4.21", disk: 80, template: "rhel-9-medium", created: "2026-04-12", project: "payments-prod", node: "worker-az1-03" },
-  "bnk-app-02": { name: "bnk-app-02", status: "running", os: "RHEL 9.4", cpu: 8, ram: 32, ip: "10.10.4.22", disk: 200, template: "rhel-9-large", created: "2026-04-12", project: "payments-prod", node: "worker-az2-01" },
-  "bnk-warehouse": { name: "bnk-warehouse", status: "stopped", os: "Ubuntu 22.04", cpu: 16, ram: 64, ip: "10.10.4.23", disk: 1024, template: "ubuntu-22-large", created: "2026-03-02", project: "analytics", node: "worker-az3-02" },
-  "bnk-app-04": { name: "bnk-app-04", status: "progressing", os: "RHEL 9.4", cpu: 4, ram: 16, ip: "—", disk: 80, template: "rhel-9-medium", created: "2026-06-05", project: "payments-stg", node: "—" },
-  "bnk-api-01": { name: "bnk-api-01", status: "running", os: "RHEL 9.4", cpu: 2, ram: 8, ip: "10.10.4.31", disk: 60, template: "rhel-9-small", created: "2026-05-21", project: "edge-api", node: "worker-az1-05" },
-  "bnk-ml-01": { name: "bnk-ml-01", status: "failed", os: "Ubuntu 22.04", cpu: 32, ram: 128, ip: "—", disk: 2048, template: "ubuntu-22-large", created: "2026-06-01", project: "ai-platform", node: "gpu-az2-01" },
-};
-
 function VmDetail() {
   const { name } = Route.useParams();
-  const vm: VMInfo = VM_INDEX[name] ?? {
+  const ci = findVM(name);
+  const s = ci ? vmSimpleStatus(ci.status.state) : "stopped";
+  const ui: VMInfo["status"] = s === "ready" ? "running" : s === "stopped" ? "stopped" : s === "failed" ? "failed" : "progressing";
+  const osRef = ci?.spec.image?.source_ref ?? "";
+  const vm: VMInfo = ci ? {
+    name: ci.metadata.name, status: ui,
+    os: osRef.includes("ubuntu") ? "Ubuntu 22.04" : "RHEL 9.4",
+    cpu: ci.spec.cores, ram: ci.spec.memory_gib,
+    ip: ci.status.internal_ip_address || "—",
+    disk: ci.spec.boot_disk.size_gib,
+    template: ci.spec.template ?? ci.spec.catalog_item ?? "—",
+    created: ci.metadata.creation_timestamp?.slice(0, 10) ?? "—",
+    project: ci.metadata.labels["app"] ?? "default",
+    node: ci.status.internal_ip_address ? `worker-${ci.id.slice(-2)}` : "—",
+  } : {
     name, status: "stopped", os: "RHEL 9.4", cpu: 2, ram: 8, ip: "—",
     disk: 40, template: "rhel-9-small", created: "—", project: "default", node: "—",
   };

@@ -14,18 +14,14 @@ import {
   CheckCircleIcon, InProgressIcon, OutlinedCircleIcon,
 } from "@patternfly/react-icons";
 
+import { findCluster, clusterSimpleStatus } from "@/lib/osac-api";
+
 export const Route = createFileRoute("/app/clusters/$name")({ component: ClusterDetail });
 
 interface ClusterInfo {
   name: string; version: string; nodes: number; status: "ready" | "progressing" | "upgrading" | "failed";
   region: string; network: string; created: string; storageReady: boolean;
 }
-
-const CLUSTER_INDEX: Record<string, ClusterInfo> = {
-  "prod-ocp": { name: "prod-ocp", version: "4.17.3", nodes: 9, status: "upgrading", region: "eu-central-1", network: "vn-prod", created: "2025-11-04", storageReady: true },
-  "stg-ocp": { name: "stg-ocp", version: "4.17.1", nodes: 6, status: "ready", region: "eu-central-1", network: "vn-stg", created: "2026-01-22", storageReady: true },
-  "dev-ocp": { name: "dev-ocp", version: "4.16.8", nodes: 3, status: "ready", region: "eu-central-1", network: "vn-dev", created: "2026-03-09", storageReady: false },
-};
 
 const TIER_DESCRIPTION: Record<string, string> = {
   fast: "Low-latency NVMe pool for transactional and OLTP workloads.",
@@ -35,7 +31,20 @@ const TIER_DESCRIPTION: Record<string, string> = {
 
 function ClusterDetail() {
   const { name } = Route.useParams();
-  const c: ClusterInfo = CLUSTER_INDEX[name] ?? {
+  const cl = findCluster(name);
+  const s = cl ? clusterSimpleStatus(cl.status.state) : "ready";
+  const progressing = cl?.status.conditions.find((x) => x.type === "CLUSTER_CONDITION_TYPE_PROGRESSING" && x.status === "CONDITION_STATUS_TRUE");
+  const ui: ClusterInfo["status"] = progressing ? "upgrading" : s === "ready" ? "ready" : s === "failed" ? "failed" : "progressing";
+  const c: ClusterInfo = cl ? {
+    name: cl.metadata.name,
+    version: (cl.spec.release_image ?? "").split(":").pop()?.replace("-multi", "") ?? "4.17.3",
+    nodes: Object.values(cl.spec.node_sets).reduce((a, ns) => a + ns.size, 0),
+    status: ui,
+    region: "eu-central-1",
+    network: cl.metadata.labels["env"] ? `vn-${cl.metadata.labels["env"]}` : "vn-default",
+    created: cl.metadata.creation_timestamp?.slice(0, 10) ?? "—",
+    storageReady: ui === "ready" || ui === "upgrading",
+  } : {
     name, version: "4.17.3", nodes: 3, status: "ready",
     region: "eu-central-1", network: "vn-default", created: "—", storageReady: true,
   };
