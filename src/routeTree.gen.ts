@@ -244,16 +244,6 @@ const AppAdminClusterOfferingsIdRoute =
     path: '/$id',
     getParentRoute: () => AppAdminClusterOfferingsRoute,
   } as any)
-const AppProviderTenantsIndexRoute = AppProviderTenantsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppProviderTenantsRoute,
-} as any)
-const AppProviderTenantsIdRoute = AppProviderTenantsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AppProviderTenantsRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
