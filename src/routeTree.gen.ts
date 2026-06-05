@@ -40,6 +40,8 @@ import { Route as AppAdminUsersRouteImport } from './routes/app.admin.users'
 import { Route as AppAdminQuotaRouteImport } from './routes/app.admin.quota'
 import { Route as AppAdminNetworksRouteImport } from './routes/app.admin.networks'
 import { Route as AppAdminClusterOfferingsRouteImport } from './routes/app.admin.cluster-offerings'
+import { Route as AppProviderAgentsIndexRouteImport } from './routes/app.provider.agents.index'
+import { Route as AppProviderAgentsHostRouteImport } from './routes/app.provider.agents.$host'
 import { Route as AppAdminClusterOfferingsIdRouteImport } from './routes/app.admin.cluster-offerings.$id'
 
 const SignInRoute = SignInRouteImport.update({
@@ -200,6 +202,16 @@ const AppAdminClusterOfferingsRoute =
     path: '/admin/cluster-offerings',
     getParentRoute: () => AppRoute,
   } as any)
+const AppProviderAgentsIndexRoute = AppProviderAgentsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppProviderAgentsRoute,
+} as any)
+const AppProviderAgentsHostRoute = AppProviderAgentsHostRouteImport.update({
+  id: '/$host',
+  path: '/$host',
+  getParentRoute: () => AppProviderAgentsRoute,
+} as any)
 const AppAdminClusterOfferingsIdRoute =
   AppAdminClusterOfferingsIdRouteImport.update({
     id: '/$id',
@@ -222,7 +234,7 @@ export interface FileRoutesByFullPath {
   '/app/admin/quota': typeof AppAdminQuotaRoute
   '/app/admin/users': typeof AppAdminUsersRoute
   '/app/clusters/$name': typeof AppClustersNameRoute
-  '/app/provider/agents': typeof AppProviderAgentsRoute
+  '/app/provider/agents': typeof AppProviderAgentsRouteWithChildren
   '/app/provider/ansible': typeof AppProviderAnsibleRoute
   '/app/provider/catalog-items': typeof AppProviderCatalogItemsRoute
   '/app/provider/clusters': typeof AppProviderClustersRoute
@@ -240,6 +252,8 @@ export interface FileRoutesByFullPath {
   '/app/provider/': typeof AppProviderIndexRoute
   '/app/vms/': typeof AppVmsIndexRoute
   '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
+  '/app/provider/agents/$host': typeof AppProviderAgentsHostRoute
+  '/app/provider/agents/': typeof AppProviderAgentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -253,7 +267,6 @@ export interface FileRoutesByTo {
   '/app/admin/quota': typeof AppAdminQuotaRoute
   '/app/admin/users': typeof AppAdminUsersRoute
   '/app/clusters/$name': typeof AppClustersNameRoute
-  '/app/provider/agents': typeof AppProviderAgentsRoute
   '/app/provider/ansible': typeof AppProviderAnsibleRoute
   '/app/provider/catalog-items': typeof AppProviderCatalogItemsRoute
   '/app/provider/clusters': typeof AppProviderClustersRoute
@@ -271,6 +284,8 @@ export interface FileRoutesByTo {
   '/app/provider': typeof AppProviderIndexRoute
   '/app/vms': typeof AppVmsIndexRoute
   '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
+  '/app/provider/agents/$host': typeof AppProviderAgentsHostRoute
+  '/app/provider/agents': typeof AppProviderAgentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -288,7 +303,7 @@ export interface FileRoutesById {
   '/app/admin/quota': typeof AppAdminQuotaRoute
   '/app/admin/users': typeof AppAdminUsersRoute
   '/app/clusters/$name': typeof AppClustersNameRoute
-  '/app/provider/agents': typeof AppProviderAgentsRoute
+  '/app/provider/agents': typeof AppProviderAgentsRouteWithChildren
   '/app/provider/ansible': typeof AppProviderAnsibleRoute
   '/app/provider/catalog-items': typeof AppProviderCatalogItemsRoute
   '/app/provider/clusters': typeof AppProviderClustersRoute
@@ -306,6 +321,8 @@ export interface FileRoutesById {
   '/app/provider/': typeof AppProviderIndexRoute
   '/app/vms/': typeof AppVmsIndexRoute
   '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
+  '/app/provider/agents/$host': typeof AppProviderAgentsHostRoute
+  '/app/provider/agents/': typeof AppProviderAgentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -342,6 +359,8 @@ export interface FileRouteTypes {
     | '/app/provider/'
     | '/app/vms/'
     | '/app/admin/cluster-offerings/$id'
+    | '/app/provider/agents/$host'
+    | '/app/provider/agents/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -355,7 +374,6 @@ export interface FileRouteTypes {
     | '/app/admin/quota'
     | '/app/admin/users'
     | '/app/clusters/$name'
-    | '/app/provider/agents'
     | '/app/provider/ansible'
     | '/app/provider/catalog-items'
     | '/app/provider/clusters'
@@ -373,6 +391,8 @@ export interface FileRouteTypes {
     | '/app/provider'
     | '/app/vms'
     | '/app/admin/cluster-offerings/$id'
+    | '/app/provider/agents/$host'
+    | '/app/provider/agents'
   id:
     | '__root__'
     | '/'
@@ -407,6 +427,8 @@ export interface FileRouteTypes {
     | '/app/provider/'
     | '/app/vms/'
     | '/app/admin/cluster-offerings/$id'
+    | '/app/provider/agents/$host'
+    | '/app/provider/agents/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -634,6 +656,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminClusterOfferingsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/provider/agents/': {
+      id: '/app/provider/agents/'
+      path: '/'
+      fullPath: '/app/provider/agents/'
+      preLoaderRoute: typeof AppProviderAgentsIndexRouteImport
+      parentRoute: typeof AppProviderAgentsRoute
+    }
+    '/app/provider/agents/$host': {
+      id: '/app/provider/agents/$host'
+      path: '/$host'
+      fullPath: '/app/provider/agents/$host'
+      preLoaderRoute: typeof AppProviderAgentsHostRouteImport
+      parentRoute: typeof AppProviderAgentsRoute
+    }
     '/app/admin/cluster-offerings/$id': {
       id: '/app/admin/cluster-offerings/$id'
       path: '/$id'
@@ -685,6 +721,19 @@ const AppAdminClusterOfferingsRouteWithChildren =
     AppAdminClusterOfferingsRouteChildren,
   )
 
+interface AppProviderAgentsRouteChildren {
+  AppProviderAgentsHostRoute: typeof AppProviderAgentsHostRoute
+  AppProviderAgentsIndexRoute: typeof AppProviderAgentsIndexRoute
+}
+
+const AppProviderAgentsRouteChildren: AppProviderAgentsRouteChildren = {
+  AppProviderAgentsHostRoute: AppProviderAgentsHostRoute,
+  AppProviderAgentsIndexRoute: AppProviderAgentsIndexRoute,
+}
+
+const AppProviderAgentsRouteWithChildren =
+  AppProviderAgentsRoute._addFileChildren(AppProviderAgentsRouteChildren)
+
 interface AppRouteChildren {
   AppActivityRoute: typeof AppActivityRoute
   AppCatalogRoute: typeof AppCatalogRoute
@@ -696,7 +745,7 @@ interface AppRouteChildren {
   AppAdminNetworksRoute: typeof AppAdminNetworksRoute
   AppAdminQuotaRoute: typeof AppAdminQuotaRoute
   AppAdminUsersRoute: typeof AppAdminUsersRoute
-  AppProviderAgentsRoute: typeof AppProviderAgentsRoute
+  AppProviderAgentsRoute: typeof AppProviderAgentsRouteWithChildren
   AppProviderAnsibleRoute: typeof AppProviderAnsibleRoute
   AppProviderCatalogItemsRoute: typeof AppProviderCatalogItemsRoute
   AppProviderClustersRoute: typeof AppProviderClustersRoute
@@ -723,7 +772,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppAdminNetworksRoute: AppAdminNetworksRoute,
   AppAdminQuotaRoute: AppAdminQuotaRoute,
   AppAdminUsersRoute: AppAdminUsersRoute,
-  AppProviderAgentsRoute: AppProviderAgentsRoute,
+  AppProviderAgentsRoute: AppProviderAgentsRouteWithChildren,
   AppProviderAnsibleRoute: AppProviderAnsibleRoute,
   AppProviderCatalogItemsRoute: AppProviderCatalogItemsRoute,
   AppProviderClustersRoute: AppProviderClustersRoute,
