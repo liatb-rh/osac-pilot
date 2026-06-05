@@ -288,11 +288,11 @@ function OnboardTenantWizard({
                 <ReviewRow k="Compute" v={`${cores} vCPU · ${memGib} GiB · up to ${vmCount} VMs · ${clusterCount} clusters`} />
                 <ReviewRow k="Storage" v={
                   Object.keys(tiers).length === 0 ? <em style={{ color: "#5b6b7c" }}>none</em> : (
-                    <ChipGroup numChips={5}>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                       {Object.entries(tiers).map(([t, q]) => (
-                        <Chip key={t} isReadOnly>{t}: {q} TiB</Chip>
+                        <Label key={t} isCompact color="blue">{t}: {q} TiB</Label>
                       ))}
-                    </ChipGroup>
+                    </div>
                   )
                 } />
               </ReviewCard>
