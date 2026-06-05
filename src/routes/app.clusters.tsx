@@ -22,6 +22,7 @@ const SEED: Cluster[] = CLUSTERS.map((c) => {
 
 function ClustersPage() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
   return (
     <>
       <PageHeader title="Clusters" subtitle="OpenShift clusters provisioned for this tenant organization."
