@@ -10,7 +10,7 @@ import { Table, Thead, Tr, Th, Tbody, Td, ActionsColumn } from "@patternfly/reac
 import { PlusCircleIcon, BuildingIcon } from "@patternfly/react-icons";
 import { STORAGE_TIERS } from "@/lib/storage-tiers-data";
 
-export const Route = createFileRoute("/app/provider/tenants")({ component: TenantsPage });
+export const Route = createFileRoute("/app/provider/tenants/")({ component: TenantsPage });
 
 type TenantRow = {
   n: string; id: string; users: number; vms: number; cl: number; status: "active" | "onboarding";
