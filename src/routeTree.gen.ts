@@ -21,6 +21,7 @@ import { Route as AppActivityRouteImport } from './routes/app.activity'
 import { Route as AppProviderIndexRouteImport } from './routes/app.provider.index'
 import { Route as AppAdminIndexRouteImport } from './routes/app.admin.index'
 import { Route as AppVmsNameRouteImport } from './routes/app.vms.$name'
+import { Route as AppProviderVmsRouteImport } from './routes/app.provider.vms'
 import { Route as AppProviderTenantsRouteImport } from './routes/app.provider.tenants'
 import { Route as AppProviderTemplatesRouteImport } from './routes/app.provider.templates'
 import { Route as AppProviderStorageTiersRouteImport } from './routes/app.provider.storage-tiers'
@@ -93,6 +94,11 @@ const AppVmsNameRoute = AppVmsNameRouteImport.update({
   id: '/$name',
   path: '/$name',
   getParentRoute: () => AppVmsRoute,
+} as any)
+const AppProviderVmsRoute = AppProviderVmsRouteImport.update({
+  id: '/provider/vms',
+  path: '/provider/vms',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppProviderTenantsRoute = AppProviderTenantsRouteImport.update({
   id: '/provider/tenants',
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
+  '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
   '/app/admin/': typeof AppAdminIndexRoute
   '/app/provider/': typeof AppProviderIndexRoute
@@ -204,6 +211,7 @@ export interface FileRoutesByTo {
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
+  '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
   '/app/admin': typeof AppAdminIndexRoute
   '/app/provider': typeof AppProviderIndexRoute
@@ -231,6 +239,7 @@ export interface FileRoutesById {
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
+  '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
   '/app/admin/': typeof AppAdminIndexRoute
   '/app/provider/': typeof AppProviderIndexRoute
@@ -259,6 +268,7 @@ export interface FileRouteTypes {
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
+    | '/app/provider/vms'
     | '/app/vms/$name'
     | '/app/admin/'
     | '/app/provider/'
@@ -284,6 +294,7 @@ export interface FileRouteTypes {
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
+    | '/app/provider/vms'
     | '/app/vms/$name'
     | '/app/admin'
     | '/app/provider'
@@ -310,6 +321,7 @@ export interface FileRouteTypes {
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
+    | '/app/provider/vms'
     | '/app/vms/$name'
     | '/app/admin/'
     | '/app/provider/'
@@ -407,6 +419,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/vms/$name'
       preLoaderRoute: typeof AppVmsNameRouteImport
       parentRoute: typeof AppVmsRoute
+    }
+    '/app/provider/vms': {
+      id: '/app/provider/vms'
+      path: '/provider/vms'
+      fullPath: '/app/provider/vms'
+      preLoaderRoute: typeof AppProviderVmsRouteImport
+      parentRoute: typeof AppRoute
     }
     '/app/provider/tenants': {
       id: '/app/provider/tenants'
@@ -549,6 +568,7 @@ interface AppRouteChildren {
   AppProviderStorageTiersRoute: typeof AppProviderStorageTiersRoute
   AppProviderTemplatesRoute: typeof AppProviderTemplatesRoute
   AppProviderTenantsRoute: typeof AppProviderTenantsRoute
+  AppProviderVmsRoute: typeof AppProviderVmsRoute
   AppAdminIndexRoute: typeof AppAdminIndexRoute
   AppProviderIndexRoute: typeof AppProviderIndexRoute
 }
@@ -570,6 +590,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProviderStorageTiersRoute: AppProviderStorageTiersRoute,
   AppProviderTemplatesRoute: AppProviderTemplatesRoute,
   AppProviderTenantsRoute: AppProviderTenantsRoute,
+  AppProviderVmsRoute: AppProviderVmsRoute,
   AppAdminIndexRoute: AppAdminIndexRoute,
   AppProviderIndexRoute: AppProviderIndexRoute,
 }
