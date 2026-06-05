@@ -87,6 +87,8 @@ const providerAdminGrants: PermissionId[] = [
   "manage_global_templates","view_infrastructure","view_topology","view_clusters",
   "view_cluster_catalog_items","manage_cluster_offerings","view_agents",
   "manage_agents","view_storage_tiers","manage_storage_tiers",
+  "manage_organizations","manage_rbac","onboard_tenants","manage_catalog_items",
+  "view_ansible_collection",
 ];
 
 export const ROLE_PERMISSIONS: Record<RoleId, Set<PermissionId>> = {
