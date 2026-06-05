@@ -2,18 +2,54 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHeader } from "@/components/osac/Primitives";
 import {
-  Button, Label, Modal, ModalVariant, ModalHeader, ModalBody,
+  Button, Label, Modal, ModalVariant, ModalHeader, ModalBody, ModalFooter,
   Wizard, WizardStep, Form, FormGroup, TextInput, TextArea, Checkbox,
-  NumberInput, Radio,
+  NumberInput, Radio, Alert,
 } from "@patternfly/react-core";
 import { Table, Thead, Tr, Th, Tbody, Td, ActionsColumn } from "@patternfly/react-table";
+import TrashIcon from "@patternfly/react-icons/dist/esm/icons/trash-icon";
 
 export const Route = createFileRoute("/app/admin/networks")({ component: NetworksPage });
 
-const NETWORKS = [
-  { n: "vn-prod", cidr: "10.10.0.0/16", subnets: 4, sg: 6 },
-  { n: "vn-dev", cidr: "10.20.0.0/16", subnets: 2, sg: 3 },
-  { n: "vn-data", cidr: "10.30.0.0/16", subnets: 3, sg: 4 },
+type Subnet = { name: string; cidr: string; zone: string };
+type Network = {
+  n: string;
+  cidr: string;
+  sg: number;
+  desc?: string;
+  egress: "restricted" | "open" | "none";
+  dns: boolean;
+  subnets: Subnet[];
+};
+
+const INITIAL: Network[] = [
+  {
+    n: "vn-prod", cidr: "10.10.0.0/16", sg: 6, egress: "restricted", dns: true,
+    desc: "Production workloads",
+    subnets: [
+      { name: "sn-app", cidr: "10.10.4.0/24", zone: "zone-a" },
+      { name: "sn-db", cidr: "10.10.5.0/24", zone: "zone-b" },
+      { name: "sn-edge", cidr: "10.10.6.0/24", zone: "zone-a" },
+      { name: "sn-mgmt", cidr: "10.10.7.0/24", zone: "zone-c" },
+    ],
+  },
+  {
+    n: "vn-dev", cidr: "10.20.0.0/16", sg: 3, egress: "open", dns: true,
+    desc: "Developer sandbox",
+    subnets: [
+      { name: "sn-app", cidr: "10.20.1.0/24", zone: "zone-a" },
+      { name: "sn-db", cidr: "10.20.2.0/24", zone: "zone-a" },
+    ],
+  },
+  {
+    n: "vn-data", cidr: "10.30.0.0/16", sg: 4, egress: "none", dns: false,
+    desc: "Air-gapped data plane",
+    subnets: [
+      { name: "sn-warehouse", cidr: "10.30.1.0/24", zone: "zone-a" },
+      { name: "sn-stream", cidr: "10.30.2.0/24", zone: "zone-b" },
+      { name: "sn-archive", cidr: "10.30.3.0/24", zone: "zone-c" },
+    ],
+  },
 ];
 
 const NODES = [
@@ -26,7 +62,15 @@ const NODES = [
 ];
 
 function NetworksPage() {
+  const [networks, setNetworks] = useState<Network[]>(INITIAL);
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<Network | null>(null);
+  const [subnetsTarget, setSubnetsTarget] = useState<Network | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Network | null>(null);
+
+  const upsert = (next: Network) =>
+    setNetworks((list) => list.map((x) => (x.n === next.n ? next : x)));
+
   return (
     <>
       <PageHeader title="Networks" subtitle="Virtual networks, subnets, and topology for your tenant."
@@ -37,13 +81,20 @@ function NetworksPage() {
         <Table>
           <Thead><Tr><Th>Name</Th><Th>CIDR</Th><Th>Subnets</Th><Th>Security groups</Th><Th /></Tr></Thead>
           <Tbody>
-            {NETWORKS.map((n) => (
+            {networks.map((n) => (
               <Tr key={n.n}>
                 <Td><strong>{n.n}</strong></Td>
                 <Td><code>{n.cidr}</code></Td>
-                <Td><Label isCompact>{n.subnets}</Label></Td>
+                <Td><Label isCompact>{n.subnets.length}</Label></Td>
                 <Td><Label isCompact color="blue">{n.sg}</Label></Td>
-                <Td isActionCell><ActionsColumn items={[{ title: "Manage subnets" }, { title: "Edit" }, { isSeparator: true }, { title: "Delete" }]} /></Td>
+                <Td isActionCell>
+                  <ActionsColumn items={[
+                    { title: "Manage subnets", onClick: () => setSubnetsTarget(n) },
+                    { title: "Edit", onClick: () => setEditTarget(n) },
+                    { isSeparator: true },
+                    { title: "Delete", onClick: () => setDeleteTarget(n) },
+                  ]} />
+                </Td>
               </Tr>
             ))}
           </Tbody>
@@ -76,7 +127,129 @@ function NetworksPage() {
           <NewNetworkWizard onDone={() => setWizardOpen(false)} />
         </ModalBody>
       </Modal>
+
+      {editTarget && (
+        <EditNetworkModal
+          network={editTarget}
+          onClose={() => setEditTarget(null)}
+          onSave={(next) => { upsert(next); setEditTarget(null); }}
+        />
+      )}
+
+      {subnetsTarget && (
+        <ManageSubnetsModal
+          network={subnetsTarget}
+          onClose={() => setSubnetsTarget(null)}
+          onSave={(next) => { upsert(next); setSubnetsTarget(null); }}
+        />
+      )}
+
+      {deleteTarget && (
+        <Modal variant={ModalVariant.small} isOpen onClose={() => setDeleteTarget(null)} aria-label="Delete network">
+          <ModalHeader title={`Delete ${deleteTarget.n}?`} titleIconVariant="danger" />
+          <ModalBody>
+            <Alert variant="warning" isInline title="This will release the CIDR allocation and remove all subnets and security groups attached to this network." />
+            <p style={{ marginTop: 12 }}>Running workloads bound to this network will lose connectivity. Type the network name to confirm in a real environment.</p>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="danger" onClick={() => { setNetworks((l) => l.filter((x) => x.n !== deleteTarget.n)); setDeleteTarget(null); }}>Delete network</Button>
+            <Button variant="link" onClick={() => setDeleteTarget(null)}>Cancel</Button>
+          </ModalFooter>
+        </Modal>
+      )}
     </>
+  );
+}
+
+function EditNetworkModal({ network, onClose, onSave }: { network: Network; onClose: () => void; onSave: (n: Network) => void }) {
+  const [name, setName] = useState(network.n);
+  const [desc, setDesc] = useState(network.desc ?? "");
+  const [cidr, setCidr] = useState(network.cidr);
+  const [egress, setEgress] = useState(network.egress);
+  const [dns, setDns] = useState(network.dns);
+
+  return (
+    <Modal variant={ModalVariant.medium} isOpen onClose={onClose} aria-label="Edit network">
+      <ModalHeader title={`Edit ${network.n}`} description="Update network identity, address space, and policy." />
+      <ModalBody>
+        <Form>
+          <FormGroup label="Network name" isRequired fieldId="en"><TextInput id="en" value={name} onChange={(_, v) => setName(v)} /></FormGroup>
+          <FormGroup label="Description" fieldId="ed"><TextArea id="ed" value={desc} onChange={(_, v) => setDesc(v)} rows={2} /></FormGroup>
+          <FormGroup label="IPv4 CIDR block" isRequired fieldId="ec"><TextInput id="ec" value={cidr} onChange={(_, v) => setCidr(v)} /></FormGroup>
+          <FormGroup label="Default egress policy" fieldId="eg" role="radiogroup">
+            <Radio id="ee-restricted" name="eedge" label="Restricted" isChecked={egress === "restricted"} onChange={() => setEgress("restricted")} />
+            <Radio id="ee-open" name="eedge" label="Open" isChecked={egress === "open"} onChange={() => setEgress("open")} />
+            <Radio id="ee-none" name="eedge" label="Air-gapped" isChecked={egress === "none"} onChange={() => setEgress("none")} />
+          </FormGroup>
+          <FormGroup fieldId="ednsg"><Checkbox id="ednsg" label="Private DNS resolution" isChecked={dns} onChange={(_, v) => setDns(v)} /></FormGroup>
+        </Form>
+        {cidr !== network.cidr && (
+          <Alert variant="warning" isInline title="Changing the CIDR block may require re-IP'ing existing subnets." style={{ marginTop: 12 }} />
+        )}
+      </ModalBody>
+      <ModalFooter>
+        <Button variant="primary" onClick={() => onSave({ ...network, n: name, desc, cidr, egress, dns })}>Save changes</Button>
+        <Button variant="link" onClick={onClose}>Cancel</Button>
+      </ModalFooter>
+    </Modal>
+  );
+}
+
+function ManageSubnetsModal({ network, onClose, onSave }: { network: Network; onClose: () => void; onSave: (n: Network) => void }) {
+  const [subnets, setSubnets] = useState<Subnet[]>(network.subnets);
+  const [draft, setDraft] = useState<Subnet>({ name: "", cidr: "", zone: "zone-a" });
+
+  const canAdd = draft.name.trim() && /^\d+\.\d+\.\d+\.\d+\/\d+$/.test(draft.cidr);
+
+  return (
+    <Modal variant={ModalVariant.large} isOpen onClose={onClose} aria-label="Manage subnets">
+      <ModalHeader title={`Manage subnets — ${network.n}`} description={`Parent CIDR ${network.cidr}. Subnets must fall within this range.`} />
+      <ModalBody>
+        <div className="osac-panel" style={{ padding: 0, overflow: "hidden", marginBottom: 16 }}>
+          <Table variant="compact">
+            <Thead><Tr><Th>Name</Th><Th>CIDR</Th><Th>Zone</Th><Th /></Tr></Thead>
+            <Tbody>
+              {subnets.length === 0 && (
+                <Tr><Td colSpan={4} style={{ textAlign: "center", color: "var(--pf-t-global-text-color-subtle)" }}>No subnets yet — add one below.</Td></Tr>
+              )}
+              {subnets.map((s, i) => (
+                <Tr key={s.name + i}>
+                  <Td>
+                    <TextInput aria-label="subnet-name" value={s.name}
+                      onChange={(_, v) => setSubnets((arr) => arr.map((x, j) => (j === i ? { ...x, name: v } : x)))} />
+                  </Td>
+                  <Td>
+                    <TextInput aria-label="subnet-cidr" value={s.cidr}
+                      onChange={(_, v) => setSubnets((arr) => arr.map((x, j) => (j === i ? { ...x, cidr: v } : x)))} />
+                  </Td>
+                  <Td>
+                    <TextInput aria-label="subnet-zone" value={s.zone}
+                      onChange={(_, v) => setSubnets((arr) => arr.map((x, j) => (j === i ? { ...x, zone: v } : x)))} />
+                  </Td>
+                  <Td isActionCell>
+                    <Button variant="plain" aria-label="remove" onClick={() => setSubnets((arr) => arr.filter((_, j) => j !== i))}>
+                      <TrashIcon />
+                    </Button>
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </div>
+
+        <h4 className="osac-section-title" style={{ marginBottom: 8 }}>Add subnet</h4>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr auto", gap: 8, alignItems: "end" }}>
+          <FormGroup label="Name" fieldId="sn-n"><TextInput id="sn-n" value={draft.name} onChange={(_, v) => setDraft({ ...draft, name: v })} placeholder="sn-app" /></FormGroup>
+          <FormGroup label="CIDR" fieldId="sn-c"><TextInput id="sn-c" value={draft.cidr} onChange={(_, v) => setDraft({ ...draft, cidr: v })} placeholder="10.10.8.0/24" /></FormGroup>
+          <FormGroup label="Zone" fieldId="sn-z"><TextInput id="sn-z" value={draft.zone} onChange={(_, v) => setDraft({ ...draft, zone: v })} placeholder="zone-a" /></FormGroup>
+          <Button isDisabled={!canAdd} onClick={() => { setSubnets((arr) => [...arr, draft]); setDraft({ name: "", cidr: "", zone: "zone-a" }); }}>Add</Button>
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <Button variant="primary" onClick={() => onSave({ ...network, subnets })}>Save subnets</Button>
+        <Button variant="link" onClick={onClose}>Cancel</Button>
+      </ModalFooter>
+    </Modal>
   );
 }
 
