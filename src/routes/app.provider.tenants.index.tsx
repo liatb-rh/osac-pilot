@@ -25,6 +25,7 @@ const SEED: TenantRow[] = [
 ];
 
 function TenantsPage() {
+  const navigate = useNavigate({ from: "/app/provider/tenants" });
   const [tenants, setTenants] = useState<TenantRow[]>(SEED);
   const [open, setOpen] = useState(false);
 
