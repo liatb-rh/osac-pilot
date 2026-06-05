@@ -5,15 +5,20 @@ import { Button, Modal, ModalVariant, ModalHeader, ModalBody, Form, FormGroup, T
 import { Table, Thead, Tr, Th, Tbody, Td, ActionsColumn } from "@patternfly/react-table";
 import { PlusCircleIcon, DownloadIcon } from "@patternfly/react-icons";
 
+import { CLUSTERS, clusterSimpleStatus } from "@/lib/osac-api";
+
 export const Route = createFileRoute("/app/clusters")({ component: ClustersPage });
 
 interface Cluster { name: string; version: string; status: "ready" | "progressing" | "upgrading" | "failed"; nodes: number; }
 
-const SEED: Cluster[] = [
-  { name: "prod-ocp", version: "4.17.3", status: "upgrading", nodes: 9 },
-  { name: "stg-ocp", version: "4.17.1", status: "ready", nodes: 6 },
-  { name: "dev-ocp", version: "4.16.8", status: "ready", nodes: 3 },
-];
+const SEED: Cluster[] = CLUSTERS.map((c) => {
+  const s = clusterSimpleStatus(c.status.state);
+  const version = (c.spec.release_image ?? "").split(":").pop()?.replace("-multi", "") ?? "—";
+  const nodes = Object.values(c.spec.node_sets).reduce((a, ns) => a + ns.size, 0);
+  const progressing = c.status.conditions.find((x) => x.type === "CLUSTER_CONDITION_TYPE_PROGRESSING" && x.status === "CONDITION_STATUS_TRUE");
+  const ui: Cluster["status"] = progressing ? "upgrading" : s === "ready" ? "ready" : s === "failed" ? "failed" : "progressing";
+  return { name: c.metadata.name, version, status: ui, nodes };
+});
 
 function ClustersPage() {
   const [open, setOpen] = useState(false);
