@@ -132,9 +132,9 @@ function AgentDetail() {
             <Table>
               <Thead><Tr><Th>Device</Th><Th>Role</Th><Th>Size</Th><Th>Type</Th><Th>Tier</Th></Tr></Thead>
               <Tbody>
-                <Tr><Td><code>/dev/nvme0n1</Td><Td>OS / etcd</Td><Td>960 GiB</Td><Td>NVMe</Td><Td><Label color="grey" isCompact>local</Label></Td></Tr>
-                <Tr><Td><code>/dev/nvme1n1</Td><Td>CSI cache</Td><Td>{(a.disk_tib * 1024 / 2).toFixed(0)} GiB</Td><Td>NVMe</Td><Td><Label color="yellow" isCompact>gold</Label></Td></Tr>
-                <Tr><Td>vast://tenant-northstar</Td><Td>Tenant storage</Td><Td>via Tier API</Td><Td>VAST CSI</Td><Td><Label color="blue" isCompact>networked</Label></Td></Tr>
+                <Tr><Td><code>/dev/nvme0n1</code></Td><Td>OS / etcd</Td><Td>960 GiB</Td><Td>NVMe</Td><Td><Label color="grey" isCompact>local</Label></Td></Tr>
+                <Tr><Td><code>/dev/nvme1n1</code></Td><Td>CSI cache</Td><Td>{(a.disk_tib * 1024 / 2).toFixed(0)} GiB</Td><Td>NVMe</Td><Td><Label color="yellow" isCompact>gold</Label></Td></Tr>
+                <Tr><Td><code>vast://tenant-northstar</code></Td><Td>Tenant storage</Td><Td>via Tier API</Td><Td>VAST CSI</Td><Td><Label color="blue" isCompact>networked</Label></Td></Tr>
               </Tbody>
             </Table>
           </div>
