@@ -41,7 +41,12 @@ export type PermissionId =
   | "view_agents"
   | "manage_agents"
   | "view_storage_tiers"
-  | "manage_storage_tiers";
+  | "manage_storage_tiers"
+  | "manage_organizations"
+  | "manage_rbac"
+  | "onboard_tenants"
+  | "manage_catalog_items"
+  | "view_ansible_collection";
 
 export const ROLES: Record<RoleId, { label: string; description: string }> = {
   providerAdmin: {
