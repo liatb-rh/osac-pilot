@@ -53,17 +53,17 @@ const ALL_LINKS: NavLink[] = [
 ];
 
 function AppShell() {
-  const { role, tenant, user, signedIn, signOut } = useSession();
+  const { role, tenant, user, signedIn, signOut, hydrated } = useSession();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!signedIn || !role || !tenant) navigate({ to: "/" });
-  }, [signedIn, role, tenant, navigate]);
+    if (hydrated && (!signedIn || !role || !tenant)) navigate({ to: "/" });
+  }, [hydrated, signedIn, role, tenant, navigate]);
 
-  if (!signedIn || !role || !tenant) return null;
+  if (!hydrated || !signedIn || !role || !tenant) return null;
 
   const tenantInfo = TENANTS[tenant];
   const roleInfo = ROLES[role];
