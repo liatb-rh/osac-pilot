@@ -58,7 +58,7 @@ function VmsPage() {
           <Tbody>
             {rows.map((v) => (
               <Tr key={v.name}>
-                <Td><strong>{v.name}</strong></Td>
+                <Td><Link to="/app/vms/$name" params={{ name: v.name }} style={{ color: "#0066cc", fontWeight: 600 }}>{v.name}</Link></Td>
                 <Td><span className="osac-status-dot" data-s={v.status} /><span style={{ textTransform: "capitalize" }}>{v.status}</span></Td>
                 <Td>{v.os}</Td>
                 <Td>{v.cpu}</Td>
