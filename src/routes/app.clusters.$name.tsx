@@ -14,8 +14,6 @@ import {
   CheckCircleIcon, InProgressIcon, OutlinedCircleIcon,
 } from "@patternfly/react-icons";
 
-export const Route = createFileRoute("/app/clusters/$name")({ component: ClusterDetail });
-
 import { findCluster, clusterSimpleStatus } from "@/lib/osac-api";
 
 export const Route = createFileRoute("/app/clusters/$name")({ component: ClusterDetail });
