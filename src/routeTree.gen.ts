@@ -25,6 +25,7 @@ import { Route as AppProviderVmsRouteImport } from './routes/app.provider.vms'
 import { Route as AppProviderTenantsRouteImport } from './routes/app.provider.tenants'
 import { Route as AppProviderTemplatesRouteImport } from './routes/app.provider.templates'
 import { Route as AppProviderStorageTiersRouteImport } from './routes/app.provider.storage-tiers'
+import { Route as AppProviderOrganizationsRouteImport } from './routes/app.provider.organizations'
 import { Route as AppProviderInfrastructureRouteImport } from './routes/app.provider.infrastructure'
 import { Route as AppProviderClustersRouteImport } from './routes/app.provider.clusters'
 import { Route as AppProviderAgentsRouteImport } from './routes/app.provider.agents'
@@ -115,6 +116,12 @@ const AppProviderStorageTiersRoute = AppProviderStorageTiersRouteImport.update({
   path: '/provider/storage-tiers',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProviderOrganizationsRoute =
+  AppProviderOrganizationsRouteImport.update({
+    id: '/provider/organizations',
+    path: '/provider/organizations',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppProviderInfrastructureRoute =
   AppProviderInfrastructureRouteImport.update({
     id: '/provider/infrastructure',
@@ -182,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/app/provider/agents': typeof AppProviderAgentsRoute
   '/app/provider/clusters': typeof AppProviderClustersRoute
   '/app/provider/infrastructure': typeof AppProviderInfrastructureRoute
+  '/app/provider/organizations': typeof AppProviderOrganizationsRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
@@ -208,6 +216,7 @@ export interface FileRoutesByTo {
   '/app/provider/agents': typeof AppProviderAgentsRoute
   '/app/provider/clusters': typeof AppProviderClustersRoute
   '/app/provider/infrastructure': typeof AppProviderInfrastructureRoute
+  '/app/provider/organizations': typeof AppProviderOrganizationsRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
@@ -236,6 +245,7 @@ export interface FileRoutesById {
   '/app/provider/agents': typeof AppProviderAgentsRoute
   '/app/provider/clusters': typeof AppProviderClustersRoute
   '/app/provider/infrastructure': typeof AppProviderInfrastructureRoute
+  '/app/provider/organizations': typeof AppProviderOrganizationsRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
@@ -265,6 +275,7 @@ export interface FileRouteTypes {
     | '/app/provider/agents'
     | '/app/provider/clusters'
     | '/app/provider/infrastructure'
+    | '/app/provider/organizations'
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
@@ -291,6 +302,7 @@ export interface FileRouteTypes {
     | '/app/provider/agents'
     | '/app/provider/clusters'
     | '/app/provider/infrastructure'
+    | '/app/provider/organizations'
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
@@ -318,6 +330,7 @@ export interface FileRouteTypes {
     | '/app/provider/agents'
     | '/app/provider/clusters'
     | '/app/provider/infrastructure'
+    | '/app/provider/organizations'
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
@@ -448,6 +461,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProviderStorageTiersRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/provider/organizations': {
+      id: '/app/provider/organizations'
+      path: '/provider/organizations'
+      fullPath: '/app/provider/organizations'
+      preLoaderRoute: typeof AppProviderOrganizationsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/provider/infrastructure': {
       id: '/app/provider/infrastructure'
       path: '/provider/infrastructure'
@@ -565,6 +585,7 @@ interface AppRouteChildren {
   AppProviderAgentsRoute: typeof AppProviderAgentsRoute
   AppProviderClustersRoute: typeof AppProviderClustersRoute
   AppProviderInfrastructureRoute: typeof AppProviderInfrastructureRoute
+  AppProviderOrganizationsRoute: typeof AppProviderOrganizationsRoute
   AppProviderStorageTiersRoute: typeof AppProviderStorageTiersRoute
   AppProviderTemplatesRoute: typeof AppProviderTemplatesRoute
   AppProviderTenantsRoute: typeof AppProviderTenantsRoute
@@ -587,6 +608,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProviderAgentsRoute: AppProviderAgentsRoute,
   AppProviderClustersRoute: AppProviderClustersRoute,
   AppProviderInfrastructureRoute: AppProviderInfrastructureRoute,
+  AppProviderOrganizationsRoute: AppProviderOrganizationsRoute,
   AppProviderStorageTiersRoute: AppProviderStorageTiersRoute,
   AppProviderTemplatesRoute: AppProviderTemplatesRoute,
   AppProviderTenantsRoute: AppProviderTenantsRoute,
@@ -605,3 +627,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
