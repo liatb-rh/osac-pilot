@@ -92,7 +92,7 @@ function NetworksPage() {
                   ]} />
                 </Td>
               </Tr>
-            ))}
+            );})}
           </Tbody>
         </Table>
       </div>
