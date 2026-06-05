@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHeader } from "@/components/osac/Primitives";
 import { Button, Modal, ModalVariant, ModalHeader, ModalBody, Form, FormGroup, TextInput } from "@patternfly/react-core";
@@ -22,6 +22,7 @@ const SEED: Cluster[] = CLUSTERS.map((c) => {
 
 function ClustersPage() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
   return (
     <>
       <PageHeader title="Clusters" subtitle="OpenShift clusters provisioned for this tenant organization."
@@ -34,12 +35,12 @@ function ClustersPage() {
           </Thead>
           <Tbody>
             {SEED.map((c) => (
-              <Tr key={c.name}>
+              <Tr key={c.name} isClickable onRowClick={() => navigate({ to: "/app/clusters/$name", params: { name: c.name } })}>
                 <Td><Link to="/app/clusters/$name" params={{ name: c.name }} style={{ color: "#0066cc", fontWeight: 600 }}>{c.name}</Link></Td>
                 <Td><span className="osac-status-dot" data-s={c.status} /><span style={{ textTransform: "capitalize" }}>{c.status}</span></Td>
                 <Td>{c.version}</Td>
                 <Td>{c.nodes} workers</Td>
-                <Td isActionCell>
+                <Td isActionCell onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                   <ActionsColumn items={[
                     { title: "Scale nodes" },
                     { title: "Upgrade" },
