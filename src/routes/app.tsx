@@ -42,6 +42,12 @@ const ALL_LINKS: NavLink[] = [
   { to: "/app/provider/templates", label: "Global Templates", icon: CubesIcon, perm: "manage_global_templates", group: "Platform" },
   { to: "/app/provider/clusters", label: "All Clusters", icon: CloudIcon, perm: "view_clusters", group: "Platform" },
   { to: "/app/provider/vms", label: "All Virtual Machines", icon: ServerIcon, perm: "view_infrastructure", group: "Platform" },
+  // Core platform services
+  { to: "/app/provider/organizations", label: "Organizations & IdP", icon: BuildingIcon, perm: "manage_organizations", group: "Core Platform" },
+  { to: "/app/provider/rbac", label: "RBAC", icon: KeyIcon, perm: "manage_rbac", group: "Core Platform" },
+  { to: "/app/provider/onboarding", label: "Tenant Onboarding", icon: ShieldAltIcon, perm: "onboard_tenants", group: "Core Platform" },
+  { to: "/app/provider/catalog-items", label: "Catalog Items", icon: CubesIcon, perm: "manage_catalog_items", group: "Core Platform" },
+  { to: "/app/provider/ansible", label: "Ansible Collection", icon: CogIcon, perm: "view_ansible_collection", group: "Core Platform" },
   // Common
   { to: "/app/activity", label: "Recent Activity", icon: OutlinedClockIcon, perm: "view_recent_activities", group: "Account" },
 ];
