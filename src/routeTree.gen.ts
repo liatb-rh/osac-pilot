@@ -25,6 +25,7 @@ import { Route as AppProviderVmsRouteImport } from './routes/app.provider.vms'
 import { Route as AppProviderTenantsRouteImport } from './routes/app.provider.tenants'
 import { Route as AppProviderTemplatesRouteImport } from './routes/app.provider.templates'
 import { Route as AppProviderStorageTiersRouteImport } from './routes/app.provider.storage-tiers'
+import { Route as AppProviderRbacRouteImport } from './routes/app.provider.rbac'
 import { Route as AppProviderOrganizationsRouteImport } from './routes/app.provider.organizations'
 import { Route as AppProviderInfrastructureRouteImport } from './routes/app.provider.infrastructure'
 import { Route as AppProviderClustersRouteImport } from './routes/app.provider.clusters'
@@ -116,6 +117,11 @@ const AppProviderStorageTiersRoute = AppProviderStorageTiersRouteImport.update({
   path: '/provider/storage-tiers',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProviderRbacRoute = AppProviderRbacRouteImport.update({
+  id: '/provider/rbac',
+  path: '/provider/rbac',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProviderOrganizationsRoute =
   AppProviderOrganizationsRouteImport.update({
     id: '/provider/organizations',
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/app/provider/clusters': typeof AppProviderClustersRoute
   '/app/provider/infrastructure': typeof AppProviderInfrastructureRoute
   '/app/provider/organizations': typeof AppProviderOrganizationsRoute
+  '/app/provider/rbac': typeof AppProviderRbacRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/app/provider/clusters': typeof AppProviderClustersRoute
   '/app/provider/infrastructure': typeof AppProviderInfrastructureRoute
   '/app/provider/organizations': typeof AppProviderOrganizationsRoute
+  '/app/provider/rbac': typeof AppProviderRbacRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
@@ -246,6 +254,7 @@ export interface FileRoutesById {
   '/app/provider/clusters': typeof AppProviderClustersRoute
   '/app/provider/infrastructure': typeof AppProviderInfrastructureRoute
   '/app/provider/organizations': typeof AppProviderOrganizationsRoute
+  '/app/provider/rbac': typeof AppProviderRbacRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/app/provider/clusters'
     | '/app/provider/infrastructure'
     | '/app/provider/organizations'
+    | '/app/provider/rbac'
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
@@ -303,6 +313,7 @@ export interface FileRouteTypes {
     | '/app/provider/clusters'
     | '/app/provider/infrastructure'
     | '/app/provider/organizations'
+    | '/app/provider/rbac'
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
@@ -331,6 +342,7 @@ export interface FileRouteTypes {
     | '/app/provider/clusters'
     | '/app/provider/infrastructure'
     | '/app/provider/organizations'
+    | '/app/provider/rbac'
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
@@ -461,6 +473,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProviderStorageTiersRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/provider/rbac': {
+      id: '/app/provider/rbac'
+      path: '/provider/rbac'
+      fullPath: '/app/provider/rbac'
+      preLoaderRoute: typeof AppProviderRbacRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/provider/organizations': {
       id: '/app/provider/organizations'
       path: '/provider/organizations'
@@ -586,6 +605,7 @@ interface AppRouteChildren {
   AppProviderClustersRoute: typeof AppProviderClustersRoute
   AppProviderInfrastructureRoute: typeof AppProviderInfrastructureRoute
   AppProviderOrganizationsRoute: typeof AppProviderOrganizationsRoute
+  AppProviderRbacRoute: typeof AppProviderRbacRoute
   AppProviderStorageTiersRoute: typeof AppProviderStorageTiersRoute
   AppProviderTemplatesRoute: typeof AppProviderTemplatesRoute
   AppProviderTenantsRoute: typeof AppProviderTenantsRoute
@@ -609,6 +629,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProviderClustersRoute: AppProviderClustersRoute,
   AppProviderInfrastructureRoute: AppProviderInfrastructureRoute,
   AppProviderOrganizationsRoute: AppProviderOrganizationsRoute,
+  AppProviderRbacRoute: AppProviderRbacRoute,
   AppProviderStorageTiersRoute: AppProviderStorageTiersRoute,
   AppProviderTemplatesRoute: AppProviderTemplatesRoute,
   AppProviderTenantsRoute: AppProviderTenantsRoute,
