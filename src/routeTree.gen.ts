@@ -21,6 +21,7 @@ import { Route as AppActivityRouteImport } from './routes/app.activity'
 import { Route as AppProviderIndexRouteImport } from './routes/app.provider.index'
 import { Route as AppAdminIndexRouteImport } from './routes/app.admin.index'
 import { Route as AppVmsNameRouteImport } from './routes/app.vms.$name'
+import { Route as AppProviderVmsRouteImport } from './routes/app.provider.vms'
 import { Route as AppProviderTenantsRouteImport } from './routes/app.provider.tenants'
 import { Route as AppProviderTemplatesRouteImport } from './routes/app.provider.templates'
 import { Route as AppProviderStorageTiersRouteImport } from './routes/app.provider.storage-tiers'
@@ -32,6 +33,7 @@ import { Route as AppAdminUsersRouteImport } from './routes/app.admin.users'
 import { Route as AppAdminQuotaRouteImport } from './routes/app.admin.quota'
 import { Route as AppAdminNetworksRouteImport } from './routes/app.admin.networks'
 import { Route as AppAdminClusterOfferingsRouteImport } from './routes/app.admin.cluster-offerings'
+import { Route as AppAdminClusterOfferingsIdRouteImport } from './routes/app.admin.cluster-offerings.$id'
 
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
@@ -93,6 +95,11 @@ const AppVmsNameRoute = AppVmsNameRouteImport.update({
   path: '/$name',
   getParentRoute: () => AppVmsRoute,
 } as any)
+const AppProviderVmsRoute = AppProviderVmsRouteImport.update({
+  id: '/provider/vms',
+  path: '/provider/vms',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProviderTenantsRoute = AppProviderTenantsRouteImport.update({
   id: '/provider/tenants',
   path: '/provider/tenants',
@@ -150,6 +157,12 @@ const AppAdminClusterOfferingsRoute =
     path: '/admin/cluster-offerings',
     getParentRoute: () => AppRoute,
   } as any)
+const AppAdminClusterOfferingsIdRoute =
+  AppAdminClusterOfferingsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AppAdminClusterOfferingsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -161,7 +174,7 @@ export interface FileRoutesByFullPath {
   '/app/console': typeof AppConsoleRoute
   '/app/vms': typeof AppVmsRouteWithChildren
   '/app/': typeof AppIndexRoute
-  '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRoute
+  '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRouteWithChildren
   '/app/admin/networks': typeof AppAdminNetworksRoute
   '/app/admin/quota': typeof AppAdminQuotaRoute
   '/app/admin/users': typeof AppAdminUsersRoute
@@ -172,9 +185,11 @@ export interface FileRoutesByFullPath {
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
+  '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
   '/app/admin/': typeof AppAdminIndexRoute
   '/app/provider/': typeof AppProviderIndexRoute
+  '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -185,7 +200,7 @@ export interface FileRoutesByTo {
   '/app/console': typeof AppConsoleRoute
   '/app/vms': typeof AppVmsRouteWithChildren
   '/app': typeof AppIndexRoute
-  '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRoute
+  '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRouteWithChildren
   '/app/admin/networks': typeof AppAdminNetworksRoute
   '/app/admin/quota': typeof AppAdminQuotaRoute
   '/app/admin/users': typeof AppAdminUsersRoute
@@ -196,9 +211,11 @@ export interface FileRoutesByTo {
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
+  '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
   '/app/admin': typeof AppAdminIndexRoute
   '/app/provider': typeof AppProviderIndexRoute
+  '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -211,7 +228,7 @@ export interface FileRoutesById {
   '/app/console': typeof AppConsoleRoute
   '/app/vms': typeof AppVmsRouteWithChildren
   '/app/': typeof AppIndexRoute
-  '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRoute
+  '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRouteWithChildren
   '/app/admin/networks': typeof AppAdminNetworksRoute
   '/app/admin/quota': typeof AppAdminQuotaRoute
   '/app/admin/users': typeof AppAdminUsersRoute
@@ -222,9 +239,11 @@ export interface FileRoutesById {
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRoute
   '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRoute
+  '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
   '/app/admin/': typeof AppAdminIndexRoute
   '/app/provider/': typeof AppProviderIndexRoute
+  '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -249,9 +268,11 @@ export interface FileRouteTypes {
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
+    | '/app/provider/vms'
     | '/app/vms/$name'
     | '/app/admin/'
     | '/app/provider/'
+    | '/app/admin/cluster-offerings/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -273,9 +294,11 @@ export interface FileRouteTypes {
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
+    | '/app/provider/vms'
     | '/app/vms/$name'
     | '/app/admin'
     | '/app/provider'
+    | '/app/admin/cluster-offerings/$id'
   id:
     | '__root__'
     | '/'
@@ -298,9 +321,11 @@ export interface FileRouteTypes {
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
     | '/app/provider/tenants'
+    | '/app/provider/vms'
     | '/app/vms/$name'
     | '/app/admin/'
     | '/app/provider/'
+    | '/app/admin/cluster-offerings/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -395,6 +420,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppVmsNameRouteImport
       parentRoute: typeof AppVmsRoute
     }
+    '/app/provider/vms': {
+      id: '/app/provider/vms'
+      path: '/provider/vms'
+      fullPath: '/app/provider/vms'
+      preLoaderRoute: typeof AppProviderVmsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/provider/tenants': {
       id: '/app/provider/tenants'
       path: '/provider/tenants'
@@ -472,6 +504,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminClusterOfferingsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/admin/cluster-offerings/$id': {
+      id: '/app/admin/cluster-offerings/$id'
+      path: '/$id'
+      fullPath: '/app/admin/cluster-offerings/$id'
+      preLoaderRoute: typeof AppAdminClusterOfferingsIdRouteImport
+      parentRoute: typeof AppAdminClusterOfferingsRoute
+    }
   }
 }
 
@@ -498,6 +537,20 @@ const AppVmsRouteChildren: AppVmsRouteChildren = {
 const AppVmsRouteWithChildren =
   AppVmsRoute._addFileChildren(AppVmsRouteChildren)
 
+interface AppAdminClusterOfferingsRouteChildren {
+  AppAdminClusterOfferingsIdRoute: typeof AppAdminClusterOfferingsIdRoute
+}
+
+const AppAdminClusterOfferingsRouteChildren: AppAdminClusterOfferingsRouteChildren =
+  {
+    AppAdminClusterOfferingsIdRoute: AppAdminClusterOfferingsIdRoute,
+  }
+
+const AppAdminClusterOfferingsRouteWithChildren =
+  AppAdminClusterOfferingsRoute._addFileChildren(
+    AppAdminClusterOfferingsRouteChildren,
+  )
+
 interface AppRouteChildren {
   AppActivityRoute: typeof AppActivityRoute
   AppCatalogRoute: typeof AppCatalogRoute
@@ -505,7 +558,7 @@ interface AppRouteChildren {
   AppConsoleRoute: typeof AppConsoleRoute
   AppVmsRoute: typeof AppVmsRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
-  AppAdminClusterOfferingsRoute: typeof AppAdminClusterOfferingsRoute
+  AppAdminClusterOfferingsRoute: typeof AppAdminClusterOfferingsRouteWithChildren
   AppAdminNetworksRoute: typeof AppAdminNetworksRoute
   AppAdminQuotaRoute: typeof AppAdminQuotaRoute
   AppAdminUsersRoute: typeof AppAdminUsersRoute
@@ -515,6 +568,7 @@ interface AppRouteChildren {
   AppProviderStorageTiersRoute: typeof AppProviderStorageTiersRoute
   AppProviderTemplatesRoute: typeof AppProviderTemplatesRoute
   AppProviderTenantsRoute: typeof AppProviderTenantsRoute
+  AppProviderVmsRoute: typeof AppProviderVmsRoute
   AppAdminIndexRoute: typeof AppAdminIndexRoute
   AppProviderIndexRoute: typeof AppProviderIndexRoute
 }
@@ -526,7 +580,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppConsoleRoute: AppConsoleRoute,
   AppVmsRoute: AppVmsRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
-  AppAdminClusterOfferingsRoute: AppAdminClusterOfferingsRoute,
+  AppAdminClusterOfferingsRoute: AppAdminClusterOfferingsRouteWithChildren,
   AppAdminNetworksRoute: AppAdminNetworksRoute,
   AppAdminQuotaRoute: AppAdminQuotaRoute,
   AppAdminUsersRoute: AppAdminUsersRoute,
@@ -536,6 +590,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProviderStorageTiersRoute: AppProviderStorageTiersRoute,
   AppProviderTemplatesRoute: AppProviderTemplatesRoute,
   AppProviderTenantsRoute: AppProviderTenantsRoute,
+  AppProviderVmsRoute: AppProviderVmsRoute,
   AppAdminIndexRoute: AppAdminIndexRoute,
   AppProviderIndexRoute: AppProviderIndexRoute,
 }
@@ -550,13 +605,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

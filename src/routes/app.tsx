@@ -41,6 +41,7 @@ const ALL_LINKS: NavLink[] = [
   { to: "/app/provider/storage-tiers", label: "Storage Tiers", icon: DatabaseIcon, perm: "view_storage_tiers", group: "Platform" },
   { to: "/app/provider/templates", label: "Global Templates", icon: CubesIcon, perm: "manage_global_templates", group: "Platform" },
   { to: "/app/provider/clusters", label: "All Clusters", icon: CloudIcon, perm: "view_clusters", group: "Platform" },
+  { to: "/app/provider/vms", label: "All Virtual Machines", icon: ServerIcon, perm: "view_infrastructure", group: "Platform" },
   // Common
   { to: "/app/activity", label: "Recent Activity", icon: OutlinedClockIcon, perm: "view_recent_activities", group: "Account" },
 ];
