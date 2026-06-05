@@ -50,13 +50,23 @@ function TenantsPage() {
           <Tbody>
             {tenants.map((t) => (
               <Tr key={t.id}>
-                <Td><strong>{t.n}</strong></Td>
+                <Td>
+                  <Link to="/app/provider/tenants/$id" params={{ id: t.id }} style={{ color: "#0066cc", fontWeight: 600, textDecoration: "none" }}>
+                    {t.n}
+                  </Link>
+                </Td>
                 <Td><code>{t.id}</code></Td>
                 <Td>{t.users}</Td>
                 <Td>{t.vms}</Td>
                 <Td>{t.cl}</Td>
                 <Td><Label isCompact color={t.status === "active" ? "green" : "orange"}>{t.status}</Label></Td>
-                <Td isActionCell><ActionsColumn items={[{ title: "View details" }, { title: "Edit quota" }, { title: "Audit log" }, { isSeparator: true }, { title: "Suspend" }]} /></Td>
+                <Td isActionCell><ActionsColumn items={[
+                  { title: "View details", onClick: () => navigate({ to: "/app/provider/tenants/$id", params: { id: t.id } }) },
+                  { title: "Edit quota", onClick: () => navigate({ to: "/app/provider/tenants/$id", params: { id: t.id }, hash: "quota" }) },
+                  { title: "Audit log", onClick: () => navigate({ to: "/app/provider/tenants/$id", params: { id: t.id }, hash: "audit" }) },
+                  { isSeparator: true },
+                  { title: "Suspend" },
+                ]} /></Td>
               </Tr>
             ))}
           </Tbody>
