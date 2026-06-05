@@ -129,7 +129,7 @@ function VmDetail() {
             <Table>
               <Thead><Tr><Th>Disk</Th><Th>Bus</Th><Th>Tier</Th><Th>Size</Th><Th>IOPS</Th><Th>Backing PVC</Th></Tr></Thead>
               <Tbody>
-                <Tr><Td>boot</Td><Td>virtio</Td><Td><Label color="gold" isCompact>gold</Label></Td><Td>{vm.disk} GiB</Td><Td>100k</Td><Td><code>{vm.name}-root</code></Td></Tr>
+                <Tr><Td>boot</Td><Td>virtio</Td><Td><Label color="yellow" isCompact>gold</Label></Td><Td>{vm.disk} GiB</Td><Td>100k</Td><Td><code>{vm.name}-root</code></Td></Tr>
                 <Tr><Td>data-01</Td><Td>virtio</Td><Td><Label color="grey" isCompact>silver</Label></Td><Td>500 GiB</Td><Td>30k</Td><Td><code>{vm.name}-data-01</code></Td></Tr>
               </Tbody>
             </Table>
