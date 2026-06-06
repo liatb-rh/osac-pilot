@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { SessionProvider } from "../lib/session";
+import { ThemeProvider } from "../lib/theme";
 
 function NotFoundComponent() {
   return (
@@ -65,9 +66,11 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        <Outlet />
-      </SessionProvider>
+      <ThemeProvider>
+        <SessionProvider>
+          <Outlet />
+        </SessionProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
