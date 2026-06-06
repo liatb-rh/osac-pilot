@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useSession, TENANTS, type TenantId } from "@/lib/session";
 import { ROLES, type RoleId } from "@/lib/rbac";
-import { CloudIcon, BuildingIcon, ShieldAltIcon, UserIcon } from "@patternfly/react-icons";
+import { useTheme } from "@/lib/theme";
+import { CloudIcon, BuildingIcon, ShieldAltIcon, UserIcon, MoonIcon, SunIcon } from "@patternfly/react-icons";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -80,6 +81,8 @@ function WelcomePage() {
     navigate({ to: "/sign-in" });
   };
 
+  const { theme, toggle: toggleTheme } = useTheme();
+
   return (
     <div className="osac-welcome">
       <div className="osac-welcome-inner">
@@ -94,9 +97,23 @@ function WelcomePage() {
             <CloudIcon />
           </div>
           <div>
-            <div style={{ fontWeight: 700, color: "#0b1b2b" }}>OSAC</div>
-            <div style={{ fontSize: 12, color: "#5b6b7c" }}>Open Sovereign AI Cloud</div>
+            <div style={{ fontWeight: 700, color: "var(--osac-ink)" }}>OSAC</div>
+            <div style={{ fontSize: 12, color: "var(--osac-muted)" }}>Open Sovereign AI Cloud</div>
           </div>
+          <button
+            type="button"
+            aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+            onClick={toggleTheme}
+            style={{
+              marginLeft: "auto",
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              width: 34, height: 34, padding: 0, borderRadius: 8,
+              background: "transparent", border: "1px solid transparent",
+              color: "var(--osac-ink)", cursor: "pointer",
+            }}
+          >
+            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+          </button>
         </header>
 
         <div className="osac-eyebrow">OSAC Prototypes</div>
