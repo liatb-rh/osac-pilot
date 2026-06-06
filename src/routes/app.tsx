@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useNavigate, Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useSession, TENANTS } from "@/lib/session";
+import { useTheme } from "@/lib/theme";
 import { ROLES, can, type PermissionId } from "@/lib/rbac";
 import {
   Page, Masthead, MastheadMain, MastheadBrand, MastheadContent, MastheadToggle,
@@ -12,7 +13,7 @@ import {
 import {
   BarsIcon, BellIcon, CloudIcon, ThIcon, ServerIcon, NetworkIcon, UsersIcon,
   CubesIcon, DatabaseIcon, BuildingIcon, ListIcon, KeyIcon, ShieldAltIcon,
-  CogIcon, OutlinedClockIcon,
+  CogIcon, OutlinedClockIcon, MoonIcon, SunIcon,
 } from "@patternfly/react-icons";
 
 export const Route = createFileRoute("/app")({
