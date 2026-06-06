@@ -191,3 +191,69 @@ body { background: var(--osac-bg); color: var(--osac-ink); }
   font-size: 13px; padding: 16px; border-radius: var(--osac-radius);
   min-height: 360px; line-height: 1.5;
 }
+
+/* ============================================================
+   Dark theme
+   Activated by adding `.pf-v6-theme-dark` to <html> via ThemeProvider.
+   PatternFly v6 ships dark-theme variables for its own components;
+   we re-map our custom --osac-* tokens to match.
+   ============================================================ */
+html.pf-v6-theme-dark {
+  --osac-bg: #0b1220;
+  --osac-surface: #131c2e;
+  --osac-ink: #e6edf6;
+  --osac-muted: #93a3b8;
+  --osac-accent: #4a9eff;
+  --osac-accent-soft: #15314f;
+  --osac-success: #6dc26a;
+  --osac-warning: #ffc547;
+  --osac-danger: #ff6961;
+  --osac-border: #243149;
+  --osac-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 1px rgba(0, 0, 0, 0.4);
+  --osac-shadow-md: 0 6px 24px -8px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.4);
+
+  color-scheme: dark;
+}
+
+html.pf-v6-theme-dark body { background: var(--osac-bg); color: var(--osac-ink); }
+
+html.pf-v6-theme-dark .osac-welcome {
+  background:
+    radial-gradient(1200px 600px at 90% -10%, #15314f 0%, transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, #14302a 0%, transparent 55%),
+    linear-gradient(180deg, #0b1220 0%, #131c2e 100%);
+}
+
+html.pf-v6-theme-dark .osac-trust-strip {
+  background: var(--osac-accent-soft);
+  border-bottom-color: #234566;
+  color: #cfe1f5;
+}
+html.pf-v6-theme-dark .osac-trust-strip strong { color: #ffffff; }
+
+html.pf-v6-theme-dark .osac-signin-card,
+html.pf-v6-theme-dark .osac-persona-card,
+html.pf-v6-theme-dark .osac-kpi,
+html.pf-v6-theme-dark .osac-panel,
+html.pf-v6-theme-dark .osac-topology,
+html.pf-v6-theme-dark .osac-topo-node {
+  background: var(--osac-surface);
+  border-color: var(--osac-border);
+  color: var(--osac-ink);
+}
+
+html.pf-v6-theme-dark .osac-empty {
+  background: var(--osac-surface);
+  border-color: var(--osac-border);
+  color: var(--osac-muted);
+}
+
+html.pf-v6-theme-dark .osac-kpi-value { color: var(--osac-ink); }
+html.pf-v6-theme-dark .osac-section-title { color: var(--osac-ink); }
+html.pf-v6-theme-dark .osac-persona-name { color: var(--osac-ink); }
+html.pf-v6-theme-dark .osac-hero-title { color: var(--osac-ink); }
+
+html.pf-v6-theme-dark .osac-console {
+  background: #05080f;
+  color: #8be0a4;
+}
