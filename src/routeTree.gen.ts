@@ -43,6 +43,7 @@ import { Route as AppAdminClusterOfferingsRouteImport } from './routes/app.admin
 import { Route as AppProviderTenantsIndexRouteImport } from './routes/app.provider.tenants.index'
 import { Route as AppProviderStorageTiersIndexRouteImport } from './routes/app.provider.storage-tiers.index'
 import { Route as AppProviderAgentsIndexRouteImport } from './routes/app.provider.agents.index'
+import { Route as AppAdminClusterOfferingsIndexRouteImport } from './routes/app.admin.cluster-offerings.index'
 import { Route as AppProviderTenantsIdRouteImport } from './routes/app.provider.tenants.$id'
 import { Route as AppProviderStorageTiersIdRouteImport } from './routes/app.provider.storage-tiers.$id'
 import { Route as AppProviderAgentsHostRouteImport } from './routes/app.provider.agents.$host'
@@ -222,6 +223,12 @@ const AppProviderAgentsIndexRoute = AppProviderAgentsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppProviderAgentsRoute,
 } as any)
+const AppAdminClusterOfferingsIndexRoute =
+  AppAdminClusterOfferingsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AppAdminClusterOfferingsRoute,
+  } as any)
 const AppProviderTenantsIdRoute = AppProviderTenantsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -281,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/app/provider/agents/$host': typeof AppProviderAgentsHostRoute
   '/app/provider/storage-tiers/$id': typeof AppProviderStorageTiersIdRoute
   '/app/provider/tenants/$id': typeof AppProviderTenantsIdRoute
+  '/app/admin/cluster-offerings/': typeof AppAdminClusterOfferingsIndexRoute
   '/app/provider/agents/': typeof AppProviderAgentsIndexRoute
   '/app/provider/storage-tiers/': typeof AppProviderStorageTiersIndexRoute
   '/app/provider/tenants/': typeof AppProviderTenantsIndexRoute
@@ -292,7 +300,6 @@ export interface FileRoutesByTo {
   '/app/catalog': typeof AppCatalogRoute
   '/app/console': typeof AppConsoleRoute
   '/app': typeof AppIndexRoute
-  '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRouteWithChildren
   '/app/admin/networks': typeof AppAdminNetworksRoute
   '/app/admin/quota': typeof AppAdminQuotaRoute
   '/app/admin/users': typeof AppAdminUsersRoute
@@ -315,6 +322,7 @@ export interface FileRoutesByTo {
   '/app/provider/agents/$host': typeof AppProviderAgentsHostRoute
   '/app/provider/storage-tiers/$id': typeof AppProviderStorageTiersIdRoute
   '/app/provider/tenants/$id': typeof AppProviderTenantsIdRoute
+  '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsIndexRoute
   '/app/provider/agents': typeof AppProviderAgentsIndexRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersIndexRoute
   '/app/provider/tenants': typeof AppProviderTenantsIndexRoute
@@ -356,6 +364,7 @@ export interface FileRoutesById {
   '/app/provider/agents/$host': typeof AppProviderAgentsHostRoute
   '/app/provider/storage-tiers/$id': typeof AppProviderStorageTiersIdRoute
   '/app/provider/tenants/$id': typeof AppProviderTenantsIdRoute
+  '/app/admin/cluster-offerings/': typeof AppAdminClusterOfferingsIndexRoute
   '/app/provider/agents/': typeof AppProviderAgentsIndexRoute
   '/app/provider/storage-tiers/': typeof AppProviderStorageTiersIndexRoute
   '/app/provider/tenants/': typeof AppProviderTenantsIndexRoute
@@ -398,6 +407,7 @@ export interface FileRouteTypes {
     | '/app/provider/agents/$host'
     | '/app/provider/storage-tiers/$id'
     | '/app/provider/tenants/$id'
+    | '/app/admin/cluster-offerings/'
     | '/app/provider/agents/'
     | '/app/provider/storage-tiers/'
     | '/app/provider/tenants/'
@@ -409,7 +419,6 @@ export interface FileRouteTypes {
     | '/app/catalog'
     | '/app/console'
     | '/app'
-    | '/app/admin/cluster-offerings'
     | '/app/admin/networks'
     | '/app/admin/quota'
     | '/app/admin/users'
@@ -432,6 +441,7 @@ export interface FileRouteTypes {
     | '/app/provider/agents/$host'
     | '/app/provider/storage-tiers/$id'
     | '/app/provider/tenants/$id'
+    | '/app/admin/cluster-offerings'
     | '/app/provider/agents'
     | '/app/provider/storage-tiers'
     | '/app/provider/tenants'
@@ -472,6 +482,7 @@ export interface FileRouteTypes {
     | '/app/provider/agents/$host'
     | '/app/provider/storage-tiers/$id'
     | '/app/provider/tenants/$id'
+    | '/app/admin/cluster-offerings/'
     | '/app/provider/agents/'
     | '/app/provider/storage-tiers/'
     | '/app/provider/tenants/'
@@ -723,6 +734,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProviderAgentsIndexRouteImport
       parentRoute: typeof AppProviderAgentsRoute
     }
+    '/app/admin/cluster-offerings/': {
+      id: '/app/admin/cluster-offerings/'
+      path: '/'
+      fullPath: '/app/admin/cluster-offerings/'
+      preLoaderRoute: typeof AppAdminClusterOfferingsIndexRouteImport
+      parentRoute: typeof AppAdminClusterOfferingsRoute
+    }
     '/app/provider/tenants/$id': {
       id: '/app/provider/tenants/$id'
       path: '/$id'
@@ -783,11 +801,13 @@ const AppVmsRouteWithChildren =
 
 interface AppAdminClusterOfferingsRouteChildren {
   AppAdminClusterOfferingsIdRoute: typeof AppAdminClusterOfferingsIdRoute
+  AppAdminClusterOfferingsIndexRoute: typeof AppAdminClusterOfferingsIndexRoute
 }
 
 const AppAdminClusterOfferingsRouteChildren: AppAdminClusterOfferingsRouteChildren =
   {
     AppAdminClusterOfferingsIdRoute: AppAdminClusterOfferingsIdRoute,
+    AppAdminClusterOfferingsIndexRoute: AppAdminClusterOfferingsIndexRoute,
   }
 
 const AppAdminClusterOfferingsRouteWithChildren =
@@ -901,13 +921,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
