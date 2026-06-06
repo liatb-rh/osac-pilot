@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useSession, TENANTS, type TenantId } from "@/lib/session";
 import { ROLES, type RoleId } from "@/lib/rbac";
-import { CloudIcon, BuildingIcon, ShieldAltIcon, UserIcon } from "@patternfly/react-icons";
+import { useTheme } from "@/lib/theme";
+import { CloudIcon, BuildingIcon, ShieldAltIcon, UserIcon, MoonIcon, SunIcon } from "@patternfly/react-icons";
 
 export const Route = createFileRoute("/")({
   head: () => ({
