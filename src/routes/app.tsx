@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useNavigate, Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useSession, TENANTS } from "@/lib/session";
+import { useTheme } from "@/lib/theme";
 import { ROLES, can, type PermissionId } from "@/lib/rbac";
 import {
   Page, Masthead, MastheadMain, MastheadBrand, MastheadContent, MastheadToggle,
@@ -12,7 +13,7 @@ import {
 import {
   BarsIcon, BellIcon, CloudIcon, ThIcon, ServerIcon, NetworkIcon, UsersIcon,
   CubesIcon, DatabaseIcon, BuildingIcon, ListIcon, KeyIcon, ShieldAltIcon,
-  CogIcon, OutlinedClockIcon,
+  CogIcon, OutlinedClockIcon, MoonIcon, SunIcon,
 } from "@patternfly/react-icons";
 
 export const Route = createFileRoute("/app")({
@@ -54,6 +55,7 @@ const ALL_LINKS: NavLink[] = [
 
 function AppShell() {
   const { role, tenant, user, signedIn, signOut, hydrated } = useSession();
+  const { theme, toggle: toggleTheme } = useTheme();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -106,8 +108,23 @@ function AppShell() {
               </Badge>
             </ToolbarItem>
             <ToolbarItem align={{ default: "alignEnd" }}>
+              <button
+                type="button"
+                aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+                onClick={toggleTheme}
+                style={{
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  width: 34, height: 34, padding: 0, borderRadius: 8,
+                  background: "transparent", border: "1px solid transparent",
+                  color: "var(--osac-ink)", cursor: "pointer",
+                }}
+              >
+                {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+              </button>
+            </ToolbarItem>
+            <ToolbarItem>
               <Link to="/app/activity" aria-label="Recent activity"
-                style={{ display: "inline-flex", alignItems: "center", padding: 8, color: "#0b1b2b" }}>
+                style={{ display: "inline-flex", alignItems: "center", padding: 8, color: "var(--osac-ink)" }}>
                 <BellIcon />
               </Link>
             </ToolbarItem>
