@@ -5,11 +5,12 @@ import {
   Button, Tabs, Tab, TabTitleText, Breadcrumb, BreadcrumbItem,
   Label, LabelGroup, Card, CardBody, CardTitle, ClipboardCopy, ClipboardCopyVariant,
   DescriptionList, DescriptionListGroup, DescriptionListTerm, DescriptionListDescription,
+  Tooltip, Progress, ProgressSize, Alert,
 } from "@patternfly/react-core";
 import { Table, Thead, Tr, Th, Tbody, Td } from "@patternfly/react-table";
-import { EditIcon, TrashIcon } from "@patternfly/react-icons";
+import { EditIcon, TrashIcon, OutlinedQuestionCircleIcon, BoltIcon } from "@patternfly/react-icons";
 
-import { findTier } from "@/lib/storage-tiers-data";
+import { findTier, TEMPERATURE_META, LIFECYCLE_RULES, REHYDRATION_JOBS } from "@/lib/storage-tiers-data";
 
 export const Route = createFileRoute("/app/provider/storage-tiers/$id")({ component: TierDetail });
 
@@ -70,13 +71,31 @@ parameters:
       />
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 12, marginBottom: 20 }}>
-        <Kpi label="Status" value={<Label color={t.enabled ? "green" : "grey"}>{t.enabled ? "available" : "disabled"}</Label> as any} />
-        <Kpi label="IOPS" value={t.iops} hint="per view" />
-        <Kpi label="Throughput" value={`${t.throughput_gbps} GB/s`} hint="sustained" />
+        <Kpi label="Temperature" value={
+          <span className="osac-temp-pill" style={{
+            ["--tier-tone" as any]: `var(--osac-temp-${t.temperature})`,
+            ["--tier-tone-soft" as any]: `var(--osac-temp-${t.temperature}-soft)`,
+          } as React.CSSProperties}>
+            {TEMPERATURE_META[t.temperature].label}
+          </span> as any
+        } hint={TEMPERATURE_META[t.temperature].blurb} />
+        <Kpi label="Storage cost" value={`$${t.cost_storage_per_tib_month}`} hint="per TiB · month" />
+        <Kpi label="Retrieval" value={t.cost_retrieval_per_tib === 0 ? "free" : `$${t.cost_retrieval_per_tib}`} hint={t.cost_retrieval_per_tib === 0 ? "always online" : `per TiB · ${t.rehydration_eta}`} tone={t.cost_retrieval_per_tib > 0 ? "warning" : "default"} />
         <Kpi label="Latency" value={`${t.latency_ms} ms`} hint="p99" />
         <Kpi label="Capacity" value={`${t.used_tib} / ${t.capacity_tib} TiB`} hint={`${usedPct}% used`} tone={usedPct > 80 ? "warning" : "default"} />
         <Kpi label="Consumers" value={totalPvcs} hint={`${t.consumers.length} tenants`} />
       </div>
+
+      {t.min_retention_days > 0 && (
+        <Alert
+          variant="warning"
+          isInline
+          title={`Minimum retention: ${t.min_retention_days} days · early-delete fee $${t.early_delete_fee_per_tib}/TiB`}
+          style={{ marginBottom: 16 }}
+        >
+          Data moved into {t.name} must remain at least {t.min_retention_days} days. Surface this warning before any bulk-move into this tier.
+        </Alert>
+      )}
 
       <Tabs activeKey={tab} onSelect={(_, k) => setTab(k)} aria-label="Tier detail tabs">
         <Tab eventKey="overview" title={<TabTitleText>Overview</TabTitleText>}>
@@ -160,6 +179,107 @@ parameters:
             </Table>
           </div>
         </Tab>
+
+        <Tab eventKey="economics" title={<TabTitleText>Economics</TabTitleText>}>
+          <div style={{ paddingTop: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <Card><CardTitle>Cost structure</CardTitle><CardBody>
+              <DescriptionList isHorizontal>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>Storage</DescriptionListTerm>
+                  <DescriptionListDescription>${t.cost_storage_per_tib_month} / TiB·month</DescriptionListDescription>
+                </DescriptionListGroup>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>
+                    Retrieval{" "}
+                    <Tooltip content="Charged per TiB read out of this tier.">
+                      <OutlinedQuestionCircleIcon style={{ fontSize: 12, color: "var(--osac-muted)" }} />
+                    </Tooltip>
+                  </DescriptionListTerm>
+                  <DescriptionListDescription>
+                    {t.cost_retrieval_per_tib === 0 ? "free" : `$${t.cost_retrieval_per_tib} / TiB`}
+                  </DescriptionListDescription>
+                </DescriptionListGroup>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>Rehydration ETA</DescriptionListTerm>
+                  <DescriptionListDescription>{t.rehydration_eta}</DescriptionListDescription>
+                </DescriptionListGroup>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>Minimum retention</DescriptionListTerm>
+                  <DescriptionListDescription>{t.min_retention_days === 0 ? "—" : `${t.min_retention_days} days`}</DescriptionListDescription>
+                </DescriptionListGroup>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>Early-delete fee</DescriptionListTerm>
+                  <DescriptionListDescription>{t.early_delete_fee_per_tib === 0 ? "—" : `$${t.early_delete_fee_per_tib} / TiB`}</DescriptionListDescription>
+                </DescriptionListGroup>
+              </DescriptionList>
+            </CardBody></Card>
+            <Card><CardTitle>Current monthly spend (estimated)</CardTitle><CardBody>
+              <div style={{ fontSize: 32, fontWeight: 700, color: "var(--osac-ink)" }}>
+                ${(t.used_tib * t.cost_storage_per_tib_month).toLocaleString()}
+              </div>
+              <div style={{ color: "var(--osac-muted)", fontSize: 13 }}>
+                {t.used_tib} TiB used × ${t.cost_storage_per_tib_month}/TiB·mo
+              </div>
+              <div style={{ marginTop: 12, fontSize: 13, color: "var(--osac-muted)" }}>
+                Headroom: ${((t.capacity_tib - t.used_tib) * t.cost_storage_per_tib_month).toLocaleString()}/mo of unbilled capacity.
+              </div>
+            </CardBody></Card>
+          </div>
+        </Tab>
+
+        <Tab eventKey="lifecycle" title={<TabTitleText>Lifecycle</TabTitleText>}>
+          <div style={{ paddingTop: 16 }} className="osac-panel">
+            <h3 style={{ marginTop: 0 }}>Rules involving {t.name}</h3>
+            {LIFECYCLE_RULES.filter((r) => r.source_tier === t.id || r.target_tier === t.id).length === 0 ? (
+              <div style={{ color: "var(--osac-muted)" }}>No lifecycle rules target this tier yet.</div>
+            ) : (
+              LIFECYCLE_RULES.filter((r) => r.source_tier === t.id || r.target_tier === t.id).map((r) => (
+                <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: "1px dashed var(--osac-border)" }}>
+                  <BoltIcon style={{ color: "var(--osac-warning)" }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600 }}>{r.name}</div>
+                    <div style={{ fontSize: 12, color: "var(--osac-muted)" }}>
+                      <code>{r.filter}</code> · {r.source_tier} → {r.target_tier}
+                    </div>
+                  </div>
+                  <span style={{ color: "var(--osac-success)", fontWeight: 600, fontSize: 13 }}>
+                    ≈ ${r.est_monthly_savings_usd.toLocaleString()}/mo
+                  </span>
+                  <Label isCompact color={r.enabled ? "green" : "grey"}>{r.enabled ? "active" : "paused"}</Label>
+                </div>
+              ))
+            )}
+          </div>
+        </Tab>
+
+        <Tab eventKey="rehydration" title={<TabTitleText>Rehydration</TabTitleText>}>
+          <div style={{ paddingTop: 16 }} className="osac-panel">
+            <h3 style={{ marginTop: 0 }}>Jobs reading from {t.name}</h3>
+            {REHYDRATION_JOBS.filter((j) => j.source_tier === t.id).length === 0 ? (
+              <div style={{ color: "var(--osac-muted)" }}>No active rehydration jobs from this tier.</div>
+            ) : (
+              REHYDRATION_JOBS.filter((j) => j.source_tier === t.id).map((j) => (
+                <div key={j.id} style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr 2fr auto", gap: 12, alignItems: "center", padding: "10px 0", borderBottom: "1px dashed var(--osac-border)" }}>
+                  <code style={{ fontSize: 12, color: "var(--osac-muted)" }}>{j.id}</code>
+                  <div style={{ fontSize: 13 }}>→ {j.target_tier}</div>
+                  <div style={{ fontSize: 13 }}>{j.size_tib} TiB</div>
+                  <Progress
+                    value={j.progress_pct}
+                    size={ProgressSize.sm}
+                    label={j.eta}
+                    valueText={j.eta}
+                    variant={j.status === "ready" ? "success" : j.status === "failed" ? "danger" : undefined}
+                    title={j.status === "ready" ? "Ready" : "Thawing"}
+                  />
+                  <Label isCompact color={j.status === "ready" ? "green" : j.status === "failed" ? "red" : "orange"}>
+                    {j.status}
+                  </Label>
+                </div>
+              ))
+            )}
+          </div>
+        </Tab>
+
 
         <Tab eventKey="activity" title={<TabTitleText>Activity</TabTitleText>}>
           <div style={{ paddingTop: 16 }} className="osac-panel">
