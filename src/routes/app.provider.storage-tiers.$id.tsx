@@ -180,6 +180,107 @@ parameters:
           </div>
         </Tab>
 
+        <Tab eventKey="economics" title={<TabTitleText>Economics</TabTitleText>}>
+          <div style={{ paddingTop: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <Card><CardTitle>Cost structure</CardTitle><CardBody>
+              <DescriptionList isHorizontal>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>Storage</DescriptionListTerm>
+                  <DescriptionListDescription>${t.cost_storage_per_tib_month} / TiB·month</DescriptionListDescription>
+                </DescriptionListGroup>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>
+                    Retrieval{" "}
+                    <Tooltip content="Charged per TiB read out of this tier.">
+                      <OutlinedQuestionCircleIcon style={{ fontSize: 12, color: "var(--osac-muted)" }} />
+                    </Tooltip>
+                  </DescriptionListTerm>
+                  <DescriptionListDescription>
+                    {t.cost_retrieval_per_tib === 0 ? "free" : `$${t.cost_retrieval_per_tib} / TiB`}
+                  </DescriptionListDescription>
+                </DescriptionListGroup>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>Rehydration ETA</DescriptionListTerm>
+                  <DescriptionListDescription>{t.rehydration_eta}</DescriptionListDescription>
+                </DescriptionListGroup>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>Minimum retention</DescriptionListTerm>
+                  <DescriptionListDescription>{t.min_retention_days === 0 ? "—" : `${t.min_retention_days} days`}</DescriptionListDescription>
+                </DescriptionListGroup>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>Early-delete fee</DescriptionListTerm>
+                  <DescriptionListDescription>{t.early_delete_fee_per_tib === 0 ? "—" : `$${t.early_delete_fee_per_tib} / TiB`}</DescriptionListDescription>
+                </DescriptionListGroup>
+              </DescriptionList>
+            </CardBody></Card>
+            <Card><CardTitle>Current monthly spend (estimated)</CardTitle><CardBody>
+              <div style={{ fontSize: 32, fontWeight: 700, color: "var(--osac-ink)" }}>
+                ${(t.used_tib * t.cost_storage_per_tib_month).toLocaleString()}
+              </div>
+              <div style={{ color: "var(--osac-muted)", fontSize: 13 }}>
+                {t.used_tib} TiB used × ${t.cost_storage_per_tib_month}/TiB·mo
+              </div>
+              <div style={{ marginTop: 12, fontSize: 13, color: "var(--osac-muted)" }}>
+                Headroom: ${((t.capacity_tib - t.used_tib) * t.cost_storage_per_tib_month).toLocaleString()}/mo of unbilled capacity.
+              </div>
+            </CardBody></Card>
+          </div>
+        </Tab>
+
+        <Tab eventKey="lifecycle" title={<TabTitleText>Lifecycle</TabTitleText>}>
+          <div style={{ paddingTop: 16 }} className="osac-panel">
+            <h3 style={{ marginTop: 0 }}>Rules involving {t.name}</h3>
+            {LIFECYCLE_RULES.filter((r) => r.source_tier === t.id || r.target_tier === t.id).length === 0 ? (
+              <div style={{ color: "var(--osac-muted)" }}>No lifecycle rules target this tier yet.</div>
+            ) : (
+              LIFECYCLE_RULES.filter((r) => r.source_tier === t.id || r.target_tier === t.id).map((r) => (
+                <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: "1px dashed var(--osac-border)" }}>
+                  <BoltIcon style={{ color: "var(--osac-warning)" }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600 }}>{r.name}</div>
+                    <div style={{ fontSize: 12, color: "var(--osac-muted)" }}>
+                      <code>{r.filter}</code> · {r.source_tier} → {r.target_tier}
+                    </div>
+                  </div>
+                  <span style={{ color: "var(--osac-success)", fontWeight: 600, fontSize: 13 }}>
+                    ≈ ${r.est_monthly_savings_usd.toLocaleString()}/mo
+                  </span>
+                  <Label isCompact color={r.enabled ? "green" : "grey"}>{r.enabled ? "active" : "paused"}</Label>
+                </div>
+              ))
+            )}
+          </div>
+        </Tab>
+
+        <Tab eventKey="rehydration" title={<TabTitleText>Rehydration</TabTitleText>}>
+          <div style={{ paddingTop: 16 }} className="osac-panel">
+            <h3 style={{ marginTop: 0 }}>Jobs reading from {t.name}</h3>
+            {REHYDRATION_JOBS.filter((j) => j.source_tier === t.id).length === 0 ? (
+              <div style={{ color: "var(--osac-muted)" }}>No active rehydration jobs from this tier.</div>
+            ) : (
+              REHYDRATION_JOBS.filter((j) => j.source_tier === t.id).map((j) => (
+                <div key={j.id} style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr 2fr auto", gap: 12, alignItems: "center", padding: "10px 0", borderBottom: "1px dashed var(--osac-border)" }}>
+                  <code style={{ fontSize: 12, color: "var(--osac-muted)" }}>{j.id}</code>
+                  <div style={{ fontSize: 13 }}>→ {j.target_tier}</div>
+                  <div style={{ fontSize: 13 }}>{j.size_tib} TiB</div>
+                  <Progress
+                    value={j.progress_pct}
+                    size={ProgressSize.sm}
+                    label={j.eta}
+                    valueText={j.eta}
+                    variant={j.status === "ready" ? "success" : j.status === "failed" ? "danger" : undefined}
+                    title={j.status === "ready" ? "Ready" : "Thawing"}
+                  />
+                  <Label isCompact color={j.status === "ready" ? "green" : j.status === "failed" ? "red" : "orange"}>
+                    {j.status}
+                  </Label>
+                </div>
+              ))
+            )}
+          </div>
+        </Tab>
+
+
         <Tab eventKey="activity" title={<TabTitleText>Activity</TabTitleText>}>
           <div style={{ paddingTop: 16 }} className="osac-panel">
             <Table>
