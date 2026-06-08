@@ -71,13 +71,31 @@ parameters:
       />
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 12, marginBottom: 20 }}>
-        <Kpi label="Status" value={<Label color={t.enabled ? "green" : "grey"}>{t.enabled ? "available" : "disabled"}</Label> as any} />
-        <Kpi label="IOPS" value={t.iops} hint="per view" />
-        <Kpi label="Throughput" value={`${t.throughput_gbps} GB/s`} hint="sustained" />
+        <Kpi label="Temperature" value={
+          <span className="osac-temp-pill" style={{
+            ["--tier-tone" as any]: `var(--osac-temp-${t.temperature})`,
+            ["--tier-tone-soft" as any]: `var(--osac-temp-${t.temperature}-soft)`,
+          } as React.CSSProperties}>
+            {TEMPERATURE_META[t.temperature].label}
+          </span> as any
+        } hint={TEMPERATURE_META[t.temperature].blurb} />
+        <Kpi label="Storage cost" value={`$${t.cost_storage_per_tib_month}`} hint="per TiB · month" />
+        <Kpi label="Retrieval" value={t.cost_retrieval_per_tib === 0 ? "free" : `$${t.cost_retrieval_per_tib}`} hint={t.cost_retrieval_per_tib === 0 ? "always online" : `per TiB · ${t.rehydration_eta}`} tone={t.cost_retrieval_per_tib > 0 ? "warning" : "default"} />
         <Kpi label="Latency" value={`${t.latency_ms} ms`} hint="p99" />
         <Kpi label="Capacity" value={`${t.used_tib} / ${t.capacity_tib} TiB`} hint={`${usedPct}% used`} tone={usedPct > 80 ? "warning" : "default"} />
         <Kpi label="Consumers" value={totalPvcs} hint={`${t.consumers.length} tenants`} />
       </div>
+
+      {t.min_retention_days > 0 && (
+        <Alert
+          variant="warning"
+          isInline
+          title={`Minimum retention: ${t.min_retention_days} days · early-delete fee $${t.early_delete_fee_per_tib}/TiB`}
+          style={{ marginBottom: 16 }}
+        >
+          Data moved into {t.name} must remain at least {t.min_retention_days} days. Surface this warning before any bulk-move into this tier.
+        </Alert>
+      )}
 
       <Tabs activeKey={tab} onSelect={(_, k) => setTab(k)} aria-label="Tier detail tabs">
         <Tab eventKey="overview" title={<TabTitleText>Overview</TabTitleText>}>
