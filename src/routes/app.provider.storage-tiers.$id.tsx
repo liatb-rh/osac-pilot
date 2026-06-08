@@ -5,11 +5,12 @@ import {
   Button, Tabs, Tab, TabTitleText, Breadcrumb, BreadcrumbItem,
   Label, LabelGroup, Card, CardBody, CardTitle, ClipboardCopy, ClipboardCopyVariant,
   DescriptionList, DescriptionListGroup, DescriptionListTerm, DescriptionListDescription,
+  Tooltip, Progress, ProgressSize, Alert,
 } from "@patternfly/react-core";
 import { Table, Thead, Tr, Th, Tbody, Td } from "@patternfly/react-table";
-import { EditIcon, TrashIcon } from "@patternfly/react-icons";
+import { EditIcon, TrashIcon, OutlinedQuestionCircleIcon, BoltIcon } from "@patternfly/react-icons";
 
-import { findTier } from "@/lib/storage-tiers-data";
+import { findTier, TEMPERATURE_META, LIFECYCLE_RULES, REHYDRATION_JOBS } from "@/lib/storage-tiers-data";
 
 export const Route = createFileRoute("/app/provider/storage-tiers/$id")({ component: TierDetail });
 
