@@ -9,7 +9,7 @@ import {
 import { PlusCircleIcon } from "@patternfly/react-icons";
 import { useState } from "react";
 import { HOST_TYPES, SUBNETS } from "@/lib/osac-api";
-import { STORAGE_TIERS } from "@/lib/storage-tiers-data";
+import { STORAGE_TIERS, tierProtocol } from "@/lib/storage-tiers-data";
 
 export const Route = createFileRoute("/app/provider/templates")({ component: TemplatesPage });
 
@@ -228,7 +228,7 @@ spec:
           </FormGroup>
           {selectedTier && (
             <Alert variant="info" isInline isPlain
-              title={`CSI driver ${selectedTier.csi_driver} · ${selectedTier.protocol}`} />
+              title={`CSI driver ${selectedTier.csi_driver} · ${tierProtocol(selectedTier)}`} />
           )}
           <FormGroup label="Default subnet" fieldId="sn">
             <FormSelect id="sn" value={defaultSubnet} onChange={(_, v) => setDefaultSubnet(v)}>

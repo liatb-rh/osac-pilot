@@ -8,7 +8,7 @@ import {
 } from "@patternfly/react-core";
 import { Table, Thead, Tr, Th, Tbody, Td, ActionsColumn } from "@patternfly/react-table";
 import { PlusCircleIcon, BuildingIcon } from "@patternfly/react-icons";
-import { STORAGE_TIERS } from "@/lib/storage-tiers-data";
+import { STORAGE_TIERS, tierProtocol } from "@/lib/storage-tiers-data";
 
 export const Route = createFileRoute("/app/provider/tenants/")({ component: TenantsPage });
 
@@ -226,7 +226,7 @@ function OnboardTenantWizard({
                           <strong>{t.name}</strong>
                           <div style={{ fontSize: 12, color: "#5b6b7c" }}>{t.media} · {t.iops} IOPS · {t.latency_ms}ms</div>
                         </div>
-                        <Label isCompact color="blue">{t.protocol}</Label>
+                        <Label isCompact color="blue">{tierProtocol(t)}</Label>
                         <NumberInput value={tiers[t.id] ?? 0} min={0} max={500} unit="TiB"
                           isDisabled={!enabled}
                           onMinus={() => setTiers(p => ({ ...p, [t.id]: Math.max(0, (p[t.id] ?? 0) - 1) }))}

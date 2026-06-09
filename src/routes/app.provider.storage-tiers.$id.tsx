@@ -10,7 +10,7 @@ import {
 import { Table, Thead, Tr, Th, Tbody, Td } from "@patternfly/react-table";
 import { EditIcon, TrashIcon, OutlinedQuestionCircleIcon, BoltIcon } from "@patternfly/react-icons";
 
-import { findTier, TEMPERATURE_META, LIFECYCLE_RULES, REHYDRATION_JOBS } from "@/lib/storage-tiers-data";
+import { findTier, TEMPERATURE_META, LIFECYCLE_RULES, REHYDRATION_JOBS, tierProtocol, tierPrimaryBackend } from "@/lib/storage-tiers-data";
 
 export const Route = createFileRoute("/app/provider/storage-tiers/$id")({ component: TierDetail });
 
@@ -36,7 +36,8 @@ function TierDetail() {
   const sampleTenant = t.consumers[0]?.tenant ?? "northstar";
   const sc = t.storage_class_template.replace("{tenant}", sampleTenant);
   const vsc = t.snapshot_class_template.replace("{tenant}", sampleTenant);
-  const view = t.vast_view_prefix.replace("{tenant}", sampleTenant);
+  const primary = tierPrimaryBackend(t);
+  const view = primary?.view_prefix.replace("{tenant}", sampleTenant) ?? "";
 
   const scYaml = `apiVersion: storage.k8s.io/v1
 kind: StorageClass
@@ -48,8 +49,8 @@ volumeBindingMode: ${t.volume_binding_mode}
 allowVolumeExpansion: ${t.allow_volume_expansion}
 parameters:
   view_policy: ${t.id}
-  protocol: ${t.protocol}
-  vast_cluster: ${t.vast_cluster}
+  protocol: ${tierProtocol(t)}
+  vast_cluster: ${primary?.cluster ?? ""}
   view: ${view}`;
 
   return (
@@ -110,8 +111,8 @@ parameters:
                 <DescriptionListGroup><DescriptionListTerm>Labels</DescriptionListTerm><DescriptionListDescription>
                   <LabelGroup>
                     <Label color="blue">media={t.media.split(" ")[0].toLowerCase()}</Label>
-                    <Label color="purple">protocol={t.protocol}</Label>
-                    <Label color="grey">backend={t.vast_cluster}</Label>
+                    <Label color="purple">protocol={tierProtocol(t)}</Label>
+                    <Label color="grey">backend={primary?.cluster ?? "—"}</Label>
                   </LabelGroup>
                 </DescriptionListDescription></DescriptionListGroup>
               </DescriptionList>
@@ -136,15 +137,34 @@ parameters:
         </Tab>
 
         <Tab eventKey="backend" title={<TabTitleText>Backend</TabTitleText>}>
-          <div style={{ paddingTop: 16 }}>
-            <Card><CardTitle>VAST view binding</CardTitle><CardBody>
-              <DescriptionList isHorizontal>
-                <DescriptionListGroup><DescriptionListTerm>VAST cluster</DescriptionListTerm><DescriptionListDescription><code>{t.vast_cluster}</code></DescriptionListDescription></DescriptionListGroup>
-                <DescriptionListGroup><DescriptionListTerm>Protocol</DescriptionListTerm><DescriptionListDescription>{t.protocol}</DescriptionListDescription></DescriptionListGroup>
-                <DescriptionListGroup><DescriptionListTerm>View prefix</DescriptionListTerm><DescriptionListDescription><code>{t.vast_view_prefix}</code></DescriptionListDescription></DescriptionListGroup>
-                <DescriptionListGroup><DescriptionListTerm>Example view</DescriptionListTerm><DescriptionListDescription><code>{view}</code></DescriptionListDescription></DescriptionListGroup>
-              </DescriptionList>
-            </CardBody></Card>
+          <div style={{ paddingTop: 16 }} className="osac-panel">
+            <Table>
+              <Thead>
+                <Tr>
+                  <Th>Cluster</Th>
+                  <Th>Protocol</Th>
+                  <Th>View prefix</Th>
+                  <Th>Capacity</Th>
+                  <Th>Used</Th>
+                  <Th>Status</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {t.backends.map((b) => {
+                  const pct = Math.round((b.used_tib / b.capacity_tib) * 100);
+                  return (
+                    <Tr key={b.cluster}>
+                      <Td><code>{b.cluster}</code></Td>
+                      <Td><Label isCompact color="blue">{b.protocol}</Label></Td>
+                      <Td><code>{b.view_prefix.replace("{tenant}", sampleTenant)}</code></Td>
+                      <Td>{b.capacity_tib} TiB</Td>
+                      <Td>{b.used_tib} TiB ({pct}%)</Td>
+                      <Td><Label isCompact color={b.status === "healthy" ? "green" : b.status === "degraded" ? "orange" : "red"}>{b.status}</Label></Td>
+                    </Tr>
+                  );
+                })}
+              </Tbody>
+            </Table>
           </div>
         </Tab>
 

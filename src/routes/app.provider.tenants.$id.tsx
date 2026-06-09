@@ -8,7 +8,7 @@ import {
 } from "@patternfly/react-core";
 import { Table, Thead, Tr, Th, Tbody, Td } from "@patternfly/react-table";
 import { CLUSTERS, COMPUTE_INSTANCES } from "@/lib/osac-api";
-import { STORAGE_TIERS } from "@/lib/storage-tiers-data";
+import { STORAGE_TIERS, tierProtocol } from "@/lib/storage-tiers-data";
 import { AGENTS } from "@/lib/agents-data";
 
 export const Route = createFileRoute("/app/provider/tenants/$id")({ component: TenantDetail });
@@ -210,7 +210,7 @@ function TenantDetail() {
                       <Td>{c!.clusters.join(", ")}</Td>
                       <Td>{c!.pvcs}</Td>
                       <Td>{c!.used_tib} TiB</Td>
-                      <Td><Label isCompact color="blue">{tier.protocol}</Label></Td>
+                      <Td><Label isCompact color="blue">{tierProtocol(tier)}</Label></Td>
                     </Tr>
                   ))}
                 </Tbody>
