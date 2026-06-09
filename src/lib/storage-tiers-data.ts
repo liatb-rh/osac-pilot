@@ -90,8 +90,9 @@ export const STORAGE_TIERS: StorageTier[] = [
     enabled: true, is_default: true,
     media: "NVMe SSD", iops: "100k", throughput_gbps: 25, latency_ms: "<0.5",
     capacity_tib: 480, used_tib: 211,
-    vast_cluster: "vast-prod-α", vast_view_prefix: "/tenants/{tenant}/gold",
-    protocol: "NFSv4.1",
+    backends: [
+      { cluster: "vast-prod-α", view_prefix: "/tenants/{tenant}/gold", protocol: "NFSv4.1", status: "healthy", capacity_tib: 480, used_tib: 211 },
+    ],
     csi_driver: "csi.vastdata.com",
     storage_class_template: "tenant-{tenant}-gold",
     snapshot_class_template: "tenant-{tenant}-gold-snap",
@@ -113,8 +114,9 @@ export const STORAGE_TIERS: StorageTier[] = [
     enabled: true, is_default: false,
     media: "SATA SSD", iops: "30k", throughput_gbps: 10, latency_ms: "<2",
     capacity_tib: 960, used_tib: 312,
-    vast_cluster: "vast-prod-β", vast_view_prefix: "/tenants/{tenant}/silver",
-    protocol: "NFSv4.1",
+    backends: [
+      { cluster: "vast-prod-β", view_prefix: "/tenants/{tenant}/silver", protocol: "NFSv4.1", status: "healthy", capacity_tib: 960, used_tib: 312 },
+    ],
     csi_driver: "csi.vastdata.com",
     storage_class_template: "tenant-{tenant}-silver",
     snapshot_class_template: "tenant-{tenant}-silver-snap",
@@ -136,8 +138,9 @@ export const STORAGE_TIERS: StorageTier[] = [
     enabled: true, is_default: false,
     media: "HDD (SMR)", iops: "5k", throughput_gbps: 4, latency_ms: "<20",
     capacity_tib: 2400, used_tib: 410,
-    vast_cluster: "vast-archive-γ", vast_view_prefix: "/tenants/{tenant}/bronze",
-    protocol: "S3",
+    backends: [
+      { cluster: "vast-archive-γ", view_prefix: "/tenants/{tenant}/bronze", protocol: "S3", status: "healthy", capacity_tib: 2400, used_tib: 410 },
+    ],
     csi_driver: "csi.vastdata.com",
     storage_class_template: "tenant-{tenant}-bronze",
     snapshot_class_template: "tenant-{tenant}-bronze-snap",
@@ -158,8 +161,9 @@ export const STORAGE_TIERS: StorageTier[] = [
     enabled: true, is_default: false,
     media: "Tape library + erasure-coded HDD", iops: "—", throughput_gbps: 1, latency_ms: "n/a",
     capacity_tib: 5000, used_tib: 1280,
-    vast_cluster: "vast-archive-γ", vast_view_prefix: "/tenants/{tenant}/glacier",
-    protocol: "S3",
+    backends: [
+      { cluster: "vast-archive-γ", view_prefix: "/tenants/{tenant}/glacier", protocol: "S3", status: "healthy", capacity_tib: 5000, used_tib: 1280 },
+    ],
     csi_driver: "csi.vastdata.com",
     storage_class_template: "tenant-{tenant}-glacier",
     snapshot_class_template: "tenant-{tenant}-glacier-snap",
@@ -175,6 +179,9 @@ export const STORAGE_TIERS: StorageTier[] = [
     ],
   },
 ];
+
+export const tierProtocol = (t: StorageTier) => t.backends[0]?.protocol ?? "—";
+export const tierPrimaryBackend = (t: StorageTier) => t.backends[0];
 
 export const findTier = (id: string) => STORAGE_TIERS.find((t) => t.id === id);
 export const tierHasData = (t: StorageTier) => t.consumers.length > 0;
