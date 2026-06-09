@@ -10,7 +10,7 @@ import {
 import { Table, Thead, Tr, Th, Tbody, Td } from "@patternfly/react-table";
 import { EditIcon, TrashIcon, OutlinedQuestionCircleIcon, BoltIcon } from "@patternfly/react-icons";
 
-import { findTier, TEMPERATURE_META, LIFECYCLE_RULES, REHYDRATION_JOBS } from "@/lib/storage-tiers-data";
+import { findTier, TEMPERATURE_META, LIFECYCLE_RULES, REHYDRATION_JOBS, tierProtocol, tierPrimaryBackend } from "@/lib/storage-tiers-data";
 
 export const Route = createFileRoute("/app/provider/storage-tiers/$id")({ component: TierDetail });
 
