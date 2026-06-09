@@ -39,14 +39,15 @@ jobs:
       - name: Locate build output
         id: locate
         run: |
-          if [ -f dist/index.html ]; then
+          if [ -f dist/client/index.html ]; then
+            echo "dir=dist/client" >> "$GITHUB_OUTPUT"
+          elif [ -f dist/index.html ]; then
             echo "dir=dist" >> "$GITHUB_OUTPUT"
           elif [ -f .output/public/index.html ]; then
             echo "dir=.output/public" >> "$GITHUB_OUTPUT"
           else
-            echo "=== dist/ ===" && ls -la dist/ 2>/dev/null || true
-            echo "=== .output/public/ ===" && ls -la .output/public/ 2>/dev/null || true
-            echo "::error::Could not find index.html in dist/ or .output/public/"
+            echo "=== dist/ ===" && ls -lR dist/ 2>/dev/null || true
+            echo "::error::Could not find index.html in dist/client/, dist/, or .output/public/"
             exit 1
           fi
 
