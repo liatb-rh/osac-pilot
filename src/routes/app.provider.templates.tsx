@@ -228,7 +228,7 @@ spec:
           </FormGroup>
           {selectedTier && (
             <Alert variant="info" isInline isPlain
-              title={`CSI driver ${selectedTier.csi_driver} · ${selectedTier.protocol}`} />
+              title={`CSI driver ${selectedTier.csi_driver} · ${tierProtocol(selectedTier)}`} />
           )}
           <FormGroup label="Default subnet" fieldId="sn">
             <FormSelect id="sn" value={defaultSubnet} onChange={(_, v) => setDefaultSubnet(v)}>

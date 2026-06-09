@@ -210,7 +210,7 @@ function TenantDetail() {
                       <Td>{c!.clusters.join(", ")}</Td>
                       <Td>{c!.pvcs}</Td>
                       <Td>{c!.used_tib} TiB</Td>
-                      <Td><Label isCompact color="blue">{tier.protocol}</Label></Td>
+                      <Td><Label isCompact color="blue">{tierProtocol(tier)}</Label></Td>
                     </Tr>
                   ))}
                 </Tbody>

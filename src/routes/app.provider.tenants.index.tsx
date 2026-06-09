@@ -226,7 +226,7 @@ function OnboardTenantWizard({
                           <strong>{t.name}</strong>
                           <div style={{ fontSize: 12, color: "#5b6b7c" }}>{t.media} · {t.iops} IOPS · {t.latency_ms}ms</div>
                         </div>
-                        <Label isCompact color="blue">{t.protocol}</Label>
+                        <Label isCompact color="blue">{tierProtocol(t)}</Label>
                         <NumberInput value={tiers[t.id] ?? 0} min={0} max={500} unit="TiB"
                           isDisabled={!enabled}
                           onMinus={() => setTiers(p => ({ ...p, [t.id]: Math.max(0, (p[t.id] ?? 0) - 1) }))}

@@ -151,7 +151,7 @@ function OfferingDetail() {
                     <Td>{t.iops}</Td>
                     <Td>{t.latency_ms} ms</Td>
                     <Td><code style={{ fontSize: 12 }}>{t.csi_driver}</code></Td>
-                    <Td><Label isCompact color="blue">{t.protocol}</Label></Td>
+                    <Td><Label isCompact color="blue">{tierProtocol(t)}</Label></Td>
                   </Tr>
                 ))}
               </Tbody>
