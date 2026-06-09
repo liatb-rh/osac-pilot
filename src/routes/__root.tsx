@@ -53,6 +53,12 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        {/* Restore path from GitHub Pages 404.html redirect */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var p=window.location.search.slice(1);if(p.indexOf('p=')===0){var path=decodeURIComponent(p.slice(2).replace(/&q=/,'?'));window.history.replaceState(null,null,'/'+path);}})()`,
+          }}
+        />
       </head>
       <body>
         {children}
