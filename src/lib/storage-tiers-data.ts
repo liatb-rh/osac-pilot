@@ -16,10 +16,15 @@ export interface StorageTier {
   latency_ms: string;
   capacity_tib: number;
   used_tib: number;
-  // VAST backend
-  vast_cluster: string;
-  vast_view_prefix: string;
-  protocol: "NFSv4.1" | "NFSv3" | "S3";
+  // VAST backends (a tier may span multiple clusters)
+  backends: {
+    cluster: string;
+    view_prefix: string;
+    protocol: "NFSv4.1" | "NFSv3" | "S3";
+    status: "healthy" | "degraded" | "unavailable";
+    capacity_tib: number;
+    used_tib: number;
+  }[];
   // K8s CSI
   csi_driver: string;
   storage_class_template: string;
