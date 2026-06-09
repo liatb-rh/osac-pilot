@@ -9,7 +9,7 @@ import {
 import { PlusCircleIcon } from "@patternfly/react-icons";
 import { useState } from "react";
 import { HOST_TYPES, SUBNETS } from "@/lib/osac-api";
-import { STORAGE_TIERS } from "@/lib/storage-tiers-data";
+import { STORAGE_TIERS, tierProtocol } from "@/lib/storage-tiers-data";
 
 export const Route = createFileRoute("/app/provider/templates")({ component: TemplatesPage });
 

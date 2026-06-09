@@ -10,7 +10,7 @@ import {
 import { Table, Thead, Tr, Th, Tbody, Td } from "@patternfly/react-table";
 import { OFFERINGS } from "./app.admin.cluster-offerings";
 import { CLUSTERS } from "@/lib/osac-api";
-import { STORAGE_TIERS } from "@/lib/storage-tiers-data";
+import { STORAGE_TIERS, tierProtocol } from "@/lib/storage-tiers-data";
 import { AGENTS } from "@/lib/agents-data";
 
 export const Route = createFileRoute("/app/admin/cluster-offerings/$id")({ component: OfferingDetail });
