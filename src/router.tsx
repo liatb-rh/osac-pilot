@@ -8,7 +8,10 @@ export const getRouter = () => {
   const router = createRouter({
     routeTree,
     context: { queryClient },
-    basepath: import.meta.env.BASE_URL,
+    // During SSR prerender Nitro crawls '/', not '/osac-pilot/'.
+    // Use '/' as basepath on the server so prerender matches the root route.
+    // On the client, use the real base so navigation under /osac-pilot/ works.
+    basepath: typeof window === 'undefined' ? '/' : (import.meta.env.BASE_URL ?? '/'),
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
   });
