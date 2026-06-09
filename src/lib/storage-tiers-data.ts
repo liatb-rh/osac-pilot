@@ -66,8 +66,9 @@ export const STORAGE_TIERS: StorageTier[] = [
     enabled: true, is_default: false,
     media: "NVMe SSD RAID-10", iops: "200k", throughput_gbps: 40, latency_ms: "<0.2",
     capacity_tib: 120, used_tib: 38,
-    vast_cluster: "vast-prod-α", vast_view_prefix: "/tenants/{tenant}/platinum",
-    protocol: "NFSv4.1",
+    backends: [
+      { cluster: "vast-prod-α", view_prefix: "/tenants/{tenant}/platinum", protocol: "NFSv4.1", status: "healthy", capacity_tib: 120, used_tib: 38 },
+    ],
     csi_driver: "csi.vastdata.com",
     storage_class_template: "tenant-{tenant}-platinum",
     snapshot_class_template: "tenant-{tenant}-platinum-snap",
