@@ -3,12 +3,7 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 const base = process.env.VITE_BASE_URL ?? "/";
 
 export default defineConfig({
-  nitro: {
-    preset: "static",
-    output: {
-      publicDir: ".output/public",
-    },
-  },
+  nitro: false,
   tanstackStart: {
     server: { entry: "server" },
   },
