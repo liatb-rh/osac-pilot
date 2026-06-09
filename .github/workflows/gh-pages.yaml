@@ -36,10 +36,24 @@ jobs:
         env:
           VITE_BASE_URL: '/osac-pilot/'
 
+      - name: Locate build output
+        id: locate
+        run: |
+          if [ -f dist/index.html ]; then
+            echo "dir=dist" >> "$GITHUB_OUTPUT"
+          elif [ -f .output/public/index.html ]; then
+            echo "dir=.output/public" >> "$GITHUB_OUTPUT"
+          else
+            echo "=== dist/ ===" && ls -la dist/ 2>/dev/null || true
+            echo "=== .output/public/ ===" && ls -la .output/public/ 2>/dev/null || true
+            echo "::error::Could not find index.html in dist/ or .output/public/"
+            exit 1
+          fi
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/client
+          path: ${{ steps.locate.outputs.dir }}
 
   deploy:
     name: Deploy to GitHub Pages
