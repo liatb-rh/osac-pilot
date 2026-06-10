@@ -56,7 +56,12 @@ export type PermissionId =
   | "manage_bare_metal_hosts"
   | "manage_bare_metal_discovery"
   | "manage_bare_metal_allocation"
-  | "view_all_bare_metal";
+  | "view_all_bare_metal"
+  | "view_public_ips"
+  | "allocate_public_ip"
+  | "manage_public_ips"
+  | "manage_group_ip_pools"
+  | "manage_public_ip_pools";
 
 export const ROLES: Record<RoleId, { label: string; description: string }> = {
   providerAdmin: {
@@ -83,12 +88,14 @@ const tenantUserGrants: PermissionId[] = [
   "launch_console","view_clusters","open_create_cluster","view_cluster_catalog_items",
   "scale_cluster_nodes","delete_cluster","upgrade_cluster","download_kubeconfig",
   "view_my_bare_metal","request_bare_metal","operate_bare_metal_power","launch_bare_metal_console",
+  "view_public_ips","allocate_public_ip",
 ];
 
 const tenantAdminGrants: PermissionId[] = [
   ...tenantUserGrants.filter((p) => !["view_clusters","open_create_cluster","view_cluster_catalog_items","scale_cluster_nodes","delete_cluster","upgrade_cluster","download_kubeconfig"].includes(p)),
   "view_tenant_admin_dashboard","manage_users","view_quota","view_topology",
   "open_vm_from_topology","manage_cluster_offerings","view_bare_metal_quota",
+  "manage_public_ips","manage_group_ip_pools",
 ];
 
 const providerAdminGrants: PermissionId[] = [
@@ -102,6 +109,7 @@ const providerAdminGrants: PermissionId[] = [
   "view_ansible_collection",
   "view_bare_metal_inventory","manage_bare_metal_hosts","manage_bare_metal_discovery",
   "manage_bare_metal_allocation","view_all_bare_metal",
+  "manage_public_ip_pools","view_public_ips",
 ];
 
 export const ROLE_PERMISSIONS: Record<RoleId, Set<PermissionId>> = {
