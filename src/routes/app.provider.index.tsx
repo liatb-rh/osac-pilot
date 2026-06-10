@@ -1,10 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader, Kpi } from "@/components/osac/Primitives";
 import { Button } from "@patternfly/react-core";
+import { BARE_METAL_HOSTS } from "@/lib/bare-metal-data";
 
 export const Route = createFileRoute("/app/provider/")({ component: ProviderOverview });
 
 function ProviderOverview() {
+  const totalBm = BARE_METAL_HOSTS.length;
+  const availableBm = BARE_METAL_HOSTS.filter((h) => h.discoveryState === "available").length;
+  const allocatedBm = BARE_METAL_HOSTS.filter((h) => h.discoveryState === "allocated").length;
+  const maintBm = BARE_METAL_HOSTS.filter((h) => h.discoveryState === "maintenance").length;
   return (
     <>
       <PageHeader
@@ -16,10 +21,12 @@ function ProviderOverview() {
         <Kpi label="Tenant organizations" value={14} hint="2 onboarding" tone="default" />
         <Kpi label="Active VMs (platform)" value={1284} hint="+86 today" tone="success" />
         <Kpi label="Clusters (platform)" value={37} tone="default" />
+        <Kpi label="Bare metal hosts" value={`${allocatedBm} / ${totalBm}`} hint={`${availableBm} available · ${maintBm} maintenance`} tone="default" />
         <Kpi label="Infrastructure agents" value="208 / 212" tone="warning" hint="4 unreachable" />
         <Kpi label="Storage tiers" value={4} tone="default" />
         <Kpi label="Open incidents" value={2} tone="danger" />
       </div>
+
 
       <div style={{ display: "grid", gap: 16, gridTemplateColumns: "2fr 1fr" }}>
         <div className="osac-panel">
