@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHeader } from "@/components/osac/Primitives";
+import { PublicIpField } from "@/components/osac/PublicIpField";
 import {
   Button, SearchInput, ToggleGroup, ToggleGroupItem, Modal, ModalVariant,
   ModalHeader, ModalBody, Wizard, WizardStep, Form, FormGroup,
@@ -169,6 +170,7 @@ function RequestBareMetalWizard({ onDone }: { onDone: () => void }) {
           <FormGroup label="Virtual network" fieldId="vn"><TextInput id="vn" defaultValue="vn-prod" /></FormGroup>
           <FormGroup label="Subnet" fieldId="sn"><TextInput id="sn" defaultValue="sn-app (10.10.4.0/24)" /></FormGroup>
           <FormGroup label="VLAN" fieldId="vlan"><TextInput id="vlan" type="number" defaultValue="410" /></FormGroup>
+          <PublicIpField multiNic />
         </Form>
       </WizardStep>
       <WizardStep name="Review" id="review" footer={{ nextButtonText: "Submit request" }}>
