@@ -28,7 +28,6 @@ import { Route as AppAdminIndexRouteImport } from './routes/app.admin.index'
 import { Route as AppVmsNameRouteImport } from './routes/app.vms.$name'
 import { Route as AppProviderVmsRouteImport } from './routes/app.provider.vms'
 import { Route as AppProviderTenantsRouteImport } from './routes/app.provider.tenants'
-import { Route as AppProviderTemplatesRouteImport } from './routes/app.provider.templates'
 import { Route as AppProviderStorageTiersRouteImport } from './routes/app.provider.storage-tiers'
 import { Route as AppProviderRbacRouteImport } from './routes/app.provider.rbac'
 import { Route as AppProviderPublicIpPoolsRouteImport } from './routes/app.provider.public-ip-pools'
@@ -156,11 +155,6 @@ const AppProviderVmsRoute = AppProviderVmsRouteImport.update({
 const AppProviderTenantsRoute = AppProviderTenantsRouteImport.update({
   id: '/provider/tenants',
   path: '/provider/tenants',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppProviderTemplatesRoute = AppProviderTemplatesRouteImport.update({
-  id: '/provider/templates',
-  path: '/provider/templates',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProviderStorageTiersRoute = AppProviderStorageTiersRouteImport.update({
@@ -372,7 +366,6 @@ export interface FileRoutesByFullPath {
   '/app/provider/public-ip-pools': typeof AppProviderPublicIpPoolsRouteWithChildren
   '/app/provider/rbac': typeof AppProviderRbacRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRouteWithChildren
-  '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRouteWithChildren
   '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
@@ -417,7 +410,6 @@ export interface FileRoutesByTo {
   '/app/provider/onboarding': typeof AppProviderOnboardingRoute
   '/app/provider/organizations': typeof AppProviderOrganizationsRoute
   '/app/provider/rbac': typeof AppProviderRbacRoute
-  '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
   '/app/admin': typeof AppAdminIndexRoute
@@ -472,7 +464,6 @@ export interface FileRoutesById {
   '/app/provider/public-ip-pools': typeof AppProviderPublicIpPoolsRouteWithChildren
   '/app/provider/rbac': typeof AppProviderRbacRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRouteWithChildren
-  '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRouteWithChildren
   '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
@@ -529,7 +520,6 @@ export interface FileRouteTypes {
     | '/app/provider/public-ip-pools'
     | '/app/provider/rbac'
     | '/app/provider/storage-tiers'
-    | '/app/provider/templates'
     | '/app/provider/tenants'
     | '/app/provider/vms'
     | '/app/vms/$name'
@@ -574,7 +564,6 @@ export interface FileRouteTypes {
     | '/app/provider/onboarding'
     | '/app/provider/organizations'
     | '/app/provider/rbac'
-    | '/app/provider/templates'
     | '/app/provider/vms'
     | '/app/vms/$name'
     | '/app/admin'
@@ -628,7 +617,6 @@ export interface FileRouteTypes {
     | '/app/provider/public-ip-pools'
     | '/app/provider/rbac'
     | '/app/provider/storage-tiers'
-    | '/app/provider/templates'
     | '/app/provider/tenants'
     | '/app/provider/vms'
     | '/app/vms/$name'
@@ -792,13 +780,6 @@ declare module '@tanstack/react-router' {
       path: '/provider/tenants'
       fullPath: '/app/provider/tenants'
       preLoaderRoute: typeof AppProviderTenantsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/provider/templates': {
-      id: '/app/provider/templates'
-      path: '/provider/templates'
-      fullPath: '/app/provider/templates'
-      preLoaderRoute: typeof AppProviderTemplatesRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/provider/storage-tiers': {
@@ -1204,7 +1185,6 @@ interface AppRouteChildren {
   AppProviderPublicIpPoolsRoute: typeof AppProviderPublicIpPoolsRouteWithChildren
   AppProviderRbacRoute: typeof AppProviderRbacRoute
   AppProviderStorageTiersRoute: typeof AppProviderStorageTiersRouteWithChildren
-  AppProviderTemplatesRoute: typeof AppProviderTemplatesRoute
   AppProviderTenantsRoute: typeof AppProviderTenantsRouteWithChildren
   AppProviderVmsRoute: typeof AppProviderVmsRoute
   AppAdminIndexRoute: typeof AppAdminIndexRoute
@@ -1237,7 +1217,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppProviderPublicIpPoolsRoute: AppProviderPublicIpPoolsRouteWithChildren,
   AppProviderRbacRoute: AppProviderRbacRoute,
   AppProviderStorageTiersRoute: AppProviderStorageTiersRouteWithChildren,
-  AppProviderTemplatesRoute: AppProviderTemplatesRoute,
   AppProviderTenantsRoute: AppProviderTenantsRouteWithChildren,
   AppProviderVmsRoute: AppProviderVmsRoute,
   AppAdminIndexRoute: AppAdminIndexRoute,
@@ -1254,3 +1233,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
