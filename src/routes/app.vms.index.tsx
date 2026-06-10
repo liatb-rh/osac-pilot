@@ -5,7 +5,7 @@ import { PublicIpField, type PublicIpSelection } from "@/components/osac/PublicI
 import {
   Button, SearchInput, ToggleGroup, ToggleGroupItem, Modal, ModalVariant,
   ModalHeader, ModalBody, Wizard, WizardStep, Form, FormGroup,
-  TextInput, Select, SelectOption, SelectList, MenuToggle,
+  TextInput, Select, SelectOption, SelectList, MenuToggle, Label,
 } from "@patternfly/react-core";
 import { Table, Thead, Tr, Th, Tbody, Td, ActionsColumn } from "@patternfly/react-table";
 import { PlusCircleIcon } from "@patternfly/react-icons";
@@ -105,11 +105,30 @@ function VmsPage() {
   );
 }
 
+const OS_OPTIONS = [
+  { value: "rhel-9.4", label: "Red Hat Enterprise Linux 9.4" },
+  { value: "rhel-8.10", label: "Red Hat Enterprise Linux 8.10" },
+  { value: "ubuntu-22.04", label: "Ubuntu 22.04 LTS" },
+  { value: "ubuntu-24.04", label: "Ubuntu 24.04 LTS" },
+  { value: "windows-2022", label: "Windows Server 2022" },
+];
+
+const SECURITY_GROUPS = ["sg-app-tier", "sg-db-tier", "sg-edge", "sg-mgmt", "sg-default"];
+
 function CreateVmWizard({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState("bnk-app-05");
   const [tpl, setTpl] = useState("rhel-9-medium");
   const [tplOpen, setTplOpen] = useState(false);
+  const [os, setOs] = useState("rhel-9.4");
+  const [osOpen, setOsOpen] = useState(false);
+  const [sgs, setSgs] = useState<string[]>(["sg-app-tier"]);
+  const [sgOpen, setSgOpen] = useState(false);
   const [pubIp, setPubIp] = useState<PublicIpSelection | null>(null);
+
+  const osLabel = OS_OPTIONS.find((o) => o.value === os)?.label ?? os;
+
+  const toggleSg = (v: string) =>
+    setSgs((prev) => (prev.includes(v) ? prev.filter((s) => s !== v) : [...prev, v]));
 
   return (
     <Wizard onClose={onDone} onSave={onDone} height={420}>
@@ -129,6 +148,23 @@ function CreateVmWizard({ onDone }: { onDone: () => void }) {
               </SelectList>
             </Select>
           </FormGroup>
+          <FormGroup label="Operating System" fieldId="os">
+            <Select isOpen={osOpen} onOpenChange={setOsOpen}
+              toggle={(ref) => (
+                <MenuToggle ref={ref} onClick={() => setOsOpen((v) => !v)} isExpanded={osOpen}>{osLabel}</MenuToggle>
+              )}
+              onSelect={(_, v) => { setOs(String(v)); setOsOpen(false); }}
+            >
+              <SelectList>
+                {OS_OPTIONS.map((o) => (
+                  <SelectOption key={o.value} value={o.value}>{o.label}</SelectOption>
+                ))}
+              </SelectList>
+            </Select>
+            <div style={{ fontSize: 12, color: "#5b6b7c", marginTop: 4 }}>
+              Temporary field — will be derived from the selected image once image catalog integration lands.
+            </div>
+          </FormGroup>
         </Form>
       </WizardStep>
       <WizardStep name="Details" id="details">
@@ -145,6 +181,29 @@ function CreateVmWizard({ onDone }: { onDone: () => void }) {
         <Form>
           <FormGroup label="Virtual network" fieldId="vn"><TextInput id="vn" defaultValue="vn-prod" /></FormGroup>
           <FormGroup label="Subnet" fieldId="sn"><TextInput id="sn" defaultValue="sn-app (10.10.4.0/24)" /></FormGroup>
+          <FormGroup label="Security groups" fieldId="sg">
+            <Select role="menu" isOpen={sgOpen} onOpenChange={setSgOpen}
+              toggle={(ref) => (
+                <MenuToggle ref={ref} onClick={() => setSgOpen((v) => !v)} isExpanded={sgOpen}>
+                  {sgs.length > 0 ? `${sgs.length} selected` : "Select security groups"}
+                </MenuToggle>
+              )}
+              onSelect={(_, v) => toggleSg(String(v))}
+            >
+              <SelectList>
+                {SECURITY_GROUPS.map((sg) => (
+                  <SelectOption key={sg} value={sg} hasCheckbox isSelected={sgs.includes(sg)}>
+                    {sg}
+                  </SelectOption>
+                ))}
+              </SelectList>
+            </Select>
+            {sgs.length > 0 && (
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
+                {sgs.map((sg) => <Label key={sg} color="blue" onClose={() => toggleSg(sg)}>{sg}</Label>)}
+              </div>
+            )}
+          </FormGroup>
           <PublicIpField onChange={setPubIp} />
         </Form>
       </WizardStep>
@@ -152,7 +211,11 @@ function CreateVmWizard({ onDone }: { onDone: () => void }) {
         <div className="osac-panel">
           <div style={{ marginBottom: 8 }}><strong>Name:</strong> {name}</div>
           <div style={{ marginBottom: 8 }}><strong>Template:</strong> {tpl}</div>
+          <div style={{ marginBottom: 8 }}><strong>Operating System:</strong> {osLabel}</div>
           <div style={{ marginBottom: 8 }}><strong>Network:</strong> vn-prod / sn-app</div>
+          <div style={{ marginBottom: 8 }}>
+            <strong>Security groups:</strong> {sgs.length > 0 ? sgs.join(", ") : "None"}
+          </div>
           <div>
             <strong>Public IP:</strong>{" "}
             {pubIp?.enabled ? pubIp.label : "None"}
