@@ -150,7 +150,7 @@ function RequestBareMetalWizard({ onDone }: { onDone: () => void }) {
             </Select>
           </FormGroup>
           <FormGroup label="Secure boot" fieldId="sb">
-            <Switch id="sb" isChecked={secureBoot} onChange={(_, v) => setSecureBoot(v)} label="Enabled" labelOff="Disabled" />
+            <Switch id="sb" isChecked={secureBoot} onChange={(_, v) => setSecureBoot(v)} label={secureBoot ? "Enabled" : "Disabled"} />
           </FormGroup>
         </Form>
       </WizardStep>
