@@ -1,121 +1,65 @@
-## Goal
+# Add Bare Metal (BMaaS) Support to OSAC
 
-Redesign the **Storage Tiers** page (`/app/provider/storage-tiers`) and its detail view to follow the recommended UX practices for tiered storage: temperature-based classification, transparent pricing/penalties, lifecycle automation, rehydration status, and bulk visual asset management.
+Bare metal becomes a first-class workload type alongside VMs and Clusters: tenants can request and operate physical servers; provider admins manage the physical inventory, discovery, and allocation.
 
-Scope is **frontend only**. The existing `StorageTier` data model is preserved and extended with a few presentation/mock fields — no backend or API changes.
+## New data layer
 
-## Data model additions (frontend mock)
+Extend `src/lib/osac-api.ts` with two resource families:
 
-Extend `src/lib/storage-tiers-data.ts` with non-breaking optional fields, populated for the four existing tiers (Platinum/Gold/Silver/Bronze mapped to Hot/Warm/Cool/Cold respectively), plus a new **Archive** tier:
+- **BareMetalHost** (provider-managed inventory): `id`, `hostname`, `serial`, `manufacturer/model`, `bmcAddress`, `cpuModel`, `cores`, `memoryGiB`, `disks[]`, `nics[]`, `gpu?`, `rack/zone`, `powerState`, `discoveryState` (discovered/inspecting/available/allocated/maintenance/failed), `tenantAllocation?`.
+- **BareMetalInstance** (tenant-facing provisioned server): `id`, `name`, `tenant`, `hostRef`, `flavor` (e.g. `bm.gp1.large`, `bm.gpu.h100x4`), `image` (RHEL 9 / Ubuntu 22 / OpenShift node / custom ISO), `network` (vnet + subnet + VLAN), `provisioningState` (queued/inspecting/installing/configuring/active/failed), `bootMode` (UEFI/BIOS), `secureBoot`, `ipmiUrl`, `createdAt`.
 
-- `temperature: "hot" | "warm" | "cool" | "cold" | "archive"`
-- `cost_storage_per_tib_month: number` (e.g. 220, 95, 38, 12, 4)
-- `cost_retrieval_per_tib: number` (0, 0, 5, 18, 60)
-- `min_retention_days: number` (0, 0, 30, 90, 180)
-- `early_delete_fee_per_tib: number`
-- `rehydration_eta: string` ("instant", "minutes", "1–4 hours", "up to 12 hours")
-- `icon_tone`: hot=red, warm=amber, cool=blue, cold=indigo, archive=slate
+Seed ~6 hosts across 2 racks and ~3 instances across tenants so listing screens look real. Add `bmSimpleStatus()` helper mirroring `vmSimpleStatus`.
 
-Add a small mock lifecycle-rule list and a mock "rehydration jobs" list (in-memory) used by the new sections.
+## RBAC
 
-## New page layout (`storage-tiers.index.tsx`)
+In `src/lib/rbac.ts` add permissions and grants:
 
-```text
-PageHeader  [New tier] [New lifecycle rule]
+- Tenant user: `view_my_bare_metal`, `request_bare_metal`, `operate_bare_metal_power`, `launch_bare_metal_console`.
+- Tenant admin: inherits view + `view_bare_metal_quota`.
+- Provider admin: `view_bare_metal_inventory`, `manage_bare_metal_hosts`, `manage_bare_metal_discovery`, `manage_bare_metal_allocation`, `view_all_bare_metal`.
 
-┌─ Tier temperature strip ──────────────────────────────────────┐
-│  Hot · Warm · Cool · Cold · Archive                           │
-│  segmented filter; click filters the grid below               │
-└───────────────────────────────────────────────────────────────┘
+## New routes
 
-┌─ Tier cards grid (replaces dense table) ──────────────────────┐
-│  ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌──────────┐       │
-│  │ HOT       │ │ WARM      │ │ COOL      │ │ ARCHIVE  │  ...  │
-│  │ Platinum  │ │ Gold      │ │ Silver    │ │ Bronze   │       │
-│  │ flame ico │ │ sun ico   │ │ snowflake │ │ cube ico │       │
-│  │           │ │           │ │           │ │          │       │
-│  │ $220/TiB  │ │ $95/TiB   │ │ $38/TiB   │ │ $12/TiB  │       │
-│  │ retrieval │ │ retrieval │ │ +$5/TiB   │ │ +$18/TiB │       │
-│  │ instant   │ │ instant   │ │ minutes   │ │ 1–4 hrs  │       │
-│  │           │ │           │ │           │ │          │       │
-│  │ Used bar  │ │ Used bar  │ │ Used bar  │ │ Used bar │       │
-│  │ 38/120TiB │ │ 211/480   │ │ 312/960   │ │ 0/2400   │       │
-│  │           │ │           │ │           │ │          │       │
-│  │ [Details] │ │ [Details] │ │ [Details] │ │ [Details]│       │
-│  └───────────┘ └───────────┘ └───────────┘ └──────────┘       │
-└───────────────────────────────────────────────────────────────┘
+Tenant-scoped:
+- `src/routes/app.bare-metal.tsx` — layout (Outlet).
+- `src/routes/app.bare-metal.index.tsx` — list of my bare metal instances with filter/search, "Request bare metal" wizard (flavor → image → network → review), row actions (power on/off, reboot, console, release).
+- `src/routes/app.bare-metal.$name.tsx` — details: Overview, Hardware (CPU/RAM/disks/NICs/GPU), Network, Power & Console (BMC URL, power state, soft/hard actions), Activity timeline.
 
-┌─ Cost & penalty comparison table ─────────────────────────────┐
-│ Tier | Storage $/TiB·mo | Retrieval $/TiB | Min retention |   │
-│       | Early delete fee | Latency        | Replication   |   │
-│  (hover any cell → tooltip explaining the trade-off)          │
-└───────────────────────────────────────────────────────────────┘
+Provider-scoped:
+- `src/routes/app.provider.bare-metal.tsx` — layout.
+- `src/routes/app.provider.bare-metal.index.tsx` — tabs: **Hosts** (inventory table: serial, model, rack, CPU/RAM, GPU, discovery state, allocation), **Instances** (cross-tenant list), **Discovery** (recently discovered hardware awaiting inspection, "Inspect" / "Make available" actions).
+- `src/routes/app.provider.bare-metal.$id.tsx` — host detail: hardware inventory, BMC settings, lifecycle actions (inspect, maintenance mode, decommission), current allocation.
 
-┌─ Lifecycle rules (automation) ────────────────────────────────┐
-│  List of rules:                                               │
-│   • "Move VM snapshots older than 30d → Cool"   [edit][off]   │
-│   • "Archive logs older than 1y → Archive"      [edit][off]   │
-│  [+ New rule]   opens a small wizard:                         │
-│    1. Source tier  2. Age / size / tag filter                 │
-│    3. Target tier  4. What-if savings preview                 │
-└───────────────────────────────────────────────────────────────┘
+## Navigation
 
-┌─ Rehydration jobs ────────────────────────────────────────────┐
-│  job-id  | source archive → cool | 1.2 TiB |  ▓▓▓▓░░ 62% ETA 38m │
-│  job-id  | source cold → hot     | 80 GiB  |  ✓ Ready          │
-└───────────────────────────────────────────────────────────────┘
-```
+In `src/routes/app.tsx`, append to `ALL_LINKS`:
+- Workloads group: `Bare Metal` → `/app/bare-metal` (perm `view_my_bare_metal`, icon `ServerIcon` styled as physical — use `HddIcon` or `ServerIcon`).
+- Platform group: `Bare Metal Inventory` → `/app/provider/bare-metal` (perm `view_bare_metal_inventory`).
 
-### Tier card details (per card)
-- Big temperature pill (color-coded by `icon_tone`) + Lucide icon (Flame/Sun/Snowflake/Database/Archive).
-- Two-row cost block: **storage cost** and **retrieval cost**, with `?` icon → Tooltip explaining trade-off.
-- Latency + rehydration ETA chip.
-- Used / capacity bar, color flips red at >80%.
-- "Available" toggle (existing behavior preserved).
-- "Details" link → existing `/app/provider/storage-tiers/$id` route.
+## Provider Overview tile
 
-### Cost & penalty comparison
-- Plain table using existing PatternFly `Table` components.
-- Tooltip on each penalty cell with a one-sentence explanation (e.g. "Files deleted before 90 days incur a $18/TiB early-delete fee").
-- A small `<Alert variant="warning">` if a tier has a minimum retention period, surfaced near any action that would move data into it.
+In `src/routes/app.provider.index.tsx`, add a Bare Metal KPI card (total hosts, available, allocated, in maintenance).
 
-### Lifecycle rules
-- New mock array `LIFECYCLE_RULES` with `{id, name, sourceTier, filter, targetTier, enabled, estMonthlySavingsUsd}`.
-- "New rule" wizard reuses `Wizard`/`WizardStep` pattern from `NewTierWizard`. Final step shows a **What-if calculator**: enter data size → renders estimated monthly savings using the cost deltas from the data model. Pure client-side math.
+## Visual + status conventions
 
-### Rehydration jobs
-- New mock array `REHYDRATION_JOBS` with `{id, sourceTier, targetTier, sizeTib, progressPct, etaText, status}`.
-- Inline progress bars (PatternFly `Progress`).
-- "Start rehydration" action on Cold/Archive tier cards opens a small modal that appends a mock job.
-
-## Detail page (`storage-tiers.$id.tsx`) additions
-
-Add three sections under existing content:
-1. **Temperature & economics** card — temperature pill, storage/retrieval cost, min retention, early-delete fee, ETA, with the same tooltip pattern.
-2. **Lifecycle rules targeting this tier** — filtered slice of `LIFECYCLE_RULES`.
-3. **Active rehydration jobs from this tier** — filtered slice of `REHYDRATION_JOBS`.
-
-Existing consumers / Kubernetes / governance sections remain unchanged.
-
-## Bulk actions (light touch)
-
-On the tier cards grid, add a "Bulk move" affordance: checkboxes on each card → a sticky footer bar `[N tiers selected]  [Move data to ▼ tier]  [Cancel]` that opens a confirmation modal showing the cost delta and any retention-penalty warning. Mock-only — clicking confirm just shows a success toast.
-
-## Design tokens
-
-Add temperature color tokens to `src/styles.css` (light + dark variants) so cards stay consistent with the existing semantic-token rule:
-- `--osac-temp-hot`, `--osac-temp-warm`, `--osac-temp-cool`, `--osac-temp-cold`, `--osac-temp-archive`
-- Matching `*-soft` background variants for pill chips.
-
-## Files changed
-
-- **Modified**: `src/lib/storage-tiers-data.ts` — extend `StorageTier`, add `LIFECYCLE_RULES`, `REHYDRATION_JOBS`, Archive tier.
-- **Modified**: `src/routes/app.provider.storage-tiers.index.tsx` — full redesign (cards, comparison table, lifecycle rules, rehydration jobs, bulk bar).
-- **Modified**: `src/routes/app.provider.storage-tiers.$id.tsx` — add temperature/economics, rules, rehydration sections.
-- **Modified**: `src/styles.css` — temperature tokens (light + dark).
-- **New**: `src/components/osac/StorageTierCard.tsx`, `LifecycleRuleList.tsx`, `RehydrationJobList.tsx`, `CostComparisonTable.tsx` — small focused components to keep the route file readable.
+Reuse existing `osac-status-dot`, `osac-panel`, `Table`, `PageHeader`, and PatternFly `Wizard`/`Modal` patterns from `app.vms.index.tsx` so bare metal UIs feel native. Map BMaaS provisioning states to the same dot tones (`ready`/`progressing`/`stopped`/`failed`).
 
 ## Out of scope
 
-- No backend/API changes, no real lifecycle execution, no real rehydration.
-- The provisioning wizard (`NewTierWizard`) keeps its current 6 steps; only a single new "Temperature & economics" step is added so newly created tiers populate the new fields.
+No backend wiring; this is mock data and UI flows only, matching the rest of the project.
+
+## Files to add/modify
+
+```text
+src/lib/osac-api.ts                              (extend)
+src/lib/rbac.ts                                  (extend)
+src/routes/app.tsx                               (nav links)
+src/routes/app.provider.index.tsx                (KPI tile)
+src/routes/app.bare-metal.tsx                    (new)
+src/routes/app.bare-metal.index.tsx              (new)
+src/routes/app.bare-metal.$name.tsx              (new)
+src/routes/app.provider.bare-metal.tsx           (new)
+src/routes/app.provider.bare-metal.index.tsx     (new)
+src/routes/app.provider.bare-metal.$id.tsx      (new)
+```
