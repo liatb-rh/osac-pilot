@@ -82,12 +82,13 @@ const tenantUserGrants: PermissionId[] = [
   "use_vm_wizard","provision_vm","view_my_vms","operate_vm_power","clone_vm",
   "launch_console","view_clusters","open_create_cluster","view_cluster_catalog_items",
   "scale_cluster_nodes","delete_cluster","upgrade_cluster","download_kubeconfig",
+  "view_my_bare_metal","request_bare_metal","operate_bare_metal_power","launch_bare_metal_console",
 ];
 
 const tenantAdminGrants: PermissionId[] = [
   ...tenantUserGrants.filter((p) => !["view_clusters","open_create_cluster","view_cluster_catalog_items","scale_cluster_nodes","delete_cluster","upgrade_cluster","download_kubeconfig"].includes(p)),
   "view_tenant_admin_dashboard","manage_users","view_quota","view_topology",
-  "open_vm_from_topology","manage_cluster_offerings",
+  "open_vm_from_topology","manage_cluster_offerings","view_bare_metal_quota",
 ];
 
 const providerAdminGrants: PermissionId[] = [
@@ -99,6 +100,8 @@ const providerAdminGrants: PermissionId[] = [
   "manage_agents","view_storage_tiers","manage_storage_tiers",
   "manage_organizations","manage_rbac","onboard_tenants","manage_catalog_items",
   "view_ansible_collection",
+  "view_bare_metal_inventory","manage_bare_metal_hosts","manage_bare_metal_discovery",
+  "manage_bare_metal_allocation","view_all_bare_metal",
 ];
 
 export const ROLE_PERMISSIONS: Record<RoleId, Set<PermissionId>> = {
