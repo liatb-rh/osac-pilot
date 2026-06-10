@@ -92,7 +92,7 @@ function ProviderBareMetalIndex() {
         </Tab>
 
         <Tab eventKey="instances" title={<TabTitleText>Instances</TabTitleText>}>
-          <div style={{ paddingTop: 16 }} className="osac-panel" style={{ padding: 0 }}>
+          <div className="osac-panel" style={{ marginTop: 16, padding: 0 }}>
             <Table aria-label="Bare metal instances">
               <Thead>
                 <Tr><Th>Instance</Th><Th>Tenant</Th><Th>Flavor</Th><Th>Image</Th><Th>Host</Th><Th>State</Th><Th>Created</Th></Tr>
