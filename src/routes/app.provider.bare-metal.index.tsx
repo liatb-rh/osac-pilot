@@ -11,11 +11,11 @@ import {
 
 export const Route = createFileRoute("/app/provider/bare-metal/")({ component: ProviderBareMetalIndex });
 
-const stateTone: Record<string, "blue" | "green" | "orange" | "red" | "grey" | "purple" | "gold"> = {
+const stateTone: Record<string, "blue" | "green" | "orange" | "red" | "grey" | "purple" | "yellow"> = {
   discovered: "blue",
   inspecting: "purple",
   available: "green",
-  allocated: "gold",
+  allocated: "yellow",
   maintenance: "orange",
   failed: "red",
 };
