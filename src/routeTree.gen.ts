@@ -17,10 +17,12 @@ import { Route as AppVmsRouteImport } from './routes/app.vms'
 import { Route as AppConsoleRouteImport } from './routes/app.console'
 import { Route as AppClustersRouteImport } from './routes/app.clusters'
 import { Route as AppCatalogRouteImport } from './routes/app.catalog'
+import { Route as AppBareMetalRouteImport } from './routes/app.bare-metal'
 import { Route as AppActivityRouteImport } from './routes/app.activity'
 import { Route as AppVmsIndexRouteImport } from './routes/app.vms.index'
 import { Route as AppProviderIndexRouteImport } from './routes/app.provider.index'
 import { Route as AppClustersIndexRouteImport } from './routes/app.clusters.index'
+import { Route as AppBareMetalIndexRouteImport } from './routes/app.bare-metal.index'
 import { Route as AppAdminIndexRouteImport } from './routes/app.admin.index'
 import { Route as AppVmsNameRouteImport } from './routes/app.vms.$name'
 import { Route as AppProviderVmsRouteImport } from './routes/app.provider.vms'
@@ -33,19 +35,23 @@ import { Route as AppProviderOnboardingRouteImport } from './routes/app.provider
 import { Route as AppProviderInfrastructureRouteImport } from './routes/app.provider.infrastructure'
 import { Route as AppProviderClustersRouteImport } from './routes/app.provider.clusters'
 import { Route as AppProviderCatalogItemsRouteImport } from './routes/app.provider.catalog-items'
+import { Route as AppProviderBareMetalRouteImport } from './routes/app.provider.bare-metal'
 import { Route as AppProviderAnsibleRouteImport } from './routes/app.provider.ansible'
 import { Route as AppProviderAgentsRouteImport } from './routes/app.provider.agents'
 import { Route as AppClustersNameRouteImport } from './routes/app.clusters.$name'
+import { Route as AppBareMetalNameRouteImport } from './routes/app.bare-metal.$name'
 import { Route as AppAdminUsersRouteImport } from './routes/app.admin.users'
 import { Route as AppAdminQuotaRouteImport } from './routes/app.admin.quota'
 import { Route as AppAdminNetworksRouteImport } from './routes/app.admin.networks'
 import { Route as AppAdminClusterOfferingsRouteImport } from './routes/app.admin.cluster-offerings'
 import { Route as AppProviderTenantsIndexRouteImport } from './routes/app.provider.tenants.index'
 import { Route as AppProviderStorageTiersIndexRouteImport } from './routes/app.provider.storage-tiers.index'
+import { Route as AppProviderBareMetalIndexRouteImport } from './routes/app.provider.bare-metal.index'
 import { Route as AppProviderAgentsIndexRouteImport } from './routes/app.provider.agents.index'
 import { Route as AppAdminClusterOfferingsIndexRouteImport } from './routes/app.admin.cluster-offerings.index'
 import { Route as AppProviderTenantsIdRouteImport } from './routes/app.provider.tenants.$id'
 import { Route as AppProviderStorageTiersIdRouteImport } from './routes/app.provider.storage-tiers.$id'
+import { Route as AppProviderBareMetalIdRouteImport } from './routes/app.provider.bare-metal.$id'
 import { Route as AppProviderAgentsHostRouteImport } from './routes/app.provider.agents.$host'
 import { Route as AppAdminClusterOfferingsIdRouteImport } from './routes/app.admin.cluster-offerings.$id'
 
@@ -89,6 +95,11 @@ const AppCatalogRoute = AppCatalogRouteImport.update({
   path: '/catalog',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBareMetalRoute = AppBareMetalRouteImport.update({
+  id: '/bare-metal',
+  path: '/bare-metal',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppActivityRoute = AppActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
@@ -108,6 +119,11 @@ const AppClustersIndexRoute = AppClustersIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppClustersRoute,
+} as any)
+const AppBareMetalIndexRoute = AppBareMetalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppBareMetalRoute,
 } as any)
 const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
   id: '/admin/',
@@ -171,6 +187,11 @@ const AppProviderCatalogItemsRoute = AppProviderCatalogItemsRouteImport.update({
   path: '/provider/catalog-items',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProviderBareMetalRoute = AppProviderBareMetalRouteImport.update({
+  id: '/provider/bare-metal',
+  path: '/provider/bare-metal',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProviderAnsibleRoute = AppProviderAnsibleRouteImport.update({
   id: '/provider/ansible',
   path: '/provider/ansible',
@@ -185,6 +206,11 @@ const AppClustersNameRoute = AppClustersNameRouteImport.update({
   id: '/$name',
   path: '/$name',
   getParentRoute: () => AppClustersRoute,
+} as any)
+const AppBareMetalNameRoute = AppBareMetalNameRouteImport.update({
+  id: '/$name',
+  path: '/$name',
+  getParentRoute: () => AppBareMetalRoute,
 } as any)
 const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
   id: '/admin/users',
@@ -218,6 +244,12 @@ const AppProviderStorageTiersIndexRoute =
     path: '/',
     getParentRoute: () => AppProviderStorageTiersRoute,
   } as any)
+const AppProviderBareMetalIndexRoute =
+  AppProviderBareMetalIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AppProviderBareMetalRoute,
+  } as any)
 const AppProviderAgentsIndexRoute = AppProviderAgentsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -240,6 +272,11 @@ const AppProviderStorageTiersIdRoute =
     path: '/$id',
     getParentRoute: () => AppProviderStorageTiersRoute,
   } as any)
+const AppProviderBareMetalIdRoute = AppProviderBareMetalIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppProviderBareMetalRoute,
+} as any)
 const AppProviderAgentsHostRoute = AppProviderAgentsHostRouteImport.update({
   id: '/$host',
   path: '/$host',
@@ -257,6 +294,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/sign-in': typeof SignInRoute
   '/app/activity': typeof AppActivityRoute
+  '/app/bare-metal': typeof AppBareMetalRouteWithChildren
   '/app/catalog': typeof AppCatalogRoute
   '/app/clusters': typeof AppClustersRouteWithChildren
   '/app/console': typeof AppConsoleRoute
@@ -266,9 +304,11 @@ export interface FileRoutesByFullPath {
   '/app/admin/networks': typeof AppAdminNetworksRoute
   '/app/admin/quota': typeof AppAdminQuotaRoute
   '/app/admin/users': typeof AppAdminUsersRoute
+  '/app/bare-metal/$name': typeof AppBareMetalNameRoute
   '/app/clusters/$name': typeof AppClustersNameRoute
   '/app/provider/agents': typeof AppProviderAgentsRouteWithChildren
   '/app/provider/ansible': typeof AppProviderAnsibleRoute
+  '/app/provider/bare-metal': typeof AppProviderBareMetalRouteWithChildren
   '/app/provider/catalog-items': typeof AppProviderCatalogItemsRoute
   '/app/provider/clusters': typeof AppProviderClustersRoute
   '/app/provider/infrastructure': typeof AppProviderInfrastructureRoute
@@ -281,15 +321,18 @@ export interface FileRoutesByFullPath {
   '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
   '/app/admin/': typeof AppAdminIndexRoute
+  '/app/bare-metal/': typeof AppBareMetalIndexRoute
   '/app/clusters/': typeof AppClustersIndexRoute
   '/app/provider/': typeof AppProviderIndexRoute
   '/app/vms/': typeof AppVmsIndexRoute
   '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
   '/app/provider/agents/$host': typeof AppProviderAgentsHostRoute
+  '/app/provider/bare-metal/$id': typeof AppProviderBareMetalIdRoute
   '/app/provider/storage-tiers/$id': typeof AppProviderStorageTiersIdRoute
   '/app/provider/tenants/$id': typeof AppProviderTenantsIdRoute
   '/app/admin/cluster-offerings/': typeof AppAdminClusterOfferingsIndexRoute
   '/app/provider/agents/': typeof AppProviderAgentsIndexRoute
+  '/app/provider/bare-metal/': typeof AppProviderBareMetalIndexRoute
   '/app/provider/storage-tiers/': typeof AppProviderStorageTiersIndexRoute
   '/app/provider/tenants/': typeof AppProviderTenantsIndexRoute
 }
@@ -303,6 +346,7 @@ export interface FileRoutesByTo {
   '/app/admin/networks': typeof AppAdminNetworksRoute
   '/app/admin/quota': typeof AppAdminQuotaRoute
   '/app/admin/users': typeof AppAdminUsersRoute
+  '/app/bare-metal/$name': typeof AppBareMetalNameRoute
   '/app/clusters/$name': typeof AppClustersNameRoute
   '/app/provider/ansible': typeof AppProviderAnsibleRoute
   '/app/provider/catalog-items': typeof AppProviderCatalogItemsRoute
@@ -315,15 +359,18 @@ export interface FileRoutesByTo {
   '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
   '/app/admin': typeof AppAdminIndexRoute
+  '/app/bare-metal': typeof AppBareMetalIndexRoute
   '/app/clusters': typeof AppClustersIndexRoute
   '/app/provider': typeof AppProviderIndexRoute
   '/app/vms': typeof AppVmsIndexRoute
   '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
   '/app/provider/agents/$host': typeof AppProviderAgentsHostRoute
+  '/app/provider/bare-metal/$id': typeof AppProviderBareMetalIdRoute
   '/app/provider/storage-tiers/$id': typeof AppProviderStorageTiersIdRoute
   '/app/provider/tenants/$id': typeof AppProviderTenantsIdRoute
   '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsIndexRoute
   '/app/provider/agents': typeof AppProviderAgentsIndexRoute
+  '/app/provider/bare-metal': typeof AppProviderBareMetalIndexRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersIndexRoute
   '/app/provider/tenants': typeof AppProviderTenantsIndexRoute
 }
@@ -333,6 +380,7 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/sign-in': typeof SignInRoute
   '/app/activity': typeof AppActivityRoute
+  '/app/bare-metal': typeof AppBareMetalRouteWithChildren
   '/app/catalog': typeof AppCatalogRoute
   '/app/clusters': typeof AppClustersRouteWithChildren
   '/app/console': typeof AppConsoleRoute
@@ -342,9 +390,11 @@ export interface FileRoutesById {
   '/app/admin/networks': typeof AppAdminNetworksRoute
   '/app/admin/quota': typeof AppAdminQuotaRoute
   '/app/admin/users': typeof AppAdminUsersRoute
+  '/app/bare-metal/$name': typeof AppBareMetalNameRoute
   '/app/clusters/$name': typeof AppClustersNameRoute
   '/app/provider/agents': typeof AppProviderAgentsRouteWithChildren
   '/app/provider/ansible': typeof AppProviderAnsibleRoute
+  '/app/provider/bare-metal': typeof AppProviderBareMetalRouteWithChildren
   '/app/provider/catalog-items': typeof AppProviderCatalogItemsRoute
   '/app/provider/clusters': typeof AppProviderClustersRoute
   '/app/provider/infrastructure': typeof AppProviderInfrastructureRoute
@@ -357,15 +407,18 @@ export interface FileRoutesById {
   '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
   '/app/admin/': typeof AppAdminIndexRoute
+  '/app/bare-metal/': typeof AppBareMetalIndexRoute
   '/app/clusters/': typeof AppClustersIndexRoute
   '/app/provider/': typeof AppProviderIndexRoute
   '/app/vms/': typeof AppVmsIndexRoute
   '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
   '/app/provider/agents/$host': typeof AppProviderAgentsHostRoute
+  '/app/provider/bare-metal/$id': typeof AppProviderBareMetalIdRoute
   '/app/provider/storage-tiers/$id': typeof AppProviderStorageTiersIdRoute
   '/app/provider/tenants/$id': typeof AppProviderTenantsIdRoute
   '/app/admin/cluster-offerings/': typeof AppAdminClusterOfferingsIndexRoute
   '/app/provider/agents/': typeof AppProviderAgentsIndexRoute
+  '/app/provider/bare-metal/': typeof AppProviderBareMetalIndexRoute
   '/app/provider/storage-tiers/': typeof AppProviderStorageTiersIndexRoute
   '/app/provider/tenants/': typeof AppProviderTenantsIndexRoute
 }
@@ -376,6 +429,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/sign-in'
     | '/app/activity'
+    | '/app/bare-metal'
     | '/app/catalog'
     | '/app/clusters'
     | '/app/console'
@@ -385,9 +439,11 @@ export interface FileRouteTypes {
     | '/app/admin/networks'
     | '/app/admin/quota'
     | '/app/admin/users'
+    | '/app/bare-metal/$name'
     | '/app/clusters/$name'
     | '/app/provider/agents'
     | '/app/provider/ansible'
+    | '/app/provider/bare-metal'
     | '/app/provider/catalog-items'
     | '/app/provider/clusters'
     | '/app/provider/infrastructure'
@@ -400,15 +456,18 @@ export interface FileRouteTypes {
     | '/app/provider/vms'
     | '/app/vms/$name'
     | '/app/admin/'
+    | '/app/bare-metal/'
     | '/app/clusters/'
     | '/app/provider/'
     | '/app/vms/'
     | '/app/admin/cluster-offerings/$id'
     | '/app/provider/agents/$host'
+    | '/app/provider/bare-metal/$id'
     | '/app/provider/storage-tiers/$id'
     | '/app/provider/tenants/$id'
     | '/app/admin/cluster-offerings/'
     | '/app/provider/agents/'
+    | '/app/provider/bare-metal/'
     | '/app/provider/storage-tiers/'
     | '/app/provider/tenants/'
   fileRoutesByTo: FileRoutesByTo
@@ -422,6 +481,7 @@ export interface FileRouteTypes {
     | '/app/admin/networks'
     | '/app/admin/quota'
     | '/app/admin/users'
+    | '/app/bare-metal/$name'
     | '/app/clusters/$name'
     | '/app/provider/ansible'
     | '/app/provider/catalog-items'
@@ -434,15 +494,18 @@ export interface FileRouteTypes {
     | '/app/provider/vms'
     | '/app/vms/$name'
     | '/app/admin'
+    | '/app/bare-metal'
     | '/app/clusters'
     | '/app/provider'
     | '/app/vms'
     | '/app/admin/cluster-offerings/$id'
     | '/app/provider/agents/$host'
+    | '/app/provider/bare-metal/$id'
     | '/app/provider/storage-tiers/$id'
     | '/app/provider/tenants/$id'
     | '/app/admin/cluster-offerings'
     | '/app/provider/agents'
+    | '/app/provider/bare-metal'
     | '/app/provider/storage-tiers'
     | '/app/provider/tenants'
   id:
@@ -451,6 +514,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/sign-in'
     | '/app/activity'
+    | '/app/bare-metal'
     | '/app/catalog'
     | '/app/clusters'
     | '/app/console'
@@ -460,9 +524,11 @@ export interface FileRouteTypes {
     | '/app/admin/networks'
     | '/app/admin/quota'
     | '/app/admin/users'
+    | '/app/bare-metal/$name'
     | '/app/clusters/$name'
     | '/app/provider/agents'
     | '/app/provider/ansible'
+    | '/app/provider/bare-metal'
     | '/app/provider/catalog-items'
     | '/app/provider/clusters'
     | '/app/provider/infrastructure'
@@ -475,15 +541,18 @@ export interface FileRouteTypes {
     | '/app/provider/vms'
     | '/app/vms/$name'
     | '/app/admin/'
+    | '/app/bare-metal/'
     | '/app/clusters/'
     | '/app/provider/'
     | '/app/vms/'
     | '/app/admin/cluster-offerings/$id'
     | '/app/provider/agents/$host'
+    | '/app/provider/bare-metal/$id'
     | '/app/provider/storage-tiers/$id'
     | '/app/provider/tenants/$id'
     | '/app/admin/cluster-offerings/'
     | '/app/provider/agents/'
+    | '/app/provider/bare-metal/'
     | '/app/provider/storage-tiers/'
     | '/app/provider/tenants/'
   fileRoutesById: FileRoutesById
@@ -552,6 +621,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCatalogRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/bare-metal': {
+      id: '/app/bare-metal'
+      path: '/bare-metal'
+      fullPath: '/app/bare-metal'
+      preLoaderRoute: typeof AppBareMetalRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/activity': {
       id: '/app/activity'
       path: '/activity'
@@ -579,6 +655,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/clusters/'
       preLoaderRoute: typeof AppClustersIndexRouteImport
       parentRoute: typeof AppClustersRoute
+    }
+    '/app/bare-metal/': {
+      id: '/app/bare-metal/'
+      path: '/'
+      fullPath: '/app/bare-metal/'
+      preLoaderRoute: typeof AppBareMetalIndexRouteImport
+      parentRoute: typeof AppBareMetalRoute
     }
     '/app/admin/': {
       id: '/app/admin/'
@@ -664,6 +747,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProviderCatalogItemsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/provider/bare-metal': {
+      id: '/app/provider/bare-metal'
+      path: '/provider/bare-metal'
+      fullPath: '/app/provider/bare-metal'
+      preLoaderRoute: typeof AppProviderBareMetalRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/provider/ansible': {
       id: '/app/provider/ansible'
       path: '/provider/ansible'
@@ -684,6 +774,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/clusters/$name'
       preLoaderRoute: typeof AppClustersNameRouteImport
       parentRoute: typeof AppClustersRoute
+    }
+    '/app/bare-metal/$name': {
+      id: '/app/bare-metal/$name'
+      path: '/$name'
+      fullPath: '/app/bare-metal/$name'
+      preLoaderRoute: typeof AppBareMetalNameRouteImport
+      parentRoute: typeof AppBareMetalRoute
     }
     '/app/admin/users': {
       id: '/app/admin/users'
@@ -727,6 +824,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProviderStorageTiersIndexRouteImport
       parentRoute: typeof AppProviderStorageTiersRoute
     }
+    '/app/provider/bare-metal/': {
+      id: '/app/provider/bare-metal/'
+      path: '/'
+      fullPath: '/app/provider/bare-metal/'
+      preLoaderRoute: typeof AppProviderBareMetalIndexRouteImport
+      parentRoute: typeof AppProviderBareMetalRoute
+    }
     '/app/provider/agents/': {
       id: '/app/provider/agents/'
       path: '/'
@@ -755,6 +859,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProviderStorageTiersIdRouteImport
       parentRoute: typeof AppProviderStorageTiersRoute
     }
+    '/app/provider/bare-metal/$id': {
+      id: '/app/provider/bare-metal/$id'
+      path: '/$id'
+      fullPath: '/app/provider/bare-metal/$id'
+      preLoaderRoute: typeof AppProviderBareMetalIdRouteImport
+      parentRoute: typeof AppProviderBareMetalRoute
+    }
     '/app/provider/agents/$host': {
       id: '/app/provider/agents/$host'
       path: '/$host'
@@ -771,6 +882,20 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AppBareMetalRouteChildren {
+  AppBareMetalNameRoute: typeof AppBareMetalNameRoute
+  AppBareMetalIndexRoute: typeof AppBareMetalIndexRoute
+}
+
+const AppBareMetalRouteChildren: AppBareMetalRouteChildren = {
+  AppBareMetalNameRoute: AppBareMetalNameRoute,
+  AppBareMetalIndexRoute: AppBareMetalIndexRoute,
+}
+
+const AppBareMetalRouteWithChildren = AppBareMetalRoute._addFileChildren(
+  AppBareMetalRouteChildren,
+)
 
 interface AppClustersRouteChildren {
   AppClustersNameRoute: typeof AppClustersNameRoute
@@ -828,6 +953,19 @@ const AppProviderAgentsRouteChildren: AppProviderAgentsRouteChildren = {
 const AppProviderAgentsRouteWithChildren =
   AppProviderAgentsRoute._addFileChildren(AppProviderAgentsRouteChildren)
 
+interface AppProviderBareMetalRouteChildren {
+  AppProviderBareMetalIdRoute: typeof AppProviderBareMetalIdRoute
+  AppProviderBareMetalIndexRoute: typeof AppProviderBareMetalIndexRoute
+}
+
+const AppProviderBareMetalRouteChildren: AppProviderBareMetalRouteChildren = {
+  AppProviderBareMetalIdRoute: AppProviderBareMetalIdRoute,
+  AppProviderBareMetalIndexRoute: AppProviderBareMetalIndexRoute,
+}
+
+const AppProviderBareMetalRouteWithChildren =
+  AppProviderBareMetalRoute._addFileChildren(AppProviderBareMetalRouteChildren)
+
 interface AppProviderStorageTiersRouteChildren {
   AppProviderStorageTiersIdRoute: typeof AppProviderStorageTiersIdRoute
   AppProviderStorageTiersIndexRoute: typeof AppProviderStorageTiersIndexRoute
@@ -859,6 +997,7 @@ const AppProviderTenantsRouteWithChildren =
 
 interface AppRouteChildren {
   AppActivityRoute: typeof AppActivityRoute
+  AppBareMetalRoute: typeof AppBareMetalRouteWithChildren
   AppCatalogRoute: typeof AppCatalogRoute
   AppClustersRoute: typeof AppClustersRouteWithChildren
   AppConsoleRoute: typeof AppConsoleRoute
@@ -870,6 +1009,7 @@ interface AppRouteChildren {
   AppAdminUsersRoute: typeof AppAdminUsersRoute
   AppProviderAgentsRoute: typeof AppProviderAgentsRouteWithChildren
   AppProviderAnsibleRoute: typeof AppProviderAnsibleRoute
+  AppProviderBareMetalRoute: typeof AppProviderBareMetalRouteWithChildren
   AppProviderCatalogItemsRoute: typeof AppProviderCatalogItemsRoute
   AppProviderClustersRoute: typeof AppProviderClustersRoute
   AppProviderInfrastructureRoute: typeof AppProviderInfrastructureRoute
@@ -886,6 +1026,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppActivityRoute: AppActivityRoute,
+  AppBareMetalRoute: AppBareMetalRouteWithChildren,
   AppCatalogRoute: AppCatalogRoute,
   AppClustersRoute: AppClustersRouteWithChildren,
   AppConsoleRoute: AppConsoleRoute,
@@ -897,6 +1038,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppAdminUsersRoute: AppAdminUsersRoute,
   AppProviderAgentsRoute: AppProviderAgentsRouteWithChildren,
   AppProviderAnsibleRoute: AppProviderAnsibleRoute,
+  AppProviderBareMetalRoute: AppProviderBareMetalRouteWithChildren,
   AppProviderCatalogItemsRoute: AppProviderCatalogItemsRoute,
   AppProviderClustersRoute: AppProviderClustersRoute,
   AppProviderInfrastructureRoute: AppProviderInfrastructureRoute,
