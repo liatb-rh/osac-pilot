@@ -67,7 +67,7 @@ export function PublicIpField({
           label="Assign a public IP"
           isChecked={enabled && !disabled}
           isDisabled={disabled}
-          onChange={(_, v) => setEnabled(v)}
+          onChange={(_, v) => { setEnabled(v); emit({ enabled: v }); }}
         />
         {disabled && (
           <div style={{ fontSize: 12, color: "#5b6b7c", marginTop: 4 }}>
@@ -86,7 +86,7 @@ export function PublicIpField({
                 {choiceLabel}
               </MenuToggle>
             )}
-            onSelect={(_, v) => { setChoice(String(v)); setOpen(false); }}
+            onSelect={(_, v) => { setChoice(String(v)); setOpen(false); emit({ choice: String(v) }); }}
           >
             <SelectList>
               <SelectOption value="auto" description={`Eligible pools: ${pools.map((p) => p.name).join(", ")}`}>
@@ -111,7 +111,7 @@ export function PublicIpField({
             id="pub-ip-count"
             type="number"
             value={count}
-            onChange={(_, v) => setCount(v)}
+            onChange={(_, v) => { setCount(v); emit({ count: v }); }}
             style={{ maxWidth: 120 }}
           />
         </FormGroup>
