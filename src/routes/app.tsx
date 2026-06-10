@@ -26,6 +26,7 @@ const ALL_LINKS: NavLink[] = [
   // Tenant user
   { to: "/app", label: "Dashboard", icon: ThIcon, perm: "view_dashboard", group: "Workloads" },
   { to: "/app/vms", label: "Virtual Machines", icon: ServerIcon, perm: "view_my_vms", group: "Workloads" },
+  { to: "/app/bare-metal", label: "Bare Metal", icon: ServerIcon, perm: "view_my_bare_metal", group: "Workloads" },
   { to: "/app/catalog", label: "Template Catalog", icon: CubesIcon, perm: "view_catalog", group: "Workloads" },
   { to: "/app/clusters", label: "Clusters", icon: CloudIcon, perm: "view_clusters", group: "Workloads" },
   // Tenant admin
