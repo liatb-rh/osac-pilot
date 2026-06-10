@@ -5,13 +5,31 @@ import {
 import { useSession } from "@/lib/session";
 import { eligiblePools, ipsForTenant } from "@/lib/public-ip-data";
 
+/** Selection reported to the parent wizard (e.g. for the Review step). */
+export interface PublicIpSelection {
+  enabled: boolean;
+  /** "auto" or a pre-allocated IP id */
+  choice: string;
+  /** Human-readable summary, e.g. "Auto-allocate from an eligible pool" or "203.0.113.10" */
+  label: string;
+  /** Number of public IPs (only > 1 when multiNic) */
+  count: number;
+}
+
 /**
  * "Assign a public IP" toggle + pool / pre-allocated IP picker.
  * Shared by the Create VM, Create Cluster, and Create Bare Metal wizards
  * (Networking step). Disabled when no pool is available to the user's group.
  * Bare metal supports multiple public IPs (one per NIC) via `multiNic`.
+ * Pass `onChange` to receive the current selection (for review steps).
  */
-export function PublicIpField({ multiNic = false }: { multiNic?: boolean }) {
+export function PublicIpField({
+  multiNic = false,
+  onChange,
+}: {
+  multiNic?: boolean;
+  onChange?: (sel: PublicIpSelection) => void;
+}) {
   const { tenant } = useSession();
   const pools = eligiblePools(tenant);
   const preallocated = ipsForTenant(tenant).filter((ip) => ip.state === "allocated");
@@ -22,10 +40,24 @@ export function PublicIpField({ multiNic = false }: { multiNic?: boolean }) {
   const [choice, setChoice] = useState("auto");
   const [count, setCount] = useState("1");
 
-  const choiceLabel =
-    choice === "auto"
+  const labelFor = (c: string) =>
+    c === "auto"
       ? "Auto-allocate from an eligible pool"
-      : `Pre-allocated · ${preallocated.find((ip) => ip.id === choice)?.address ?? choice}`;
+      : `Pre-allocated · ${preallocated.find((ip) => ip.id === c)?.address ?? c}`;
+
+  const choiceLabel = labelFor(choice);
+
+  const emit = (next: { enabled?: boolean; choice?: string; count?: string }) => {
+    const e = next.enabled ?? enabled;
+    const c = next.choice ?? choice;
+    const n = next.count ?? count;
+    onChange?.({
+      enabled: e && !disabled,
+      choice: c,
+      label: labelFor(c),
+      count: Math.max(1, parseInt(n, 10) || 1),
+    });
+  };
 
   return (
     <>
@@ -35,7 +67,7 @@ export function PublicIpField({ multiNic = false }: { multiNic?: boolean }) {
           label="Assign a public IP"
           isChecked={enabled && !disabled}
           isDisabled={disabled}
-          onChange={(_, v) => setEnabled(v)}
+          onChange={(_, v) => { setEnabled(v); emit({ enabled: v }); }}
         />
         {disabled && (
           <div style={{ fontSize: 12, color: "#5b6b7c", marginTop: 4 }}>
@@ -54,7 +86,7 @@ export function PublicIpField({ multiNic = false }: { multiNic?: boolean }) {
                 {choiceLabel}
               </MenuToggle>
             )}
-            onSelect={(_, v) => { setChoice(String(v)); setOpen(false); }}
+            onSelect={(_, v) => { setChoice(String(v)); setOpen(false); emit({ choice: String(v) }); }}
           >
             <SelectList>
               <SelectOption value="auto" description={`Eligible pools: ${pools.map((p) => p.name).join(", ")}`}>
@@ -79,7 +111,7 @@ export function PublicIpField({ multiNic = false }: { multiNic?: boolean }) {
             id="pub-ip-count"
             type="number"
             value={count}
-            onChange={(_, v) => setCount(v)}
+            onChange={(_, v) => { setCount(v); emit({ count: v }); }}
             style={{ maxWidth: 120 }}
           />
         </FormGroup>

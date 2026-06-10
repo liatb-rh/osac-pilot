@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHeader } from "@/components/osac/Primitives";
-import { PublicIpField } from "@/components/osac/PublicIpField";
+import { PublicIpField, type PublicIpSelection } from "@/components/osac/PublicIpField";
 import {
   Button, SearchInput, ToggleGroup, ToggleGroupItem, Modal, ModalVariant,
   ModalHeader, ModalBody, Wizard, WizardStep, Form, FormGroup,
@@ -109,6 +109,7 @@ function CreateVmWizard({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState("bnk-app-05");
   const [tpl, setTpl] = useState("rhel-9-medium");
   const [tplOpen, setTplOpen] = useState(false);
+  const [pubIp, setPubIp] = useState<PublicIpSelection | null>(null);
 
   return (
     <Wizard onClose={onDone} onSave={onDone} height={420}>
@@ -144,14 +145,23 @@ function CreateVmWizard({ onDone }: { onDone: () => void }) {
         <Form>
           <FormGroup label="Virtual network" fieldId="vn"><TextInput id="vn" defaultValue="vn-prod" /></FormGroup>
           <FormGroup label="Subnet" fieldId="sn"><TextInput id="sn" defaultValue="sn-app (10.10.4.0/24)" /></FormGroup>
-          <PublicIpField />
+          <PublicIpField onChange={setPubIp} />
         </Form>
       </WizardStep>
       <WizardStep name="Review" id="review" footer={{ nextButtonText: "Provision" }}>
         <div className="osac-panel">
           <div style={{ marginBottom: 8 }}><strong>Name:</strong> {name}</div>
           <div style={{ marginBottom: 8 }}><strong>Template:</strong> {tpl}</div>
-          <div><strong>Network:</strong> vn-prod / sn-app</div>
+          <div style={{ marginBottom: 8 }}><strong>Network:</strong> vn-prod / sn-app</div>
+          <div>
+            <strong>Public IP:</strong>{" "}
+            {pubIp?.enabled ? pubIp.label : "None"}
+            {pubIp?.enabled && pubIp.choice === "auto" && (
+              <span style={{ fontSize: 12, color: "#5b6b7c", marginLeft: 8 }}>
+                (attached automatically once the VM reaches Running)
+              </span>
+            )}
+          </div>
         </div>
       </WizardStep>
     </Wizard>
