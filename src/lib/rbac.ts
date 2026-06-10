@@ -46,7 +46,17 @@ export type PermissionId =
   | "manage_rbac"
   | "onboard_tenants"
   | "manage_catalog_items"
-  | "view_ansible_collection";
+  | "view_ansible_collection"
+  | "view_my_bare_metal"
+  | "request_bare_metal"
+  | "operate_bare_metal_power"
+  | "launch_bare_metal_console"
+  | "view_bare_metal_quota"
+  | "view_bare_metal_inventory"
+  | "manage_bare_metal_hosts"
+  | "manage_bare_metal_discovery"
+  | "manage_bare_metal_allocation"
+  | "view_all_bare_metal";
 
 export const ROLES: Record<RoleId, { label: string; description: string }> = {
   providerAdmin: {
