@@ -14,6 +14,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppVmsRouteImport } from './routes/app.vms'
+import { Route as AppPublicIpsRouteImport } from './routes/app.public-ips'
 import { Route as AppConsoleRouteImport } from './routes/app.console'
 import { Route as AppClustersRouteImport } from './routes/app.clusters'
 import { Route as AppCatalogRouteImport } from './routes/app.catalog'
@@ -30,6 +31,7 @@ import { Route as AppProviderTenantsRouteImport } from './routes/app.provider.te
 import { Route as AppProviderTemplatesRouteImport } from './routes/app.provider.templates'
 import { Route as AppProviderStorageTiersRouteImport } from './routes/app.provider.storage-tiers'
 import { Route as AppProviderRbacRouteImport } from './routes/app.provider.rbac'
+import { Route as AppProviderPublicIpPoolsRouteImport } from './routes/app.provider.public-ip-pools'
 import { Route as AppProviderOrganizationsRouteImport } from './routes/app.provider.organizations'
 import { Route as AppProviderOnboardingRouteImport } from './routes/app.provider.onboarding'
 import { Route as AppProviderInfrastructureRouteImport } from './routes/app.provider.infrastructure'
@@ -42,17 +44,22 @@ import { Route as AppClustersNameRouteImport } from './routes/app.clusters.$name
 import { Route as AppBareMetalNameRouteImport } from './routes/app.bare-metal.$name'
 import { Route as AppAdminUsersRouteImport } from './routes/app.admin.users'
 import { Route as AppAdminQuotaRouteImport } from './routes/app.admin.quota'
+import { Route as AppAdminPublicIpPoolsRouteImport } from './routes/app.admin.public-ip-pools'
 import { Route as AppAdminNetworksRouteImport } from './routes/app.admin.networks'
 import { Route as AppAdminClusterOfferingsRouteImport } from './routes/app.admin.cluster-offerings'
 import { Route as AppProviderTenantsIndexRouteImport } from './routes/app.provider.tenants.index'
 import { Route as AppProviderStorageTiersIndexRouteImport } from './routes/app.provider.storage-tiers.index'
+import { Route as AppProviderPublicIpPoolsIndexRouteImport } from './routes/app.provider.public-ip-pools.index'
 import { Route as AppProviderBareMetalIndexRouteImport } from './routes/app.provider.bare-metal.index'
 import { Route as AppProviderAgentsIndexRouteImport } from './routes/app.provider.agents.index'
+import { Route as AppAdminPublicIpPoolsIndexRouteImport } from './routes/app.admin.public-ip-pools.index'
 import { Route as AppAdminClusterOfferingsIndexRouteImport } from './routes/app.admin.cluster-offerings.index'
 import { Route as AppProviderTenantsIdRouteImport } from './routes/app.provider.tenants.$id'
 import { Route as AppProviderStorageTiersIdRouteImport } from './routes/app.provider.storage-tiers.$id'
+import { Route as AppProviderPublicIpPoolsIdRouteImport } from './routes/app.provider.public-ip-pools.$id'
 import { Route as AppProviderBareMetalIdRouteImport } from './routes/app.provider.bare-metal.$id'
 import { Route as AppProviderAgentsHostRouteImport } from './routes/app.provider.agents.$host'
+import { Route as AppAdminPublicIpPoolsIdRouteImport } from './routes/app.admin.public-ip-pools.$id'
 import { Route as AppAdminClusterOfferingsIdRouteImport } from './routes/app.admin.cluster-offerings.$id'
 
 const SignInRoute = SignInRouteImport.update({
@@ -78,6 +85,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppVmsRoute = AppVmsRouteImport.update({
   id: '/vms',
   path: '/vms',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPublicIpsRoute = AppPublicIpsRouteImport.update({
+  id: '/public-ips',
+  path: '/public-ips',
   getParentRoute: () => AppRoute,
 } as any)
 const AppConsoleRoute = AppConsoleRouteImport.update({
@@ -160,6 +172,12 @@ const AppProviderRbacRoute = AppProviderRbacRouteImport.update({
   path: '/provider/rbac',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProviderPublicIpPoolsRoute =
+  AppProviderPublicIpPoolsRouteImport.update({
+    id: '/provider/public-ip-pools',
+    path: '/provider/public-ip-pools',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppProviderOrganizationsRoute =
   AppProviderOrganizationsRouteImport.update({
     id: '/provider/organizations',
@@ -222,6 +240,11 @@ const AppAdminQuotaRoute = AppAdminQuotaRouteImport.update({
   path: '/admin/quota',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminPublicIpPoolsRoute = AppAdminPublicIpPoolsRouteImport.update({
+  id: '/admin/public-ip-pools',
+  path: '/admin/public-ip-pools',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAdminNetworksRoute = AppAdminNetworksRouteImport.update({
   id: '/admin/networks',
   path: '/admin/networks',
@@ -244,6 +267,12 @@ const AppProviderStorageTiersIndexRoute =
     path: '/',
     getParentRoute: () => AppProviderStorageTiersRoute,
   } as any)
+const AppProviderPublicIpPoolsIndexRoute =
+  AppProviderPublicIpPoolsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AppProviderPublicIpPoolsRoute,
+  } as any)
 const AppProviderBareMetalIndexRoute =
   AppProviderBareMetalIndexRouteImport.update({
     id: '/',
@@ -255,6 +284,12 @@ const AppProviderAgentsIndexRoute = AppProviderAgentsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppProviderAgentsRoute,
 } as any)
+const AppAdminPublicIpPoolsIndexRoute =
+  AppAdminPublicIpPoolsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AppAdminPublicIpPoolsRoute,
+  } as any)
 const AppAdminClusterOfferingsIndexRoute =
   AppAdminClusterOfferingsIndexRouteImport.update({
     id: '/',
@@ -272,6 +307,12 @@ const AppProviderStorageTiersIdRoute =
     path: '/$id',
     getParentRoute: () => AppProviderStorageTiersRoute,
   } as any)
+const AppProviderPublicIpPoolsIdRoute =
+  AppProviderPublicIpPoolsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AppProviderPublicIpPoolsRoute,
+  } as any)
 const AppProviderBareMetalIdRoute = AppProviderBareMetalIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -281,6 +322,11 @@ const AppProviderAgentsHostRoute = AppProviderAgentsHostRouteImport.update({
   id: '/$host',
   path: '/$host',
   getParentRoute: () => AppProviderAgentsRoute,
+} as any)
+const AppAdminPublicIpPoolsIdRoute = AppAdminPublicIpPoolsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppAdminPublicIpPoolsRoute,
 } as any)
 const AppAdminClusterOfferingsIdRoute =
   AppAdminClusterOfferingsIdRouteImport.update({
@@ -298,10 +344,12 @@ export interface FileRoutesByFullPath {
   '/app/catalog': typeof AppCatalogRoute
   '/app/clusters': typeof AppClustersRouteWithChildren
   '/app/console': typeof AppConsoleRoute
+  '/app/public-ips': typeof AppPublicIpsRoute
   '/app/vms': typeof AppVmsRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRouteWithChildren
   '/app/admin/networks': typeof AppAdminNetworksRoute
+  '/app/admin/public-ip-pools': typeof AppAdminPublicIpPoolsRouteWithChildren
   '/app/admin/quota': typeof AppAdminQuotaRoute
   '/app/admin/users': typeof AppAdminUsersRoute
   '/app/bare-metal/$name': typeof AppBareMetalNameRoute
@@ -314,6 +362,7 @@ export interface FileRoutesByFullPath {
   '/app/provider/infrastructure': typeof AppProviderInfrastructureRoute
   '/app/provider/onboarding': typeof AppProviderOnboardingRoute
   '/app/provider/organizations': typeof AppProviderOrganizationsRoute
+  '/app/provider/public-ip-pools': typeof AppProviderPublicIpPoolsRouteWithChildren
   '/app/provider/rbac': typeof AppProviderRbacRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRouteWithChildren
   '/app/provider/templates': typeof AppProviderTemplatesRoute
@@ -326,13 +375,17 @@ export interface FileRoutesByFullPath {
   '/app/provider/': typeof AppProviderIndexRoute
   '/app/vms/': typeof AppVmsIndexRoute
   '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
+  '/app/admin/public-ip-pools/$id': typeof AppAdminPublicIpPoolsIdRoute
   '/app/provider/agents/$host': typeof AppProviderAgentsHostRoute
   '/app/provider/bare-metal/$id': typeof AppProviderBareMetalIdRoute
+  '/app/provider/public-ip-pools/$id': typeof AppProviderPublicIpPoolsIdRoute
   '/app/provider/storage-tiers/$id': typeof AppProviderStorageTiersIdRoute
   '/app/provider/tenants/$id': typeof AppProviderTenantsIdRoute
   '/app/admin/cluster-offerings/': typeof AppAdminClusterOfferingsIndexRoute
+  '/app/admin/public-ip-pools/': typeof AppAdminPublicIpPoolsIndexRoute
   '/app/provider/agents/': typeof AppProviderAgentsIndexRoute
   '/app/provider/bare-metal/': typeof AppProviderBareMetalIndexRoute
+  '/app/provider/public-ip-pools/': typeof AppProviderPublicIpPoolsIndexRoute
   '/app/provider/storage-tiers/': typeof AppProviderStorageTiersIndexRoute
   '/app/provider/tenants/': typeof AppProviderTenantsIndexRoute
 }
@@ -342,6 +395,7 @@ export interface FileRoutesByTo {
   '/app/activity': typeof AppActivityRoute
   '/app/catalog': typeof AppCatalogRoute
   '/app/console': typeof AppConsoleRoute
+  '/app/public-ips': typeof AppPublicIpsRoute
   '/app': typeof AppIndexRoute
   '/app/admin/networks': typeof AppAdminNetworksRoute
   '/app/admin/quota': typeof AppAdminQuotaRoute
@@ -364,13 +418,17 @@ export interface FileRoutesByTo {
   '/app/provider': typeof AppProviderIndexRoute
   '/app/vms': typeof AppVmsIndexRoute
   '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
+  '/app/admin/public-ip-pools/$id': typeof AppAdminPublicIpPoolsIdRoute
   '/app/provider/agents/$host': typeof AppProviderAgentsHostRoute
   '/app/provider/bare-metal/$id': typeof AppProviderBareMetalIdRoute
+  '/app/provider/public-ip-pools/$id': typeof AppProviderPublicIpPoolsIdRoute
   '/app/provider/storage-tiers/$id': typeof AppProviderStorageTiersIdRoute
   '/app/provider/tenants/$id': typeof AppProviderTenantsIdRoute
   '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsIndexRoute
+  '/app/admin/public-ip-pools': typeof AppAdminPublicIpPoolsIndexRoute
   '/app/provider/agents': typeof AppProviderAgentsIndexRoute
   '/app/provider/bare-metal': typeof AppProviderBareMetalIndexRoute
+  '/app/provider/public-ip-pools': typeof AppProviderPublicIpPoolsIndexRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersIndexRoute
   '/app/provider/tenants': typeof AppProviderTenantsIndexRoute
 }
@@ -384,10 +442,12 @@ export interface FileRoutesById {
   '/app/catalog': typeof AppCatalogRoute
   '/app/clusters': typeof AppClustersRouteWithChildren
   '/app/console': typeof AppConsoleRoute
+  '/app/public-ips': typeof AppPublicIpsRoute
   '/app/vms': typeof AppVmsRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRouteWithChildren
   '/app/admin/networks': typeof AppAdminNetworksRoute
+  '/app/admin/public-ip-pools': typeof AppAdminPublicIpPoolsRouteWithChildren
   '/app/admin/quota': typeof AppAdminQuotaRoute
   '/app/admin/users': typeof AppAdminUsersRoute
   '/app/bare-metal/$name': typeof AppBareMetalNameRoute
@@ -400,6 +460,7 @@ export interface FileRoutesById {
   '/app/provider/infrastructure': typeof AppProviderInfrastructureRoute
   '/app/provider/onboarding': typeof AppProviderOnboardingRoute
   '/app/provider/organizations': typeof AppProviderOrganizationsRoute
+  '/app/provider/public-ip-pools': typeof AppProviderPublicIpPoolsRouteWithChildren
   '/app/provider/rbac': typeof AppProviderRbacRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRouteWithChildren
   '/app/provider/templates': typeof AppProviderTemplatesRoute
@@ -412,13 +473,17 @@ export interface FileRoutesById {
   '/app/provider/': typeof AppProviderIndexRoute
   '/app/vms/': typeof AppVmsIndexRoute
   '/app/admin/cluster-offerings/$id': typeof AppAdminClusterOfferingsIdRoute
+  '/app/admin/public-ip-pools/$id': typeof AppAdminPublicIpPoolsIdRoute
   '/app/provider/agents/$host': typeof AppProviderAgentsHostRoute
   '/app/provider/bare-metal/$id': typeof AppProviderBareMetalIdRoute
+  '/app/provider/public-ip-pools/$id': typeof AppProviderPublicIpPoolsIdRoute
   '/app/provider/storage-tiers/$id': typeof AppProviderStorageTiersIdRoute
   '/app/provider/tenants/$id': typeof AppProviderTenantsIdRoute
   '/app/admin/cluster-offerings/': typeof AppAdminClusterOfferingsIndexRoute
+  '/app/admin/public-ip-pools/': typeof AppAdminPublicIpPoolsIndexRoute
   '/app/provider/agents/': typeof AppProviderAgentsIndexRoute
   '/app/provider/bare-metal/': typeof AppProviderBareMetalIndexRoute
+  '/app/provider/public-ip-pools/': typeof AppProviderPublicIpPoolsIndexRoute
   '/app/provider/storage-tiers/': typeof AppProviderStorageTiersIndexRoute
   '/app/provider/tenants/': typeof AppProviderTenantsIndexRoute
 }
@@ -433,10 +498,12 @@ export interface FileRouteTypes {
     | '/app/catalog'
     | '/app/clusters'
     | '/app/console'
+    | '/app/public-ips'
     | '/app/vms'
     | '/app/'
     | '/app/admin/cluster-offerings'
     | '/app/admin/networks'
+    | '/app/admin/public-ip-pools'
     | '/app/admin/quota'
     | '/app/admin/users'
     | '/app/bare-metal/$name'
@@ -449,6 +516,7 @@ export interface FileRouteTypes {
     | '/app/provider/infrastructure'
     | '/app/provider/onboarding'
     | '/app/provider/organizations'
+    | '/app/provider/public-ip-pools'
     | '/app/provider/rbac'
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
@@ -461,13 +529,17 @@ export interface FileRouteTypes {
     | '/app/provider/'
     | '/app/vms/'
     | '/app/admin/cluster-offerings/$id'
+    | '/app/admin/public-ip-pools/$id'
     | '/app/provider/agents/$host'
     | '/app/provider/bare-metal/$id'
+    | '/app/provider/public-ip-pools/$id'
     | '/app/provider/storage-tiers/$id'
     | '/app/provider/tenants/$id'
     | '/app/admin/cluster-offerings/'
+    | '/app/admin/public-ip-pools/'
     | '/app/provider/agents/'
     | '/app/provider/bare-metal/'
+    | '/app/provider/public-ip-pools/'
     | '/app/provider/storage-tiers/'
     | '/app/provider/tenants/'
   fileRoutesByTo: FileRoutesByTo
@@ -477,6 +549,7 @@ export interface FileRouteTypes {
     | '/app/activity'
     | '/app/catalog'
     | '/app/console'
+    | '/app/public-ips'
     | '/app'
     | '/app/admin/networks'
     | '/app/admin/quota'
@@ -499,13 +572,17 @@ export interface FileRouteTypes {
     | '/app/provider'
     | '/app/vms'
     | '/app/admin/cluster-offerings/$id'
+    | '/app/admin/public-ip-pools/$id'
     | '/app/provider/agents/$host'
     | '/app/provider/bare-metal/$id'
+    | '/app/provider/public-ip-pools/$id'
     | '/app/provider/storage-tiers/$id'
     | '/app/provider/tenants/$id'
     | '/app/admin/cluster-offerings'
+    | '/app/admin/public-ip-pools'
     | '/app/provider/agents'
     | '/app/provider/bare-metal'
+    | '/app/provider/public-ip-pools'
     | '/app/provider/storage-tiers'
     | '/app/provider/tenants'
   id:
@@ -518,10 +595,12 @@ export interface FileRouteTypes {
     | '/app/catalog'
     | '/app/clusters'
     | '/app/console'
+    | '/app/public-ips'
     | '/app/vms'
     | '/app/'
     | '/app/admin/cluster-offerings'
     | '/app/admin/networks'
+    | '/app/admin/public-ip-pools'
     | '/app/admin/quota'
     | '/app/admin/users'
     | '/app/bare-metal/$name'
@@ -534,6 +613,7 @@ export interface FileRouteTypes {
     | '/app/provider/infrastructure'
     | '/app/provider/onboarding'
     | '/app/provider/organizations'
+    | '/app/provider/public-ip-pools'
     | '/app/provider/rbac'
     | '/app/provider/storage-tiers'
     | '/app/provider/templates'
@@ -546,13 +626,17 @@ export interface FileRouteTypes {
     | '/app/provider/'
     | '/app/vms/'
     | '/app/admin/cluster-offerings/$id'
+    | '/app/admin/public-ip-pools/$id'
     | '/app/provider/agents/$host'
     | '/app/provider/bare-metal/$id'
+    | '/app/provider/public-ip-pools/$id'
     | '/app/provider/storage-tiers/$id'
     | '/app/provider/tenants/$id'
     | '/app/admin/cluster-offerings/'
+    | '/app/admin/public-ip-pools/'
     | '/app/provider/agents/'
     | '/app/provider/bare-metal/'
+    | '/app/provider/public-ip-pools/'
     | '/app/provider/storage-tiers/'
     | '/app/provider/tenants/'
   fileRoutesById: FileRoutesById
@@ -598,6 +682,13 @@ declare module '@tanstack/react-router' {
       path: '/vms'
       fullPath: '/app/vms'
       preLoaderRoute: typeof AppVmsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/public-ips': {
+      id: '/app/public-ips'
+      path: '/public-ips'
+      fullPath: '/app/public-ips'
+      preLoaderRoute: typeof AppPublicIpsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/console': {
@@ -712,6 +803,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProviderRbacRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/provider/public-ip-pools': {
+      id: '/app/provider/public-ip-pools'
+      path: '/provider/public-ip-pools'
+      fullPath: '/app/provider/public-ip-pools'
+      preLoaderRoute: typeof AppProviderPublicIpPoolsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/provider/organizations': {
       id: '/app/provider/organizations'
       path: '/provider/organizations'
@@ -796,6 +894,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminQuotaRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/admin/public-ip-pools': {
+      id: '/app/admin/public-ip-pools'
+      path: '/admin/public-ip-pools'
+      fullPath: '/app/admin/public-ip-pools'
+      preLoaderRoute: typeof AppAdminPublicIpPoolsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/admin/networks': {
       id: '/app/admin/networks'
       path: '/admin/networks'
@@ -824,6 +929,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProviderStorageTiersIndexRouteImport
       parentRoute: typeof AppProviderStorageTiersRoute
     }
+    '/app/provider/public-ip-pools/': {
+      id: '/app/provider/public-ip-pools/'
+      path: '/'
+      fullPath: '/app/provider/public-ip-pools/'
+      preLoaderRoute: typeof AppProviderPublicIpPoolsIndexRouteImport
+      parentRoute: typeof AppProviderPublicIpPoolsRoute
+    }
     '/app/provider/bare-metal/': {
       id: '/app/provider/bare-metal/'
       path: '/'
@@ -837,6 +949,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/provider/agents/'
       preLoaderRoute: typeof AppProviderAgentsIndexRouteImport
       parentRoute: typeof AppProviderAgentsRoute
+    }
+    '/app/admin/public-ip-pools/': {
+      id: '/app/admin/public-ip-pools/'
+      path: '/'
+      fullPath: '/app/admin/public-ip-pools/'
+      preLoaderRoute: typeof AppAdminPublicIpPoolsIndexRouteImport
+      parentRoute: typeof AppAdminPublicIpPoolsRoute
     }
     '/app/admin/cluster-offerings/': {
       id: '/app/admin/cluster-offerings/'
@@ -859,6 +978,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProviderStorageTiersIdRouteImport
       parentRoute: typeof AppProviderStorageTiersRoute
     }
+    '/app/provider/public-ip-pools/$id': {
+      id: '/app/provider/public-ip-pools/$id'
+      path: '/$id'
+      fullPath: '/app/provider/public-ip-pools/$id'
+      preLoaderRoute: typeof AppProviderPublicIpPoolsIdRouteImport
+      parentRoute: typeof AppProviderPublicIpPoolsRoute
+    }
     '/app/provider/bare-metal/$id': {
       id: '/app/provider/bare-metal/$id'
       path: '/$id'
@@ -872,6 +998,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/provider/agents/$host'
       preLoaderRoute: typeof AppProviderAgentsHostRouteImport
       parentRoute: typeof AppProviderAgentsRoute
+    }
+    '/app/admin/public-ip-pools/$id': {
+      id: '/app/admin/public-ip-pools/$id'
+      path: '/$id'
+      fullPath: '/app/admin/public-ip-pools/$id'
+      preLoaderRoute: typeof AppAdminPublicIpPoolsIdRouteImport
+      parentRoute: typeof AppAdminPublicIpPoolsRoute
     }
     '/app/admin/cluster-offerings/$id': {
       id: '/app/admin/cluster-offerings/$id'
@@ -940,6 +1073,21 @@ const AppAdminClusterOfferingsRouteWithChildren =
     AppAdminClusterOfferingsRouteChildren,
   )
 
+interface AppAdminPublicIpPoolsRouteChildren {
+  AppAdminPublicIpPoolsIdRoute: typeof AppAdminPublicIpPoolsIdRoute
+  AppAdminPublicIpPoolsIndexRoute: typeof AppAdminPublicIpPoolsIndexRoute
+}
+
+const AppAdminPublicIpPoolsRouteChildren: AppAdminPublicIpPoolsRouteChildren = {
+  AppAdminPublicIpPoolsIdRoute: AppAdminPublicIpPoolsIdRoute,
+  AppAdminPublicIpPoolsIndexRoute: AppAdminPublicIpPoolsIndexRoute,
+}
+
+const AppAdminPublicIpPoolsRouteWithChildren =
+  AppAdminPublicIpPoolsRoute._addFileChildren(
+    AppAdminPublicIpPoolsRouteChildren,
+  )
+
 interface AppProviderAgentsRouteChildren {
   AppProviderAgentsHostRoute: typeof AppProviderAgentsHostRoute
   AppProviderAgentsIndexRoute: typeof AppProviderAgentsIndexRoute
@@ -965,6 +1113,22 @@ const AppProviderBareMetalRouteChildren: AppProviderBareMetalRouteChildren = {
 
 const AppProviderBareMetalRouteWithChildren =
   AppProviderBareMetalRoute._addFileChildren(AppProviderBareMetalRouteChildren)
+
+interface AppProviderPublicIpPoolsRouteChildren {
+  AppProviderPublicIpPoolsIdRoute: typeof AppProviderPublicIpPoolsIdRoute
+  AppProviderPublicIpPoolsIndexRoute: typeof AppProviderPublicIpPoolsIndexRoute
+}
+
+const AppProviderPublicIpPoolsRouteChildren: AppProviderPublicIpPoolsRouteChildren =
+  {
+    AppProviderPublicIpPoolsIdRoute: AppProviderPublicIpPoolsIdRoute,
+    AppProviderPublicIpPoolsIndexRoute: AppProviderPublicIpPoolsIndexRoute,
+  }
+
+const AppProviderPublicIpPoolsRouteWithChildren =
+  AppProviderPublicIpPoolsRoute._addFileChildren(
+    AppProviderPublicIpPoolsRouteChildren,
+  )
 
 interface AppProviderStorageTiersRouteChildren {
   AppProviderStorageTiersIdRoute: typeof AppProviderStorageTiersIdRoute
@@ -1001,10 +1165,12 @@ interface AppRouteChildren {
   AppCatalogRoute: typeof AppCatalogRoute
   AppClustersRoute: typeof AppClustersRouteWithChildren
   AppConsoleRoute: typeof AppConsoleRoute
+  AppPublicIpsRoute: typeof AppPublicIpsRoute
   AppVmsRoute: typeof AppVmsRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
   AppAdminClusterOfferingsRoute: typeof AppAdminClusterOfferingsRouteWithChildren
   AppAdminNetworksRoute: typeof AppAdminNetworksRoute
+  AppAdminPublicIpPoolsRoute: typeof AppAdminPublicIpPoolsRouteWithChildren
   AppAdminQuotaRoute: typeof AppAdminQuotaRoute
   AppAdminUsersRoute: typeof AppAdminUsersRoute
   AppProviderAgentsRoute: typeof AppProviderAgentsRouteWithChildren
@@ -1015,6 +1181,7 @@ interface AppRouteChildren {
   AppProviderInfrastructureRoute: typeof AppProviderInfrastructureRoute
   AppProviderOnboardingRoute: typeof AppProviderOnboardingRoute
   AppProviderOrganizationsRoute: typeof AppProviderOrganizationsRoute
+  AppProviderPublicIpPoolsRoute: typeof AppProviderPublicIpPoolsRouteWithChildren
   AppProviderRbacRoute: typeof AppProviderRbacRoute
   AppProviderStorageTiersRoute: typeof AppProviderStorageTiersRouteWithChildren
   AppProviderTemplatesRoute: typeof AppProviderTemplatesRoute
@@ -1030,10 +1197,12 @@ const AppRouteChildren: AppRouteChildren = {
   AppCatalogRoute: AppCatalogRoute,
   AppClustersRoute: AppClustersRouteWithChildren,
   AppConsoleRoute: AppConsoleRoute,
+  AppPublicIpsRoute: AppPublicIpsRoute,
   AppVmsRoute: AppVmsRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
   AppAdminClusterOfferingsRoute: AppAdminClusterOfferingsRouteWithChildren,
   AppAdminNetworksRoute: AppAdminNetworksRoute,
+  AppAdminPublicIpPoolsRoute: AppAdminPublicIpPoolsRouteWithChildren,
   AppAdminQuotaRoute: AppAdminQuotaRoute,
   AppAdminUsersRoute: AppAdminUsersRoute,
   AppProviderAgentsRoute: AppProviderAgentsRouteWithChildren,
@@ -1044,6 +1213,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProviderInfrastructureRoute: AppProviderInfrastructureRoute,
   AppProviderOnboardingRoute: AppProviderOnboardingRoute,
   AppProviderOrganizationsRoute: AppProviderOrganizationsRoute,
+  AppProviderPublicIpPoolsRoute: AppProviderPublicIpPoolsRouteWithChildren,
   AppProviderRbacRoute: AppProviderRbacRoute,
   AppProviderStorageTiersRoute: AppProviderStorageTiersRouteWithChildren,
   AppProviderTemplatesRoute: AppProviderTemplatesRoute,
