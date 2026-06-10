@@ -167,7 +167,7 @@ function BareMetalDetail() {
         </Tab>
 
         <Tab eventKey="danger" title={<TabTitleText>Danger zone</TabTitleText>}>
-          <div style={{ paddingTop: 16 }} className="osac-panel" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 16 }}>
+          <div className="osac-panel" style={{ marginTop: 16, display: "flex", alignItems: "center", justifyContent: "space-between", padding: 16 }}>
             <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
               <TrashIcon style={{ color: "#c9190b" }} />
               <div>
