@@ -27,6 +27,7 @@ const ALL_LINKS: NavLink[] = [
   { to: "/app", label: "Dashboard", icon: ThIcon, perm: "view_dashboard", group: "Workloads" },
   { to: "/app/vms", label: "Virtual Machines", icon: ServerIcon, perm: "view_my_vms", group: "Workloads" },
   { to: "/app/bare-metal", label: "Bare Metal", icon: ServerIcon, perm: "view_my_bare_metal", group: "Workloads" },
+  { to: "/app/public-ips", label: "Public IPs", icon: NetworkIcon, perm: "view_public_ips", group: "Workloads" },
   { to: "/app/catalog", label: "Template Catalog", icon: CubesIcon, perm: "view_catalog", group: "Workloads" },
   { to: "/app/clusters", label: "Clusters", icon: CloudIcon, perm: "view_clusters", group: "Workloads" },
   // Tenant admin
@@ -35,12 +36,14 @@ const ALL_LINKS: NavLink[] = [
   { to: "/app/admin/quota", label: "Quota", icon: DatabaseIcon, perm: "view_quota", group: "Administration" },
   { to: "/app/admin/networks", label: "Networks", icon: NetworkIcon, perm: "view_topology", group: "Administration" },
   { to: "/app/admin/cluster-offerings", label: "Cluster Offerings", icon: ListIcon, perm: "manage_cluster_offerings", group: "Administration" },
+  { to: "/app/admin/public-ip-pools", label: "Public IP Pools", icon: NetworkIcon, perm: "manage_group_ip_pools", group: "Administration" },
   // Provider admin
   { to: "/app/provider", label: "Provider Overview", icon: ShieldAltIcon, perm: "view_provider_dashboard", group: "Platform" },
   { to: "/app/provider/tenants", label: "Tenant Organizations", icon: BuildingIcon, perm: "manage_tenants", group: "Platform" },
   { to: "/app/provider/infrastructure", label: "Infrastructure", icon: NetworkIcon, perm: "view_infrastructure", group: "Platform" },
   { to: "/app/provider/agents", label: "Infrastructure Agents", icon: CogIcon, perm: "view_agents", group: "Platform" },
   { to: "/app/provider/storage-tiers", label: "Storage Tiers", icon: DatabaseIcon, perm: "view_storage_tiers", group: "Platform" },
+  { to: "/app/provider/public-ip-pools", label: "Public IP Pools", icon: NetworkIcon, perm: "manage_public_ip_pools", group: "Platform" },
   { to: "/app/provider/templates", label: "Global Templates", icon: CubesIcon, perm: "manage_global_templates", group: "Platform" },
   { to: "/app/provider/clusters", label: "All Clusters", icon: CloudIcon, perm: "view_clusters", group: "Platform" },
   { to: "/app/provider/vms", label: "All Virtual Machines", icon: ServerIcon, perm: "view_infrastructure", group: "Platform" },

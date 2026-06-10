@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHeader } from "@/components/osac/Primitives";
+import { PublicIpField } from "@/components/osac/PublicIpField";
 import { Button, Modal, ModalVariant, ModalHeader, ModalBody, Form, FormGroup, TextInput } from "@patternfly/react-core";
 import { Table, Thead, Tr, Th, Tbody, Td, ActionsColumn } from "@patternfly/react-table";
 import { PlusCircleIcon } from "@patternfly/react-icons";
@@ -67,6 +68,7 @@ function ClustersPage() {
             <FormGroup label="OCP version" fieldId="cv"><TextInput id="cv" defaultValue="4.17.3" /></FormGroup>
             <FormGroup label="Workers" fieldId="cw"><TextInput id="cw" defaultValue="3" /></FormGroup>
             <FormGroup label="Virtual network" fieldId="cnet"><TextInput id="cnet" defaultValue="vn-prod" /></FormGroup>
+            <PublicIpField />
             <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
               <Button variant="primary" onClick={() => setOpen(false)}>Provision</Button>
               <Button variant="link" onClick={() => setOpen(false)}>Cancel</Button>
