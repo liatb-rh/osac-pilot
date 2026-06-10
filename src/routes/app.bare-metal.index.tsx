@@ -1,7 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/osac/Primitives";
 import { PublicIpField } from "@/components/osac/PublicIpField";
+import {
+  CatalogItemPicker, DynamicParamFields, dynamicDefaults, type DynamicValues,
+} from "@/components/osac/CatalogItemPicker";
+import { tenantVisibleItems, type CatalogItem } from "@/lib/catalog-data";
 import {
   Button, SearchInput, ToggleGroup, ToggleGroupItem, Modal, ModalVariant,
   ModalHeader, ModalBody, Wizard, WizardStep, Form, FormGroup,
@@ -15,14 +19,29 @@ import {
 } from "@/lib/bare-metal-data";
 import { useSession } from "@/lib/session";
 
-export const Route = createFileRoute("/app/bare-metal/")({ component: BareMetalIndex });
+export const Route = createFileRoute("/app/bare-metal/")({
+  component: BareMetalIndex,
+  validateSearch: (search: Record<string, unknown>): { catalogItem?: string } => ({
+    catalogItem: typeof search.catalogItem === "string" ? search.catalogItem : undefined,
+  }),
+});
 
 function BareMetalIndex() {
   const navigate = useNavigate();
   const { tenant } = useSession();
+  const { catalogItem } = Route.useSearch();
   const [filter, setFilter] = useState<"all" | "active" | "progressing">("all");
   const [q, setQ] = useState("");
   const [wizardOpen, setWizardOpen] = useState(false);
+
+  useEffect(() => {
+    if (catalogItem) setWizardOpen(true);
+  }, [catalogItem]);
+
+  const closeWizard = () => {
+    setWizardOpen(false);
+    if (catalogItem) navigate({ to: "/app/bare-metal", search: {}, replace: true });
+  };
 
   const mine = BARE_METAL_INSTANCES.filter((i) => !tenant || i.tenant === tenant);
   const rows = mine.filter((i) => {
@@ -93,35 +112,70 @@ function BareMetalIndex() {
         </Table>
       </div>
 
-      <Modal variant={ModalVariant.large} isOpen={wizardOpen} onClose={() => setWizardOpen(false)} aria-label="Request bare metal">
-        <ModalHeader title="Request bare metal" description="Provision a dedicated physical server for this tenant workspace." />
+      <Modal variant={ModalVariant.large} isOpen={wizardOpen} onClose={closeWizard} aria-label="Request bare metal">
+        <ModalHeader title="Request bare metal" description="Provision a dedicated physical server from a catalog item." />
         <ModalBody style={{ minHeight: 460 }}>
-          <RequestBareMetalWizard onDone={() => setWizardOpen(false)} />
+          <RequestBareMetalWizard onDone={closeWizard} initialItemId={catalogItem} />
         </ModalBody>
       </Modal>
     </>
   );
 }
 
-function RequestBareMetalWizard({ onDone }: { onDone: () => void }) {
+const SSH_KEYS = ["ops-default", "team-app", "personal-ed25519"];
+
+function RequestBareMetalWizard({ onDone, initialItemId }: { onDone: () => void; initialItemId?: string }) {
+  const items = tenantVisibleItems("baremetal");
+  const initial = initialItemId && items.some((i) => i.id === initialItemId) ? initialItemId : items[0]?.id ?? "";
+  const [itemId, setItemId] = useState(initial);
+  const item = items.find((i) => i.id === itemId);
+
   const [name, setName] = useState("ns-bm-05");
-  const [flavor, setFlavor] = useState(BM_FLAVORS[1].id);
+  const [sshKey, setSshKey] = useState(SSH_KEYS[0]);
+  const [sshOpen, setSshOpen] = useState(false);
+  const [flavor, setFlavor] = useState(item?.fixedDefaults.nodeProfile ?? BM_FLAVORS[1].id);
   const [flavorOpen, setFlavorOpen] = useState(false);
   const [image, setImage] = useState(BM_IMAGES[0]);
   const [imageOpen, setImageOpen] = useState(false);
   const [secureBoot, setSecureBoot] = useState(true);
+  const [dyn, setDyn] = useState<DynamicValues>(dynamicDefaults(item?.paramSchema));
 
+  const hasDyn = !!item?.paramSchema && Object.keys(item.paramSchema.properties).length > 0;
   const availableCount = BARE_METAL_HOSTS.filter((h) => h.discoveryState === "available").length;
+
+  const selectItem = (i: CatalogItem) => {
+    setItemId(i.id);
+    setFlavor(i.fixedDefaults.nodeProfile ?? BM_FLAVORS[1].id);
+    setDyn(dynamicDefaults(i.paramSchema));
+  };
 
   return (
     <Wizard onClose={onDone} onSave={onDone} height={460}>
-      <WizardStep name="Flavor" id="flavor">
+      <WizardStep name="Catalog item" id="item">
+        <CatalogItemPicker type="baremetal" selectedId={itemId} onSelect={selectItem} />
+      </WizardStep>
+      <WizardStep name="Basic parameters" id="basic">
         <Form>
-          <FormGroup label="Hardware flavor" fieldId="flavor">
+          <FormGroup label="Instance name" fieldId="n" isRequired>
+            <TextInput id="n" value={name} onChange={(_, v) => setName(v)} />
+          </FormGroup>
+          <FormGroup label="SSH key" fieldId="ssh">
+            <Select isOpen={sshOpen} onOpenChange={setSshOpen}
+              toggle={(ref) => (
+                <MenuToggle ref={ref} onClick={() => setSshOpen((v) => !v)} isExpanded={sshOpen}>{sshKey}</MenuToggle>
+              )}
+              onSelect={(_, v) => { setSshKey(String(v)); setSshOpen(false); }}
+            >
+              <SelectList>
+                {SSH_KEYS.map((k) => <SelectOption key={k} value={k}>{k}</SelectOption>)}
+              </SelectList>
+            </Select>
+          </FormGroup>
+          <FormGroup label="Node profile" fieldId="flavor">
             <Select isOpen={flavorOpen} onOpenChange={setFlavorOpen}
               toggle={(ref) => (
                 <MenuToggle ref={ref} onClick={() => setFlavorOpen((v) => !v)} isExpanded={flavorOpen}>
-                  {BM_FLAVORS.find((f) => f.id === flavor)?.label}
+                  {BM_FLAVORS.find((f) => f.id === flavor)?.label ?? flavor}
                 </MenuToggle>
               )}
               onSelect={(_, v) => { setFlavor(String(v)); setFlavorOpen(false); }}
@@ -130,10 +184,10 @@ function RequestBareMetalWizard({ onDone }: { onDone: () => void }) {
                 {BM_FLAVORS.map((f) => <SelectOption key={f.id} value={f.id}>{f.label}</SelectOption>)}
               </SelectList>
             </Select>
+            <div style={{ fontSize: 12, color: "#5b6b7c", marginTop: 4 }}>
+              Pre-filled from the selected catalog item · {availableCount} matching hosts currently available.
+            </div>
           </FormGroup>
-          <div style={{ color: "#5b6b7c", fontSize: 13 }}>
-            {availableCount} matching hosts currently available in inventory.
-          </div>
         </Form>
       </WizardStep>
       <WizardStep name="Image" id="image">
@@ -155,14 +209,13 @@ function RequestBareMetalWizard({ onDone }: { onDone: () => void }) {
           </FormGroup>
         </Form>
       </WizardStep>
-      <WizardStep name="Details" id="details">
+      <WizardStep name="Dynamic parameters" id="dyn" isHidden={!hasDyn}>
         <Form>
-          <FormGroup label="Instance name" fieldId="n" isRequired>
-            <TextInput id="n" value={name} onChange={(_, v) => setName(v)} />
-          </FormGroup>
-          <FormGroup label="Workspace tag" fieldId="tag">
-            <TextInput id="tag" defaultValue="prod" />
-          </FormGroup>
+          <DynamicParamFields
+            schema={item?.paramSchema}
+            values={dyn}
+            onChange={(k, v) => setDyn((prev) => ({ ...prev, [k]: v }))}
+          />
         </Form>
       </WizardStep>
       <WizardStep name="Networking" id="net">
@@ -175,10 +228,18 @@ function RequestBareMetalWizard({ onDone }: { onDone: () => void }) {
       </WizardStep>
       <WizardStep name="Review" id="review" footer={{ nextButtonText: "Submit request" }}>
         <div className="osac-panel">
+          <div style={{ marginBottom: 8 }}><strong>Catalog item:</strong> {item?.title ?? "—"}</div>
           <div style={{ marginBottom: 8 }}><strong>Name:</strong> {name}</div>
-          <div style={{ marginBottom: 8 }}><strong>Flavor:</strong> {flavor}</div>
+          <div style={{ marginBottom: 8 }}><strong>SSH key:</strong> {sshKey}</div>
+          <div style={{ marginBottom: 8 }}><strong>Node profile:</strong> {flavor}</div>
           <div style={{ marginBottom: 8 }}><strong>Image:</strong> {image}</div>
           <div style={{ marginBottom: 8 }}><strong>Secure boot:</strong> {secureBoot ? "enabled" : "disabled"}</div>
+          {hasDyn && (
+            <div style={{ marginBottom: 8 }}>
+              <strong>Dynamic parameters:</strong>{" "}
+              {Object.entries(dyn).map(([k, v]) => `${k}: ${String(v)}`).join(" · ")}
+            </div>
+          )}
           <div><strong>Network:</strong> vn-prod / sn-app · VLAN 410</div>
         </div>
       </WizardStep>

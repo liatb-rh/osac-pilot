@@ -28,7 +28,6 @@ import { Route as AppAdminIndexRouteImport } from './routes/app.admin.index'
 import { Route as AppVmsNameRouteImport } from './routes/app.vms.$name'
 import { Route as AppProviderVmsRouteImport } from './routes/app.provider.vms'
 import { Route as AppProviderTenantsRouteImport } from './routes/app.provider.tenants'
-import { Route as AppProviderTemplatesRouteImport } from './routes/app.provider.templates'
 import { Route as AppProviderStorageTiersRouteImport } from './routes/app.provider.storage-tiers'
 import { Route as AppProviderRbacRouteImport } from './routes/app.provider.rbac'
 import { Route as AppProviderPublicIpPoolsRouteImport } from './routes/app.provider.public-ip-pools'
@@ -47,6 +46,7 @@ import { Route as AppAdminQuotaRouteImport } from './routes/app.admin.quota'
 import { Route as AppAdminPublicIpPoolsRouteImport } from './routes/app.admin.public-ip-pools'
 import { Route as AppAdminNetworksRouteImport } from './routes/app.admin.networks'
 import { Route as AppAdminClusterOfferingsRouteImport } from './routes/app.admin.cluster-offerings'
+import { Route as AppAdminCatalogItemsRouteImport } from './routes/app.admin.catalog-items'
 import { Route as AppProviderTenantsIndexRouteImport } from './routes/app.provider.tenants.index'
 import { Route as AppProviderStorageTiersIndexRouteImport } from './routes/app.provider.storage-tiers.index'
 import { Route as AppProviderPublicIpPoolsIndexRouteImport } from './routes/app.provider.public-ip-pools.index'
@@ -157,11 +157,6 @@ const AppProviderTenantsRoute = AppProviderTenantsRouteImport.update({
   path: '/provider/tenants',
   getParentRoute: () => AppRoute,
 } as any)
-const AppProviderTemplatesRoute = AppProviderTemplatesRouteImport.update({
-  id: '/provider/templates',
-  path: '/provider/templates',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppProviderStorageTiersRoute = AppProviderStorageTiersRouteImport.update({
   id: '/provider/storage-tiers',
   path: '/provider/storage-tiers',
@@ -256,6 +251,11 @@ const AppAdminClusterOfferingsRoute =
     path: '/admin/cluster-offerings',
     getParentRoute: () => AppRoute,
   } as any)
+const AppAdminCatalogItemsRoute = AppAdminCatalogItemsRouteImport.update({
+  id: '/admin/catalog-items',
+  path: '/admin/catalog-items',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProviderTenantsIndexRoute = AppProviderTenantsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -347,6 +347,7 @@ export interface FileRoutesByFullPath {
   '/app/public-ips': typeof AppPublicIpsRoute
   '/app/vms': typeof AppVmsRouteWithChildren
   '/app/': typeof AppIndexRoute
+  '/app/admin/catalog-items': typeof AppAdminCatalogItemsRoute
   '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRouteWithChildren
   '/app/admin/networks': typeof AppAdminNetworksRoute
   '/app/admin/public-ip-pools': typeof AppAdminPublicIpPoolsRouteWithChildren
@@ -365,7 +366,6 @@ export interface FileRoutesByFullPath {
   '/app/provider/public-ip-pools': typeof AppProviderPublicIpPoolsRouteWithChildren
   '/app/provider/rbac': typeof AppProviderRbacRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRouteWithChildren
-  '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRouteWithChildren
   '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
@@ -397,6 +397,7 @@ export interface FileRoutesByTo {
   '/app/console': typeof AppConsoleRoute
   '/app/public-ips': typeof AppPublicIpsRoute
   '/app': typeof AppIndexRoute
+  '/app/admin/catalog-items': typeof AppAdminCatalogItemsRoute
   '/app/admin/networks': typeof AppAdminNetworksRoute
   '/app/admin/quota': typeof AppAdminQuotaRoute
   '/app/admin/users': typeof AppAdminUsersRoute
@@ -409,7 +410,6 @@ export interface FileRoutesByTo {
   '/app/provider/onboarding': typeof AppProviderOnboardingRoute
   '/app/provider/organizations': typeof AppProviderOrganizationsRoute
   '/app/provider/rbac': typeof AppProviderRbacRoute
-  '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
   '/app/admin': typeof AppAdminIndexRoute
@@ -445,6 +445,7 @@ export interface FileRoutesById {
   '/app/public-ips': typeof AppPublicIpsRoute
   '/app/vms': typeof AppVmsRouteWithChildren
   '/app/': typeof AppIndexRoute
+  '/app/admin/catalog-items': typeof AppAdminCatalogItemsRoute
   '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRouteWithChildren
   '/app/admin/networks': typeof AppAdminNetworksRoute
   '/app/admin/public-ip-pools': typeof AppAdminPublicIpPoolsRouteWithChildren
@@ -463,7 +464,6 @@ export interface FileRoutesById {
   '/app/provider/public-ip-pools': typeof AppProviderPublicIpPoolsRouteWithChildren
   '/app/provider/rbac': typeof AppProviderRbacRoute
   '/app/provider/storage-tiers': typeof AppProviderStorageTiersRouteWithChildren
-  '/app/provider/templates': typeof AppProviderTemplatesRoute
   '/app/provider/tenants': typeof AppProviderTenantsRouteWithChildren
   '/app/provider/vms': typeof AppProviderVmsRoute
   '/app/vms/$name': typeof AppVmsNameRoute
@@ -501,6 +501,7 @@ export interface FileRouteTypes {
     | '/app/public-ips'
     | '/app/vms'
     | '/app/'
+    | '/app/admin/catalog-items'
     | '/app/admin/cluster-offerings'
     | '/app/admin/networks'
     | '/app/admin/public-ip-pools'
@@ -519,7 +520,6 @@ export interface FileRouteTypes {
     | '/app/provider/public-ip-pools'
     | '/app/provider/rbac'
     | '/app/provider/storage-tiers'
-    | '/app/provider/templates'
     | '/app/provider/tenants'
     | '/app/provider/vms'
     | '/app/vms/$name'
@@ -551,6 +551,7 @@ export interface FileRouteTypes {
     | '/app/console'
     | '/app/public-ips'
     | '/app'
+    | '/app/admin/catalog-items'
     | '/app/admin/networks'
     | '/app/admin/quota'
     | '/app/admin/users'
@@ -563,7 +564,6 @@ export interface FileRouteTypes {
     | '/app/provider/onboarding'
     | '/app/provider/organizations'
     | '/app/provider/rbac'
-    | '/app/provider/templates'
     | '/app/provider/vms'
     | '/app/vms/$name'
     | '/app/admin'
@@ -598,6 +598,7 @@ export interface FileRouteTypes {
     | '/app/public-ips'
     | '/app/vms'
     | '/app/'
+    | '/app/admin/catalog-items'
     | '/app/admin/cluster-offerings'
     | '/app/admin/networks'
     | '/app/admin/public-ip-pools'
@@ -616,7 +617,6 @@ export interface FileRouteTypes {
     | '/app/provider/public-ip-pools'
     | '/app/provider/rbac'
     | '/app/provider/storage-tiers'
-    | '/app/provider/templates'
     | '/app/provider/tenants'
     | '/app/provider/vms'
     | '/app/vms/$name'
@@ -782,13 +782,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProviderTenantsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/provider/templates': {
-      id: '/app/provider/templates'
-      path: '/provider/templates'
-      fullPath: '/app/provider/templates'
-      preLoaderRoute: typeof AppProviderTemplatesRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/provider/storage-tiers': {
       id: '/app/provider/storage-tiers'
       path: '/provider/storage-tiers'
@@ -913,6 +906,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/cluster-offerings'
       fullPath: '/app/admin/cluster-offerings'
       preLoaderRoute: typeof AppAdminClusterOfferingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/catalog-items': {
+      id: '/app/admin/catalog-items'
+      path: '/admin/catalog-items'
+      fullPath: '/app/admin/catalog-items'
+      preLoaderRoute: typeof AppAdminCatalogItemsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/provider/tenants/': {
@@ -1168,6 +1168,7 @@ interface AppRouteChildren {
   AppPublicIpsRoute: typeof AppPublicIpsRoute
   AppVmsRoute: typeof AppVmsRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
+  AppAdminCatalogItemsRoute: typeof AppAdminCatalogItemsRoute
   AppAdminClusterOfferingsRoute: typeof AppAdminClusterOfferingsRouteWithChildren
   AppAdminNetworksRoute: typeof AppAdminNetworksRoute
   AppAdminPublicIpPoolsRoute: typeof AppAdminPublicIpPoolsRouteWithChildren
@@ -1184,7 +1185,6 @@ interface AppRouteChildren {
   AppProviderPublicIpPoolsRoute: typeof AppProviderPublicIpPoolsRouteWithChildren
   AppProviderRbacRoute: typeof AppProviderRbacRoute
   AppProviderStorageTiersRoute: typeof AppProviderStorageTiersRouteWithChildren
-  AppProviderTemplatesRoute: typeof AppProviderTemplatesRoute
   AppProviderTenantsRoute: typeof AppProviderTenantsRouteWithChildren
   AppProviderVmsRoute: typeof AppProviderVmsRoute
   AppAdminIndexRoute: typeof AppAdminIndexRoute
@@ -1200,6 +1200,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPublicIpsRoute: AppPublicIpsRoute,
   AppVmsRoute: AppVmsRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
+  AppAdminCatalogItemsRoute: AppAdminCatalogItemsRoute,
   AppAdminClusterOfferingsRoute: AppAdminClusterOfferingsRouteWithChildren,
   AppAdminNetworksRoute: AppAdminNetworksRoute,
   AppAdminPublicIpPoolsRoute: AppAdminPublicIpPoolsRouteWithChildren,
@@ -1216,7 +1217,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppProviderPublicIpPoolsRoute: AppProviderPublicIpPoolsRouteWithChildren,
   AppProviderRbacRoute: AppProviderRbacRoute,
   AppProviderStorageTiersRoute: AppProviderStorageTiersRouteWithChildren,
-  AppProviderTemplatesRoute: AppProviderTemplatesRoute,
   AppProviderTenantsRoute: AppProviderTenantsRouteWithChildren,
   AppProviderVmsRoute: AppProviderVmsRoute,
   AppAdminIndexRoute: AppAdminIndexRoute,

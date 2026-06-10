@@ -1,11 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/osac/Primitives";
 import { PublicIpField, type PublicIpSelection } from "@/components/osac/PublicIpField";
 import {
+  CatalogItemPicker, DynamicParamFields, dynamicDefaults, type DynamicValues,
+} from "@/components/osac/CatalogItemPicker";
+import { tenantVisibleItems, type CatalogItem } from "@/lib/catalog-data";
+import {
   Button, SearchInput, ToggleGroup, ToggleGroupItem, Modal, ModalVariant,
   ModalHeader, ModalBody, Wizard, WizardStep, Form, FormGroup,
-  TextInput, Select, SelectOption, SelectList, MenuToggle, Label,
+  TextInput, NumberInput, Select, SelectOption, SelectList, MenuToggle, Label,
 } from "@patternfly/react-core";
 import { Table, Thead, Tr, Th, Tbody, Td, ActionsColumn } from "@patternfly/react-table";
 import { PlusCircleIcon } from "@patternfly/react-icons";
@@ -14,6 +18,9 @@ import { COMPUTE_INSTANCES, vmSimpleStatus } from "@/lib/osac-api";
 
 export const Route = createFileRoute("/app/vms/")({
   component: VmsPage,
+  validateSearch: (search: Record<string, unknown>): { catalogItem?: string } => ({
+    catalogItem: typeof search.catalogItem === "string" ? search.catalogItem : undefined,
+  }),
 });
 
 interface VM { name: string; status: "running" | "stopped" | "progressing" | "failed"; os: string; cpu: number; ram: number; ip: string; }
@@ -35,9 +42,19 @@ const SEED: VM[] = COMPUTE_INSTANCES.map((ci) => {
 
 function VmsPage() {
   const navigate = useNavigate();
+  const { catalogItem } = Route.useSearch();
   const [filter, setFilter] = useState<"all" | "running" | "stopped">("all");
   const [q, setQ] = useState("");
   const [wizardOpen, setWizardOpen] = useState(false);
+
+  useEffect(() => {
+    if (catalogItem) setWizardOpen(true);
+  }, [catalogItem]);
+
+  const closeWizard = () => {
+    setWizardOpen(false);
+    if (catalogItem) navigate({ to: "/app/vms", search: {}, replace: true });
+  };
 
   const rows = SEED.filter((v) => (filter === "all" || v.status === filter) && v.name.includes(q));
 
@@ -95,10 +112,10 @@ function VmsPage() {
         </Table>
       </div>
 
-      <Modal variant={ModalVariant.large} isOpen={wizardOpen} onClose={() => setWizardOpen(false)} aria-label="Create VM">
-        <ModalHeader title="Create virtual machine" description="Provision a new workload in this tenant workspace." />
-        <ModalBody style={{ minHeight: 420 }}>
-          <CreateVmWizard onDone={() => setWizardOpen(false)} />
+      <Modal variant={ModalVariant.large} isOpen={wizardOpen} onClose={closeWizard} aria-label="Create VM">
+        <ModalHeader title="Create virtual machine" description="Provision a new workload from a catalog item in this tenant workspace." />
+        <ModalBody style={{ minHeight: 460 }}>
+          <CreateVmWizard onDone={closeWizard} initialItemId={catalogItem} />
         </ModalBody>
       </Modal>
     </>
@@ -114,39 +131,51 @@ const OS_OPTIONS = [
 ];
 
 const SECURITY_GROUPS = ["sg-app-tier", "sg-db-tier", "sg-edge", "sg-mgmt", "sg-default"];
+const SSH_KEYS = ["ops-default", "team-app", "personal-ed25519"];
 
-function CreateVmWizard({ onDone }: { onDone: () => void }) {
+function CreateVmWizard({ onDone, initialItemId }: { onDone: () => void; initialItemId?: string }) {
+  const items = tenantVisibleItems("vm");
+  const initial = initialItemId && items.some((i) => i.id === initialItemId) ? initialItemId : items[0]?.id ?? "";
+  const [itemId, setItemId] = useState(initial);
+  const item = items.find((i) => i.id === itemId);
+
   const [name, setName] = useState("bnk-app-05");
-  const [tpl, setTpl] = useState("rhel-9-medium");
-  const [tplOpen, setTplOpen] = useState(false);
   const [os, setOs] = useState("rhel-9.4");
   const [osOpen, setOsOpen] = useState(false);
+  const [sshKey, setSshKey] = useState(SSH_KEYS[0]);
+  const [sshOpen, setSshOpen] = useState(false);
+  const [cpu, setCpu] = useState(item?.fixedDefaults.cpu ?? 2);
+  const [ram, setRam] = useState(item?.fixedDefaults.memoryGib ?? 8);
+  const [disk, setDisk] = useState(item?.fixedDefaults.bootDiskSizeGib ?? 64);
+  const [dyn, setDyn] = useState<DynamicValues>(dynamicDefaults(item?.paramSchema));
   const [sgs, setSgs] = useState<string[]>(["sg-app-tier"]);
   const [sgOpen, setSgOpen] = useState(false);
   const [pubIp, setPubIp] = useState<PublicIpSelection | null>(null);
 
+  const resizable = item?.fixedDefaults.allowUserResize !== false;
+  const hasDyn = !!item?.paramSchema && Object.keys(item.paramSchema.properties).length > 0;
   const osLabel = OS_OPTIONS.find((o) => o.value === os)?.label ?? os;
+
+  const selectItem = (i: CatalogItem) => {
+    setItemId(i.id);
+    setCpu(i.fixedDefaults.cpu ?? 2);
+    setRam(i.fixedDefaults.memoryGib ?? 8);
+    setDisk(i.fixedDefaults.bootDiskSizeGib ?? 64);
+    setDyn(dynamicDefaults(i.paramSchema));
+  };
 
   const toggleSg = (v: string) =>
     setSgs((prev) => (prev.includes(v) ? prev.filter((s) => s !== v) : [...prev, v]));
 
   return (
-    <Wizard onClose={onDone} onSave={onDone} height={420}>
-      <WizardStep name="Template" id="tpl">
+    <Wizard onClose={onDone} onSave={onDone} height={460}>
+      <WizardStep name="Catalog item" id="item">
+        <CatalogItemPicker type="vm" selectedId={itemId} onSelect={selectItem} />
+      </WizardStep>
+      <WizardStep name="Basic parameters" id="basic">
         <Form>
-          <FormGroup label="Template" fieldId="tpl">
-            <Select isOpen={tplOpen} onOpenChange={setTplOpen}
-              toggle={(ref) => (
-                <MenuToggle ref={ref} onClick={() => setTplOpen((v) => !v)} isExpanded={tplOpen}>{tpl}</MenuToggle>
-              )}
-              onSelect={(_, v) => { setTpl(String(v)); setTplOpen(false); }}
-            >
-              <SelectList>
-                <SelectOption value="rhel-9-small">rhel-9-small · 2 vCPU · 8 GiB</SelectOption>
-                <SelectOption value="rhel-9-medium">rhel-9-medium · 4 vCPU · 16 GiB</SelectOption>
-                <SelectOption value="ubuntu-22-large">ubuntu-22-large · 16 vCPU · 64 GiB</SelectOption>
-              </SelectList>
-            </Select>
+          <FormGroup label="VM name" fieldId="n" isRequired>
+            <TextInput id="n" value={name} onChange={(_, v) => setName(v)} />
           </FormGroup>
           <FormGroup label="Operating System" fieldId="os">
             <Select isOpen={osOpen} onOpenChange={setOsOpen}
@@ -162,19 +191,63 @@ function CreateVmWizard({ onDone }: { onDone: () => void }) {
               </SelectList>
             </Select>
             <div style={{ fontSize: 12, color: "#5b6b7c", marginTop: 4 }}>
-              Temporary field — will be derived from the selected image once image catalog integration lands.
+              Temporary field (v0.1) — will be derived from the catalog item's image once image catalog integration lands.
             </div>
+          </FormGroup>
+          <FormGroup label="SSH key" fieldId="ssh">
+            <Select isOpen={sshOpen} onOpenChange={setSshOpen}
+              toggle={(ref) => (
+                <MenuToggle ref={ref} onClick={() => setSshOpen((v) => !v)} isExpanded={sshOpen}>{sshKey}</MenuToggle>
+              )}
+              onSelect={(_, v) => { setSshKey(String(v)); setSshOpen(false); }}
+            >
+              <SelectList>
+                {SSH_KEYS.map((k) => <SelectOption key={k} value={k}>{k}</SelectOption>)}
+              </SelectList>
+            </Select>
           </FormGroup>
         </Form>
       </WizardStep>
-      <WizardStep name="Details" id="details">
+      <WizardStep name="Resources" id="res">
         <Form>
-          <FormGroup label="VM name" fieldId="n" isRequired>
-            <TextInput id="n" value={name} onChange={(_, v) => setName(v)} />
+          <FormGroup label="vCPU" fieldId="cpu">
+            <NumberInput
+              value={cpu} min={1} max={64} isDisabled={!resizable}
+              onMinus={() => setCpu((n) => Math.max(1, n - 1))}
+              onPlus={() => setCpu((n) => n + 1)}
+              onChange={(e) => setCpu(Number((e.target as HTMLInputElement).value) || 1)}
+            />
           </FormGroup>
-          <FormGroup label="Workspace tag" fieldId="tag">
-            <TextInput id="tag" defaultValue="prod" />
+          <FormGroup label="Memory (GiB)" fieldId="ram">
+            <NumberInput
+              value={ram} min={1} max={512} isDisabled={!resizable}
+              onMinus={() => setRam((n) => Math.max(1, n - 1))}
+              onPlus={() => setRam((n) => n + 2)}
+              onChange={(e) => setRam(Number((e.target as HTMLInputElement).value) || 1)}
+            />
           </FormGroup>
+          <FormGroup label="Boot disk size (GiB)" fieldId="disk">
+            <NumberInput
+              value={disk} min={16} max={2048}
+              onMinus={() => setDisk((n) => Math.max(16, n - 16))}
+              onPlus={() => setDisk((n) => n + 16)}
+              onChange={(e) => setDisk(Number((e.target as HTMLInputElement).value) || 16)}
+            />
+          </FormGroup>
+          {!resizable && (
+            <div style={{ fontSize: 12, color: "#5b6b7c" }}>
+              CPU and memory are fixed by the selected catalog item.
+            </div>
+          )}
+        </Form>
+      </WizardStep>
+      <WizardStep name="Dynamic parameters" id="dyn" isHidden={!hasDyn}>
+        <Form>
+          <DynamicParamFields
+            schema={item?.paramSchema}
+            values={dyn}
+            onChange={(k, v) => setDyn((prev) => ({ ...prev, [k]: v }))}
+          />
         </Form>
       </WizardStep>
       <WizardStep name="Networking" id="net">
@@ -209,9 +282,17 @@ function CreateVmWizard({ onDone }: { onDone: () => void }) {
       </WizardStep>
       <WizardStep name="Review" id="review" footer={{ nextButtonText: "Provision" }}>
         <div className="osac-panel">
+          <div style={{ marginBottom: 8 }}><strong>Catalog item:</strong> {item?.title ?? "—"}</div>
           <div style={{ marginBottom: 8 }}><strong>Name:</strong> {name}</div>
-          <div style={{ marginBottom: 8 }}><strong>Template:</strong> {tpl}</div>
           <div style={{ marginBottom: 8 }}><strong>Operating System:</strong> {osLabel}</div>
+          <div style={{ marginBottom: 8 }}><strong>SSH key:</strong> {sshKey}</div>
+          <div style={{ marginBottom: 8 }}><strong>Resources:</strong> {cpu} vCPU · {ram} GiB RAM · {disk} GiB boot disk</div>
+          {hasDyn && (
+            <div style={{ marginBottom: 8 }}>
+              <strong>Dynamic parameters:</strong>{" "}
+              {Object.entries(dyn).map(([k, v]) => `${k}: ${String(v)}`).join(" · ")}
+            </div>
+          )}
           <div style={{ marginBottom: 8 }}><strong>Network:</strong> vn-prod / sn-app</div>
           <div style={{ marginBottom: 8 }}>
             <strong>Security groups:</strong> {sgs.length > 0 ? sgs.join(", ") : "None"}
