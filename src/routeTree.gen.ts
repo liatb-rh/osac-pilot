@@ -47,6 +47,7 @@ import { Route as AppAdminQuotaRouteImport } from './routes/app.admin.quota'
 import { Route as AppAdminPublicIpPoolsRouteImport } from './routes/app.admin.public-ip-pools'
 import { Route as AppAdminNetworksRouteImport } from './routes/app.admin.networks'
 import { Route as AppAdminClusterOfferingsRouteImport } from './routes/app.admin.cluster-offerings'
+import { Route as AppAdminCatalogItemsRouteImport } from './routes/app.admin.catalog-items'
 import { Route as AppProviderTenantsIndexRouteImport } from './routes/app.provider.tenants.index'
 import { Route as AppProviderStorageTiersIndexRouteImport } from './routes/app.provider.storage-tiers.index'
 import { Route as AppProviderPublicIpPoolsIndexRouteImport } from './routes/app.provider.public-ip-pools.index'
@@ -256,6 +257,11 @@ const AppAdminClusterOfferingsRoute =
     path: '/admin/cluster-offerings',
     getParentRoute: () => AppRoute,
   } as any)
+const AppAdminCatalogItemsRoute = AppAdminCatalogItemsRouteImport.update({
+  id: '/admin/catalog-items',
+  path: '/admin/catalog-items',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProviderTenantsIndexRoute = AppProviderTenantsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -347,6 +353,7 @@ export interface FileRoutesByFullPath {
   '/app/public-ips': typeof AppPublicIpsRoute
   '/app/vms': typeof AppVmsRouteWithChildren
   '/app/': typeof AppIndexRoute
+  '/app/admin/catalog-items': typeof AppAdminCatalogItemsRoute
   '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRouteWithChildren
   '/app/admin/networks': typeof AppAdminNetworksRoute
   '/app/admin/public-ip-pools': typeof AppAdminPublicIpPoolsRouteWithChildren
@@ -397,6 +404,7 @@ export interface FileRoutesByTo {
   '/app/console': typeof AppConsoleRoute
   '/app/public-ips': typeof AppPublicIpsRoute
   '/app': typeof AppIndexRoute
+  '/app/admin/catalog-items': typeof AppAdminCatalogItemsRoute
   '/app/admin/networks': typeof AppAdminNetworksRoute
   '/app/admin/quota': typeof AppAdminQuotaRoute
   '/app/admin/users': typeof AppAdminUsersRoute
@@ -445,6 +453,7 @@ export interface FileRoutesById {
   '/app/public-ips': typeof AppPublicIpsRoute
   '/app/vms': typeof AppVmsRouteWithChildren
   '/app/': typeof AppIndexRoute
+  '/app/admin/catalog-items': typeof AppAdminCatalogItemsRoute
   '/app/admin/cluster-offerings': typeof AppAdminClusterOfferingsRouteWithChildren
   '/app/admin/networks': typeof AppAdminNetworksRoute
   '/app/admin/public-ip-pools': typeof AppAdminPublicIpPoolsRouteWithChildren
@@ -501,6 +510,7 @@ export interface FileRouteTypes {
     | '/app/public-ips'
     | '/app/vms'
     | '/app/'
+    | '/app/admin/catalog-items'
     | '/app/admin/cluster-offerings'
     | '/app/admin/networks'
     | '/app/admin/public-ip-pools'
@@ -551,6 +561,7 @@ export interface FileRouteTypes {
     | '/app/console'
     | '/app/public-ips'
     | '/app'
+    | '/app/admin/catalog-items'
     | '/app/admin/networks'
     | '/app/admin/quota'
     | '/app/admin/users'
@@ -598,6 +609,7 @@ export interface FileRouteTypes {
     | '/app/public-ips'
     | '/app/vms'
     | '/app/'
+    | '/app/admin/catalog-items'
     | '/app/admin/cluster-offerings'
     | '/app/admin/networks'
     | '/app/admin/public-ip-pools'
@@ -915,6 +927,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminClusterOfferingsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/admin/catalog-items': {
+      id: '/app/admin/catalog-items'
+      path: '/admin/catalog-items'
+      fullPath: '/app/admin/catalog-items'
+      preLoaderRoute: typeof AppAdminCatalogItemsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/provider/tenants/': {
       id: '/app/provider/tenants/'
       path: '/'
@@ -1168,6 +1187,7 @@ interface AppRouteChildren {
   AppPublicIpsRoute: typeof AppPublicIpsRoute
   AppVmsRoute: typeof AppVmsRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
+  AppAdminCatalogItemsRoute: typeof AppAdminCatalogItemsRoute
   AppAdminClusterOfferingsRoute: typeof AppAdminClusterOfferingsRouteWithChildren
   AppAdminNetworksRoute: typeof AppAdminNetworksRoute
   AppAdminPublicIpPoolsRoute: typeof AppAdminPublicIpPoolsRouteWithChildren
@@ -1200,6 +1220,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPublicIpsRoute: AppPublicIpsRoute,
   AppVmsRoute: AppVmsRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
+  AppAdminCatalogItemsRoute: AppAdminCatalogItemsRoute,
   AppAdminClusterOfferingsRoute: AppAdminClusterOfferingsRouteWithChildren,
   AppAdminNetworksRoute: AppAdminNetworksRoute,
   AppAdminPublicIpPoolsRoute: AppAdminPublicIpPoolsRouteWithChildren,
