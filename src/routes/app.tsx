@@ -92,6 +92,9 @@ function AppShell() {
       if (role === "tenantAdmin" && l.to === "/app/public-ips") {
         return { ...l, group: "Administration" };
       }
+      if (role === "providerAdmin" && (l.to === "/app/provider/organizations" || l.to === "/app/provider/rbac" || l.to === "/app/provider/tenants")) {
+        return { ...l, group: "Administration" };
+      }
       return l;
     });
   const groups = Array.from(new Set(visible.map((l) => l.group ?? "Main")));
