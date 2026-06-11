@@ -105,12 +105,12 @@ function PublishCatalogItemWizard({ onDone }: { onDone: () => void }) {
   const [tags, setTags] = useState("general, linux");
   const [template, setTemplate] = useState(TEMPLATES_BY_TYPE.vm[0]);
   const [tOpen, setTOpen] = useState(false);
-  const [cpu, setCpu] = useState(2);
-  const [ram, setRam] = useState(4);
-  const [disk, setDisk] = useState(64);
+  const [instanceTypeId, setInstanceTypeId] = useState<string>("it-small");
+  const [itOpen, setItOpen] = useState(false);
+  const [itVersion, setItVersion] = useState(0); // bump to refresh list after adding
+  const [createItOpen, setCreateItOpen] = useState(false);
   const [ocpVersion, setOcpVersion] = useState("4.17.3");
   const [nodeProfile, setNodeProfile] = useState("bm.gp1.large");
-  const [allowResize, setAllowResize] = useState(false);
   const [schemaText, setSchemaText] = useState(
     JSON.stringify(
       { type: "object", properties: { exampleParam: { type: "string", title: "Example parameter", default: "value" } } },
