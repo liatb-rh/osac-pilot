@@ -301,7 +301,7 @@ function CreateVmWizard({ onDone, initialItemId }: { onDone: () => void; initial
           <div style={{ marginBottom: 8 }}><strong>Name:</strong> {name}</div>
           <div style={{ marginBottom: 8 }}><strong>Operating System:</strong> {osLabel}</div>
           <div style={{ marginBottom: 8 }}><strong>SSH key:</strong> {sshKey}</div>
-          <div style={{ marginBottom: 8 }}><strong>Resources:</strong> {cpu} vCPU · {ram} GiB RAM · {disk} GiB boot disk</div>
+          <div style={{ marginBottom: 8 }}><strong>Instance type:</strong> {instanceType?.displayName ?? "—"} · {cpu} vCPU · {ram} GiB RAM · {disk} GiB boot disk</div>
           {hasDyn && (
             <div style={{ marginBottom: 8 }}>
               <strong>Dynamic parameters:</strong>{" "}
