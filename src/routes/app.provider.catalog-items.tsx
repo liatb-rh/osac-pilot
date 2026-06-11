@@ -2,16 +2,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader, Kpi } from "@/components/osac/Primitives";
 import {
   Button, Label, Modal, ModalVariant, ModalHeader, ModalBody, Wizard, WizardStep,
-  Form, FormGroup, TextInput, TextArea, NumberInput, Select, SelectOption, SelectList,
+  Form, FormGroup, TextInput, TextArea, NumberInput, Select, SelectOption, SelectList, SelectGroup,
   MenuToggle, Switch, Alert, Checkbox,
 } from "@patternfly/react-core";
 import { PlusCircleIcon } from "@patternfly/react-icons";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CatalogItemIcon } from "@/components/osac/CatalogItemPicker";
 import {
   CATALOG_ITEMS, TYPE_LABELS, TYPE_COLORS, USER_GROUPS,
   type CatalogItemType,
 } from "@/lib/catalog-data";
+import {
+  listInstanceTypes, findInstanceType, addInstanceType, formatInstanceType, CATEGORY_LABELS,
+  type InstanceTypeCategory,
+} from "@/lib/instance-types-data";
 
 export const Route = createFileRoute("/app/provider/catalog-items")({ component: CatalogItemsPage });
 
