@@ -135,7 +135,6 @@ function PublishCatalogItemWizard({ onDone }: { onDone: () => void }) {
   const toggleGroup = (g: string) =>
     setGroups((prev) => (prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]));
 
-  return (
   const instanceTypes = useMemo(() => listInstanceTypes(), [itVersion]);
   const selectedIt = findInstanceType(instanceTypeId) ?? instanceTypes[0];
   const groupedIt = instanceTypes.reduce<Record<string, typeof instanceTypes>>((acc, it) => {
