@@ -9,6 +9,7 @@ import {
   tenantVisibleItems,
   type CatalogItem, type CatalogItemType, type ParamSchema,
 } from "@/lib/catalog-data";
+import { findInstanceType } from "@/lib/instance-types-data";
 
 export function CatalogItemIcon({ item, size = 34 }: { item: CatalogItem; size?: number }) {
   const Icon =
@@ -57,11 +58,19 @@ export function CatalogItemPicker({
                 <strong style={{ fontSize: 13 }}>{i.title}</strong>
               </div>
               {i.description && <div style={{ fontSize: 12, color: "#5b6b7c" }}>{i.description}</div>}
-              <div style={{ display: "flex", gap: 10, fontSize: 12, marginTop: "auto", flexWrap: "wrap" }}>
-                {i.fixedDefaults.cpu != null && <span><strong>{i.fixedDefaults.cpu}</strong> vCPU</span>}
-                {i.fixedDefaults.memoryGib != null && <span><strong>{i.fixedDefaults.memoryGib}</strong> GiB</span>}
-                {i.fixedDefaults.ocpVersion && <span>OCP <strong>{i.fixedDefaults.ocpVersion}</strong></span>}
-                {i.fixedDefaults.nodeProfile && <code style={{ fontSize: 11 }}>{i.fixedDefaults.nodeProfile}</code>}
+              <div style={{ display: "flex", gap: 10, fontSize: 12, marginTop: "auto", flexWrap: "wrap", alignItems: "center" }}>
+                {(() => {
+                  const it = findInstanceType(i.fixedDefaults.instanceTypeId);
+                  if (i.type === "vm" && it) {
+                    return <span><code style={{ fontSize: 11 }}>{it.name}</code> · <strong>{it.cpu}</strong> vCPU · <strong>{it.memoryGib}</strong> GiB</span>;
+                  }
+                  return <>
+                    {i.fixedDefaults.cpu != null && <span><strong>{i.fixedDefaults.cpu}</strong> vCPU</span>}
+                    {i.fixedDefaults.memoryGib != null && <span><strong>{i.fixedDefaults.memoryGib}</strong> GiB</span>}
+                    {i.fixedDefaults.ocpVersion && <span>OCP <strong>{i.fixedDefaults.ocpVersion}</strong></span>}
+                    {i.fixedDefaults.nodeProfile && <code style={{ fontSize: 11 }}>{i.fixedDefaults.nodeProfile}</code>}
+                  </>;
+                })()}
               </div>
             </button>
           );

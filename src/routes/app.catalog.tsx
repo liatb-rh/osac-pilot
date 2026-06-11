@@ -6,6 +6,7 @@ import {
   tenantVisibleItems, TYPE_LABELS, TYPE_COLORS, WORKLOAD_LABELS, osOf,
   type CatalogItem, type CatalogItemType, type WorkloadProfile,
 } from "@/lib/catalog-data";
+import { findInstanceType } from "@/lib/instance-types-data";
 import {
   Button, Label, SearchInput,
   Drawer, DrawerContent, DrawerContentBody, DrawerPanelContent,
@@ -83,14 +84,22 @@ function CatalogPage() {
             <strong style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "0.05em", color: "#5b6b7c" }}>
               Defaults
             </strong>
-            {sel.fixedDefaults.cpu != null && <div><strong>{sel.fixedDefaults.cpu}</strong> vCPU</div>}
-            {sel.fixedDefaults.memoryGib != null && <div><strong>{sel.fixedDefaults.memoryGib}</strong> GiB RAM</div>}
-            {sel.fixedDefaults.bootDiskSizeGib != null && <div><strong>{sel.fixedDefaults.bootDiskSizeGib}</strong> GiB boot disk</div>}
-            {sel.fixedDefaults.ocpVersion && <div>OCP version <strong>{sel.fixedDefaults.ocpVersion}</strong></div>}
-            {sel.fixedDefaults.nodeProfile && <div>Node profile <code>{sel.fixedDefaults.nodeProfile}</code></div>}
-            {sel.fixedDefaults.allowUserResize === false && (
-              <div style={{ color: "#5b6b7c", fontSize: 12 }}>Sizing is fixed for this item.</div>
-            )}
+            {(() => {
+              const it = sel.type === "vm" ? findInstanceType(sel.fixedDefaults.instanceTypeId) : undefined;
+              if (it) {
+                return <>
+                  <div>Instance type <strong>{it.displayName}</strong> <code style={{ fontSize: 12 }}>{it.name}</code></div>
+                  <div><strong>{it.cpu}</strong> vCPU · <strong>{it.memoryGib}</strong> GiB RAM · <strong>{it.bootDiskGib}</strong> GiB boot disk</div>
+                </>;
+              }
+              return <>
+                {sel.fixedDefaults.cpu != null && <div><strong>{sel.fixedDefaults.cpu}</strong> vCPU</div>}
+                {sel.fixedDefaults.memoryGib != null && <div><strong>{sel.fixedDefaults.memoryGib}</strong> GiB RAM</div>}
+                {sel.fixedDefaults.bootDiskSizeGib != null && <div><strong>{sel.fixedDefaults.bootDiskSizeGib}</strong> GiB boot disk</div>}
+                {sel.fixedDefaults.ocpVersion && <div>OCP version <strong>{sel.fixedDefaults.ocpVersion}</strong></div>}
+                {sel.fixedDefaults.nodeProfile && <div>Node profile <code>{sel.fixedDefaults.nodeProfile}</code></div>}
+              </>;
+            })()}
           </div>
           {sel.paramSchema && Object.keys(sel.paramSchema.properties).length > 0 && (
             <div style={{ fontSize: 12, color: "#5b6b7c" }}>
