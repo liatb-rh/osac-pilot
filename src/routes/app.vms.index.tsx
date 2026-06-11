@@ -7,9 +7,12 @@ import {
 } from "@/components/osac/CatalogItemPicker";
 import { tenantVisibleItems, type CatalogItem } from "@/lib/catalog-data";
 import {
+  listInstanceTypes, findInstanceType, formatInstanceType, CATEGORY_LABELS,
+} from "@/lib/instance-types-data";
+import {
   Button, SearchInput, ToggleGroup, ToggleGroupItem, Modal, ModalVariant,
   ModalHeader, ModalBody, Wizard, WizardStep, Form, FormGroup,
-  TextInput, NumberInput, Select, SelectOption, SelectList, MenuToggle, Label,
+  TextInput, Select, SelectOption, SelectList, SelectGroup, MenuToggle, Label,
 } from "@patternfly/react-core";
 import { Table, Thead, Tr, Th, Tbody, Td, ActionsColumn } from "@patternfly/react-table";
 import { PlusCircleIcon } from "@patternfly/react-icons";
@@ -144,25 +147,34 @@ function CreateVmWizard({ onDone, initialItemId }: { onDone: () => void; initial
   const [osOpen, setOsOpen] = useState(false);
   const [sshKey, setSshKey] = useState(SSH_KEYS[0]);
   const [sshOpen, setSshOpen] = useState(false);
-  const [cpu, setCpu] = useState(item?.fixedDefaults.cpu ?? 2);
-  const [ram, setRam] = useState(item?.fixedDefaults.memoryGib ?? 8);
-  const [disk, setDisk] = useState(item?.fixedDefaults.bootDiskSizeGib ?? 64);
+  const [instanceTypeId, setInstanceTypeId] = useState<string>(
+    item?.fixedDefaults.instanceTypeId ?? "it-small"
+  );
+  const [itOpen, setItOpen] = useState(false);
   const [dyn, setDyn] = useState<DynamicValues>(dynamicDefaults(item?.paramSchema));
   const [sgs, setSgs] = useState<string[]>(["sg-app-tier"]);
   const [sgOpen, setSgOpen] = useState(false);
   const [pubIp, setPubIp] = useState<PublicIpSelection | null>(null);
 
-  const resizable = item?.fixedDefaults.allowUserResize !== false;
+  const instanceTypes = listInstanceTypes();
+  const instanceType = findInstanceType(instanceTypeId) ?? instanceTypes[0];
+  const cpu = instanceType?.cpu ?? 2;
+  const ram = instanceType?.memoryGib ?? 8;
+  const disk = instanceType?.bootDiskGib ?? 64;
+
   const hasDyn = !!item?.paramSchema && Object.keys(item.paramSchema.properties).length > 0;
   const osLabel = OS_OPTIONS.find((o) => o.value === os)?.label ?? os;
 
   const selectItem = (i: CatalogItem) => {
     setItemId(i.id);
-    setCpu(i.fixedDefaults.cpu ?? 2);
-    setRam(i.fixedDefaults.memoryGib ?? 8);
-    setDisk(i.fixedDefaults.bootDiskSizeGib ?? 64);
+    if (i.fixedDefaults.instanceTypeId) setInstanceTypeId(i.fixedDefaults.instanceTypeId);
     setDyn(dynamicDefaults(i.paramSchema));
   };
+
+  const grouped = instanceTypes.reduce<Record<string, typeof instanceTypes>>((acc, it) => {
+    (acc[it.category] ||= []).push(it);
+    return acc;
+  }, {});
 
   const toggleSg = (v: string) =>
     setSgs((prev) => (prev.includes(v) ? prev.filter((s) => s !== v) : [...prev, v]));
