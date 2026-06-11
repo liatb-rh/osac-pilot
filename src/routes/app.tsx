@@ -75,7 +75,20 @@ function AppShell() {
   const tenantInfo = TENANTS[tenant];
   const roleInfo = ROLES[role];
 
-  const visible = ALL_LINKS.filter((l) => can(role, l.perm));
+  const visible = ALL_LINKS
+    .filter((l) => can(role, l.perm))
+    .filter((l) => {
+      if (role !== "tenantAdmin") return true;
+      // Tenant Admin: hide workload-operator entries
+      if (l.to === "/app/vms" || l.to === "/app/bare-metal") return false;
+      return true;
+    })
+    .map((l) => {
+      if (role === "tenantAdmin" && (l.to === "/app/catalog" || l.to === "/app/public-ips")) {
+        return { ...l, group: "Administration" };
+      }
+      return l;
+    });
   const groups = Array.from(new Set(visible.map((l) => l.group ?? "Main")));
 
   const masthead = (
