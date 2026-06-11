@@ -79,12 +79,12 @@ function AppShell() {
     .filter((l) => can(role, l.perm))
     .filter((l) => {
       if (role !== "tenantAdmin") return true;
-      // Tenant Admin: hide workload-operator entries
-      if (l.to === "/app/vms" || l.to === "/app/bare-metal") return false;
+      // Tenant Admin: hide workload-operator entries and catalog
+      if (l.to === "/app/vms" || l.to === "/app/bare-metal" || l.to === "/app/catalog") return false;
       return true;
     })
     .map((l) => {
-      if (role === "tenantAdmin" && (l.to === "/app/catalog" || l.to === "/app/public-ips")) {
+      if (role === "tenantAdmin" && l.to === "/app/public-ips") {
         return { ...l, group: "Administration" };
       }
       return l;
