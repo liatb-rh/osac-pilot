@@ -317,7 +317,7 @@ function PublishCatalogItemWizard({ onDone }: { onDone: () => void }) {
           <div><strong>Title:</strong> {title} ({variant})</div>
           <div><strong>Slug:</strong> <code>{name}</code> · <strong>Type:</strong> {TYPE_LABELS[type]} · <strong>Icon:</strong> {icon}</div>
           <div><strong>Template:</strong> <code>{template}</code></div>
-          {type === "vm" && <div><strong>Defaults:</strong> {cpu} vCPU · {ram} GiB RAM · {disk} GiB disk · resize {allowResize ? "allowed" : "locked"}</div>}
+          {type === "vm" && <div><strong>Defaults:</strong> instance type <code>{selectedIt?.name ?? "—"}</code> · {selectedIt?.cpu} vCPU · {selectedIt?.memoryGib} GiB RAM · {selectedIt?.bootDiskGib} GiB disk</div>}
           {type === "cluster" && <div><strong>Defaults:</strong> OCP {ocpVersion}</div>}
           {type === "baremetal" && <div><strong>Defaults:</strong> node profile <code>{nodeProfile}</code></div>}
           <div><strong>Tags:</strong> {tags || "—"}</div>
@@ -326,5 +326,89 @@ function PublishCatalogItemWizard({ onDone }: { onDone: () => void }) {
         </div>
       </WizardStep>
     </Wizard>
+    <CreateInstanceTypeModal
+      isOpen={createItOpen}
+      onClose={() => setCreateItOpen(false)}
+      onCreated={(id) => { setItVersion((v) => v + 1); setInstanceTypeId(id); setCreateItOpen(false); }}
+    />
+    </>
+  );
+}
+
+function CreateInstanceTypeModal({
+  isOpen, onClose, onCreated,
+}: { isOpen: boolean; onClose: () => void; onCreated: (id: string) => void }) {
+  const [name, setName] = useState("custom-medium");
+  const [displayName, setDisplayName] = useState("Custom Medium");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState<InstanceTypeCategory>("general");
+  const [catOpen, setCatOpen] = useState(false);
+  const [cpu, setCpu] = useState(4);
+  const [memoryGib, setMemoryGib] = useState(16);
+  const [bootDiskGib, setBootDiskGib] = useState(128);
+
+  const submit = () => {
+    if (!name.trim()) return;
+    const created = addInstanceType({ name: name.trim(), displayName: displayName.trim() || name.trim(), description: description.trim() || undefined, category, cpu, memoryGib, bootDiskGib });
+    onCreated(created.id);
+  };
+
+  return (
+    <Modal variant={ModalVariant.small} isOpen={isOpen} onClose={onClose} aria-label="Create instance type">
+      <ModalHeader title="Create instance type" description="Define a new VM flavor available to all catalog items." />
+      <ModalBody>
+        <Form>
+          <FormGroup label="Name (slug)" isRequired fieldId="itn">
+            <TextInput id="itn" value={name} onChange={(_, v) => setName(v)} />
+          </FormGroup>
+          <FormGroup label="Display name" isRequired fieldId="itdn">
+            <TextInput id="itdn" value={displayName} onChange={(_, v) => setDisplayName(v)} />
+          </FormGroup>
+          <FormGroup label="Description" fieldId="itd">
+            <TextInput id="itd" value={description} onChange={(_, v) => setDescription(v)} />
+          </FormGroup>
+          <FormGroup label="Category" fieldId="itc">
+            <Select
+              isOpen={catOpen} onOpenChange={setCatOpen}
+              toggle={(ref) => (
+                <MenuToggle ref={ref} onClick={() => setCatOpen((v) => !v)} isExpanded={catOpen}>
+                  {CATEGORY_LABELS[category]}
+                </MenuToggle>
+              )}
+              selected={category}
+              onSelect={(_, v) => { setCategory(v as InstanceTypeCategory); setCatOpen(false); }}
+            >
+              <SelectList>
+                {(Object.keys(CATEGORY_LABELS) as InstanceTypeCategory[]).map((c) => (
+                  <SelectOption key={c} value={c}>{CATEGORY_LABELS[c]}</SelectOption>
+                ))}
+              </SelectList>
+            </Select>
+          </FormGroup>
+          <FormGroup label="vCPU" fieldId="itcpu">
+            <NumberInput value={cpu} min={1} max={128}
+              onMinus={() => setCpu((n) => Math.max(1, n - 1))}
+              onPlus={() => setCpu((n) => n + 1)}
+              onChange={(e) => setCpu(Number((e.target as HTMLInputElement).value) || 1)} />
+          </FormGroup>
+          <FormGroup label="Memory (GiB)" fieldId="itmem">
+            <NumberInput value={memoryGib} min={1} max={1024}
+              onMinus={() => setMemoryGib((n) => Math.max(1, n - 1))}
+              onPlus={() => setMemoryGib((n) => n + 2)}
+              onChange={(e) => setMemoryGib(Number((e.target as HTMLInputElement).value) || 1)} />
+          </FormGroup>
+          <FormGroup label="Boot disk (GiB)" fieldId="itdisk">
+            <NumberInput value={bootDiskGib} min={16} max={4096}
+              onMinus={() => setBootDiskGib((n) => Math.max(16, n - 16))}
+              onPlus={() => setBootDiskGib((n) => n + 16)}
+              onChange={(e) => setBootDiskGib(Number((e.target as HTMLInputElement).value) || 16)} />
+          </FormGroup>
+          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+            <Button variant="link" onClick={onClose}>Cancel</Button>
+            <Button variant="primary" onClick={submit}>Create</Button>
+          </div>
+        </Form>
+      </ModalBody>
+    </Modal>
   );
 }
