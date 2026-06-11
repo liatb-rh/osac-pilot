@@ -220,37 +220,40 @@ function CreateVmWizard({ onDone, initialItemId }: { onDone: () => void; initial
           </FormGroup>
         </Form>
       </WizardStep>
-      <WizardStep name="Resources" id="res">
+      <WizardStep name="Instance type" id="res">
         <Form>
-          <FormGroup label="vCPU" fieldId="cpu">
-            <NumberInput
-              value={cpu} min={1} max={64} isDisabled={!resizable}
-              onMinus={() => setCpu((n) => Math.max(1, n - 1))}
-              onPlus={() => setCpu((n) => n + 1)}
-              onChange={(e) => setCpu(Number((e.target as HTMLInputElement).value) || 1)}
-            />
-          </FormGroup>
-          <FormGroup label="Memory (GiB)" fieldId="ram">
-            <NumberInput
-              value={ram} min={1} max={512} isDisabled={!resizable}
-              onMinus={() => setRam((n) => Math.max(1, n - 1))}
-              onPlus={() => setRam((n) => n + 2)}
-              onChange={(e) => setRam(Number((e.target as HTMLInputElement).value) || 1)}
-            />
-          </FormGroup>
-          <FormGroup label="Boot disk size (GiB)" fieldId="disk">
-            <NumberInput
-              value={disk} min={16} max={2048}
-              onMinus={() => setDisk((n) => Math.max(16, n - 16))}
-              onPlus={() => setDisk((n) => n + 16)}
-              onChange={(e) => setDisk(Number((e.target as HTMLInputElement).value) || 16)}
-            />
-          </FormGroup>
-          {!resizable && (
-            <div style={{ fontSize: 12, color: "#5b6b7c" }}>
-              CPU and memory are fixed by the selected catalog item.
+          <FormGroup label="Instance type" fieldId="it" isRequired>
+            <Select
+              isOpen={itOpen} onOpenChange={setItOpen}
+              toggle={(ref) => (
+                <MenuToggle ref={ref} onClick={() => setItOpen((v) => !v)} isExpanded={itOpen} style={{ minWidth: 360 }}>
+                  {instanceType ? formatInstanceType(instanceType) : "Select instance type"}
+                </MenuToggle>
+              )}
+              selected={instanceTypeId}
+              onSelect={(_, v) => { setInstanceTypeId(String(v)); setItOpen(false); }}
+            >
+              <SelectList>
+                {Object.entries(grouped).map(([cat, list]) => (
+                  <SelectGroup key={cat} label={CATEGORY_LABELS[cat as keyof typeof CATEGORY_LABELS]}>
+                    {list.map((it) => (
+                      <SelectOption key={it.id} value={it.id} description={it.description}>
+                        {formatInstanceType(it)}
+                      </SelectOption>
+                    ))}
+                  </SelectGroup>
+                ))}
+              </SelectList>
+            </Select>
+            <div style={{ fontSize: 12, color: "#5b6b7c", marginTop: 6 }}>
+              CPU, memory, and boot disk are determined by the selected instance type.
             </div>
-          )}
+          </FormGroup>
+          <div className="osac-panel" style={{ display: "flex", gap: 18, fontSize: 13 }}>
+            <div><strong>{cpu}</strong> vCPU</div>
+            <div><strong>{ram}</strong> GiB RAM</div>
+            <div><strong>{disk}</strong> GiB boot disk</div>
+          </div>
         </Form>
       </WizardStep>
       <WizardStep name="Dynamic parameters" id="dyn" isHidden={!hasDyn}>
