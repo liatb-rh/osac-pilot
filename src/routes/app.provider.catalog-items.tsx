@@ -136,6 +136,15 @@ function PublishCatalogItemWizard({ onDone }: { onDone: () => void }) {
     setGroups((prev) => (prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]));
 
   return (
+  const instanceTypes = useMemo(() => listInstanceTypes(), [itVersion]);
+  const selectedIt = findInstanceType(instanceTypeId) ?? instanceTypes[0];
+  const groupedIt = instanceTypes.reduce<Record<string, typeof instanceTypes>>((acc, it) => {
+    (acc[it.category] ||= []).push(it);
+    return acc;
+  }, {});
+
+  return (
+    <>
     <Wizard onClose={onDone} onSave={onDone} height={540}>
       <WizardStep name="Identity" id="id">
         <Form>
@@ -212,38 +221,39 @@ function PublishCatalogItemWizard({ onDone }: { onDone: () => void }) {
       </WizardStep>
       <WizardStep name="Fixed defaults" id="fix">
         <Form>
-          {type !== "cluster" && type !== "baremetal" && (
+          {type === "vm" && (
             <>
-              <FormGroup label="Preset vCPU" fieldId="c">
-                <NumberInput
-                  value={cpu} min={1} max={64}
-                  onMinus={() => setCpu((n) => Math.max(1, n - 1))}
-                  onPlus={() => setCpu((n) => n + 1)}
-                  onChange={(e) => setCpu(Number((e.target as HTMLInputElement).value) || 1)}
-                />
+              <FormGroup label="Instance type" fieldId="it" isRequired>
+                <Select
+                  isOpen={itOpen} onOpenChange={setItOpen}
+                  toggle={(ref) => (
+                    <MenuToggle ref={ref} onClick={() => setItOpen((v) => !v)} isExpanded={itOpen} style={{ minWidth: 360 }}>
+                      {selectedIt ? formatInstanceType(selectedIt) : "Select instance type"}
+                    </MenuToggle>
+                  )}
+                  selected={instanceTypeId}
+                  onSelect={(_, v) => { setInstanceTypeId(String(v)); setItOpen(false); }}
+                >
+                  <SelectList>
+                    {Object.entries(groupedIt).map(([cat, list]) => (
+                      <SelectGroup key={cat} label={CATEGORY_LABELS[cat as InstanceTypeCategory]}>
+                        {list.map((it) => (
+                          <SelectOption key={it.id} value={it.id} description={it.description}>
+                            {formatInstanceType(it)}{!it.builtIn ? " · custom" : ""}
+                          </SelectOption>
+                        ))}
+                      </SelectGroup>
+                    ))}
+                  </SelectList>
+                </Select>
+                <div style={{ marginTop: 6 }}>
+                  <Button variant="link" isInline onClick={() => setCreateItOpen(true)}>+ Create new instance type</Button>
+                </div>
               </FormGroup>
-              <FormGroup label="Preset RAM (GiB)" fieldId="r">
-                <NumberInput
-                  value={ram} min={1} max={512}
-                  onMinus={() => setRam((n) => Math.max(1, n - 1))}
-                  onPlus={() => setRam((n) => n + 2)}
-                  onChange={(e) => setRam(Number((e.target as HTMLInputElement).value) || 1)}
-                />
-              </FormGroup>
-              <FormGroup label="Boot disk (GiB)" fieldId="bd">
-                <NumberInput
-                  value={disk} min={16} max={2048}
-                  onMinus={() => setDisk((n) => Math.max(16, n - 16))}
-                  onPlus={() => setDisk((n) => n + 16)}
-                  onChange={(e) => setDisk(Number((e.target as HTMLInputElement).value) || 16)}
-                />
-              </FormGroup>
-              <FormGroup fieldId="ar">
-                <Switch
-                  id="ar" label="Allow tenant users to override CPU / RAM at order time"
-                  isChecked={allowResize} onChange={(_, v) => setAllowResize(v)}
-                />
-              </FormGroup>
+              <Alert
+                variant="info" isInline isPlain
+                title="Tenant users pick from the instance type list at order time. CPU, memory, and boot disk come from the selected instance type."
+              />
             </>
           )}
           {type === "cluster" && (
