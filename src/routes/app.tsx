@@ -78,9 +78,14 @@ function AppShell() {
   const visible = ALL_LINKS
     .filter((l) => can(role, l.perm))
     .filter((l) => {
-      if (role !== "tenantAdmin") return true;
-      // Tenant Admin: hide workload-operator entries and catalog
-      if (l.to === "/app/vms" || l.to === "/app/bare-metal" || l.to === "/app/catalog") return false;
+      if (role === "tenantAdmin") {
+        // Tenant Admin: hide workload-operator entries and catalog
+        if (l.to === "/app/vms" || l.to === "/app/bare-metal" || l.to === "/app/catalog") return false;
+      }
+      if (role === "providerAdmin") {
+        // Provider Admin: hide entire Workloads section
+        if (l.group === "Workloads") return false;
+      }
       return true;
     })
     .map((l) => {
