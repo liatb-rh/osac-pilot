@@ -40,6 +40,8 @@ export interface CatalogItem {
     allowUserResize?: boolean;
     ocpVersion?: string;
     nodeProfile?: string;
+    /** VM-only: backing instance type (flavor) id. Resolved cpu/memory/disk mirror this. */
+    instanceTypeId?: string;
   };
   paramSchema?: ParamSchema;
   /** User groups (within the tenant) authorized by the Provider Admin. */
