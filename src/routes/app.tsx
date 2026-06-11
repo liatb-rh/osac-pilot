@@ -82,6 +82,10 @@ function AppShell() {
         // Tenant Admin: hide workload-operator entries and catalog
         if (l.to === "/app/vms" || l.to === "/app/bare-metal" || l.to === "/app/catalog") return false;
       }
+      if (role === "tenantUser") {
+        // Tenant User: hide Public IPs, Clusters
+        if (l.to === "/app/public-ips" || l.to === "/app/clusters") return false;
+      }
       if (role === "providerAdmin") {
         // Provider Admin: hide entire Workloads section, All Clusters, All Virtual Machines
         if (l.group === "Workloads") return false;
@@ -92,6 +96,9 @@ function AppShell() {
     .map((l) => {
       if (role === "tenantAdmin" && l.to === "/app/public-ips") {
         return { ...l, group: "Administration" };
+      }
+      if (role === "tenantUser" && l.to === "/app/catalog") {
+        return { ...l, group: "Platform" };
       }
       if (role === "providerAdmin" && (l.to === "/app/provider/organizations" || l.to === "/app/provider/rbac" || l.to === "/app/provider/tenants")) {
         return { ...l, group: "Administration" };
