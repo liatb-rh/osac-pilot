@@ -83,8 +83,9 @@ function AppShell() {
         if (l.to === "/app/vms" || l.to === "/app/bare-metal" || l.to === "/app/catalog") return false;
       }
       if (role === "providerAdmin") {
-        // Provider Admin: hide entire Workloads section
+        // Provider Admin: hide entire Workloads section, All Clusters, All Virtual Machines
         if (l.group === "Workloads") return false;
+        if (l.to === "/app/provider/clusters" || l.to === "/app/provider/vms") return false;
       }
       return true;
     })
