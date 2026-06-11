@@ -1,65 +1,67 @@
-# Add Bare Metal (BMaaS) Support to OSAC
+# VM Instance Types (Flavors)
 
-Bare metal becomes a first-class workload type alongside VMs and Clusters: tenants can request and operate physical servers; provider admins manage the physical inventory, discovery, and allocation.
+Introduce predefined VM instance types (t-shirt sizes) as the standard way to size VMs. Catalog Items reference an instance type instead of raw CPU/RAM/disk fields, and the tenant VM wizard picks an instance type instead of editing individual numbers. Scope is VM only — clusters and bare metal are untouched.
 
-## New data layer
+## Data model (`src/lib/instance-types-data.ts` — new)
 
-Extend `src/lib/osac-api.ts` with two resource families:
+```ts
+type InstanceTypeCategory = "general" | "compute" | "memory";
 
-- **BareMetalHost** (provider-managed inventory): `id`, `hostname`, `serial`, `manufacturer/model`, `bmcAddress`, `cpuModel`, `cores`, `memoryGiB`, `disks[]`, `nics[]`, `gpu?`, `rack/zone`, `powerState`, `discoveryState` (discovered/inspecting/available/allocated/maintenance/failed), `tenantAllocation?`.
-- **BareMetalInstance** (tenant-facing provisioned server): `id`, `name`, `tenant`, `hostRef`, `flavor` (e.g. `bm.gp1.large`, `bm.gpu.h100x4`), `image` (RHEL 9 / Ubuntu 22 / OpenShift node / custom ISO), `network` (vnet + subnet + VLAN), `provisioningState` (queued/inspecting/installing/configuring/active/failed), `bootMode` (UEFI/BIOS), `secureBoot`, `ipmiUrl`, `createdAt`.
+interface InstanceType {
+  id: string;            // "it-small"
+  name: string;          // "small"
+  displayName: string;   // "Small"
+  description?: string;
+  category: InstanceTypeCategory;
+  cpu: number;
+  memoryGib: number;
+  bootDiskGib: number;
+  builtIn: boolean;      // seeded t-shirt sizes can't be deleted
+}
+```
 
-Seed ~6 hosts across 2 racks and ~3 instances across tenants so listing screens look real. Add `bmSimpleStatus()` helper mirroring `vmSimpleStatus`.
+Seed: `small` (2/8/64), `medium` (4/16/128), `large` (8/32/256), `xlarge` (16/64/512), `compute-l` (16/32/128, compute), `memory-l` (8/64/256, memory). Helpers: `listInstanceTypes()`, `findInstanceType(id)`.
 
-## RBAC
+## Catalog data changes (`src/lib/catalog-data.ts`)
 
-In `src/lib/rbac.ts` add permissions and grants:
+- Add optional `instanceTypeId?: string` to `CatalogItem.fixedDefaults` (only meaningful for `type: "vm"`).
+- Migrate seeded VM items to reference an instance type (e.g. `vm-rhel9-small` → `it-small`). Keep `cpu`/`memoryGib`/`bootDiskSizeGib` as resolved/fallback values so non-VM views and existing summaries stay intact.
+- `allowUserResize` is retired for VMs — replaced by "pick another instance type". Keep the field tolerated but unused.
 
-- Tenant user: `view_my_bare_metal`, `request_bare_metal`, `operate_bare_metal_power`, `launch_bare_metal_console`.
-- Tenant admin: inherits view + `view_bare_metal_quota`.
-- Provider admin: `view_bare_metal_inventory`, `manage_bare_metal_hosts`, `manage_bare_metal_discovery`, `manage_bare_metal_allocation`, `view_all_bare_metal`.
+## Provider Catalog Items wizard (`src/routes/app.provider.catalog-items.tsx`)
 
-## New routes
+Step 3 ("Defaults") for VM-type items:
+- Replace CPU / RAM / disk inputs with a single **Instance type** `Select` listing all instance types, grouped by category, showing `name — N vCPU · N GiB · N GiB disk`.
+- "Create new instance type…" inline action opens a small modal (name, displayName, description, category, cpu, memoryGib, bootDiskGib). Saving appends to the in-memory list and selects it. Built-in types are not editable; custom ones can be edited/removed from the same modal's list view.
+- Cluster and Bare Metal items keep their existing Step 3 unchanged.
+- Card rendering: for VM items show the resolved instance type chip (e.g. `medium · 4 vCPU · 16 GiB`) instead of separate CPU/RAM stats.
 
-Tenant-scoped:
-- `src/routes/app.bare-metal.tsx` — layout (Outlet).
-- `src/routes/app.bare-metal.index.tsx` — list of my bare metal instances with filter/search, "Request bare metal" wizard (flavor → image → network → review), row actions (power on/off, reboot, console, release).
-- `src/routes/app.bare-metal.$name.tsx` — details: Overview, Hardware (CPU/RAM/disks/NICs/GPU), Network, Power & Console (BMC URL, power state, soft/hard actions), Activity timeline.
+## Tenant VM wizard (`src/routes/app.vms.index.tsx`)
 
-Provider-scoped:
-- `src/routes/app.provider.bare-metal.tsx` — layout.
-- `src/routes/app.provider.bare-metal.index.tsx` — tabs: **Hosts** (inventory table: serial, model, rack, CPU/RAM, GPU, discovery state, allocation), **Instances** (cross-tenant list), **Discovery** (recently discovered hardware awaiting inspection, "Inspect" / "Make available" actions).
-- `src/routes/app.provider.bare-metal.$id.tsx` — host detail: hardware inventory, BMC settings, lifecycle actions (inspect, maintenance mode, decommission), current allocation.
+- Remove the CPU / RAM / Boot disk `NumberInput` fields.
+- Add a single **Instance type** select pre-seeded from the chosen catalog item's `instanceTypeId`; user can switch to any other instance type.
+- Derived `cpu`, `ram`, `disk` come from the selected instance type and are shown read-only in the Resources summary and Review step (`small · 2 vCPU · 8 GiB · 64 GiB`).
+- VM table rows continue to show resolved cpu/ram, sourced from the instance type at creation time.
 
-## Navigation
+## Catalog detail / picker (`src/components/osac/CatalogItemPicker.tsx`, `src/routes/app.catalog.tsx`)
 
-In `src/routes/app.tsx`, append to `ALL_LINKS`:
-- Workloads group: `Bare Metal` → `/app/bare-metal` (perm `view_my_bare_metal`, icon `ServerIcon` styled as physical — use `HddIcon` or `ServerIcon`).
-- Platform group: `Bare Metal Inventory` → `/app/provider/bare-metal` (perm `view_bare_metal_inventory`).
+For VM items, render the instance type label + resolved specs in the spec row instead of separate CPU/GiB chips. Cluster and BM rendering unchanged.
 
-## Provider Overview tile
+## RBAC (`src/lib/rbac.ts`)
 
-In `src/routes/app.provider.index.tsx`, add a Bare Metal KPI card (total hosts, available, allocated, in maintenance).
-
-## Visual + status conventions
-
-Reuse existing `osac-status-dot`, `osac-panel`, `Table`, `PageHeader`, and PatternFly `Wizard`/`Modal` patterns from `app.vms.index.tsx` so bare metal UIs feel native. Map BMaaS provisioning states to the same dot tones (`ready`/`progressing`/`stopped`/`failed`).
+No new roles required. Instance type CRUD lives inside the existing Provider Catalog Items wizard, which is already gated by `manage_catalog_items`.
 
 ## Out of scope
 
-No backend wiring; this is mock data and UI flows only, matching the rest of the project.
+Dedicated `/app/provider/instance-types` admin page, tenant-defined instance types, GPU flavors, placement / scheduling policies, persistence beyond the in-memory seed.
 
-## Files to add/modify
+## Files
 
 ```text
-src/lib/osac-api.ts                              (extend)
-src/lib/rbac.ts                                  (extend)
-src/routes/app.tsx                               (nav links)
-src/routes/app.provider.index.tsx                (KPI tile)
-src/routes/app.bare-metal.tsx                    (new)
-src/routes/app.bare-metal.index.tsx              (new)
-src/routes/app.bare-metal.$name.tsx              (new)
-src/routes/app.provider.bare-metal.tsx           (new)
-src/routes/app.provider.bare-metal.index.tsx     (new)
-src/routes/app.provider.bare-metal.$id.tsx      (new)
+src/lib/instance-types-data.ts                (new)
+src/lib/catalog-data.ts                       (extend fixedDefaults, migrate VM seeds)
+src/routes/app.provider.catalog-items.tsx     (Step 3 instance-type selector + create modal)
+src/routes/app.vms.index.tsx                  (wizard: replace cpu/ram/disk with instance type)
+src/components/osac/CatalogItemPicker.tsx     (VM spec rendering)
+src/routes/app.catalog.tsx                    (VM spec rendering in detail drawer)
 ```

@@ -40,6 +40,8 @@ export interface CatalogItem {
     allowUserResize?: boolean;
     ocpVersion?: string;
     nodeProfile?: string;
+    /** VM-only: backing instance type (flavor) id. Resolved cpu/memory/disk mirror this. */
+    instanceTypeId?: string;
   };
   paramSchema?: ParamSchema;
   /** User groups (within the tenant) authorized by the Provider Admin. */
@@ -79,7 +81,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     description: "General-purpose RHEL 9 virtual machine for lightweight services.",
     icon: "rhel", type: "vm", tags: ["general", "linux"], published: true,
     templateRef: "vm-rhel9",
-    fixedDefaults: { cpu: 2, memoryGib: 8, bootDiskSizeGib: 64, allowUserResize: false },
+    fixedDefaults: { instanceTypeId: "it-small", cpu: 2, memoryGib: 8, bootDiskSizeGib: 64 },
     assignedGroups: ["grp-app-dev", "grp-platform-eng"], tenantEnabled: true, order: 1,
   },
   {
@@ -89,7 +91,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     description: "Balanced RHEL 9 profile for application tiers and services.",
     icon: "rhel", type: "vm", tags: ["general", "linux"], published: true,
     templateRef: "vm-rhel9",
-    fixedDefaults: { cpu: 4, memoryGib: 16, bootDiskSizeGib: 128, allowUserResize: true },
+    fixedDefaults: { instanceTypeId: "it-medium", cpu: 4, memoryGib: 16, bootDiskSizeGib: 128 },
     assignedGroups: ["grp-app-dev", "grp-platform-eng", "grp-data-science"], tenantEnabled: true, order: 2,
   },
   {
@@ -99,7 +101,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     description: "Compute-heavy RHEL 9 profile for demanding workloads.",
     icon: "rhel", type: "vm", workloadProfile: "high-performance", tags: ["compute"], published: true,
     templateRef: "vm-rhel9",
-    fixedDefaults: { cpu: 8, memoryGib: 32, bootDiskSizeGib: 256, allowUserResize: true },
+    fixedDefaults: { instanceTypeId: "it-large", cpu: 8, memoryGib: 32, bootDiskSizeGib: 256 },
     assignedGroups: ["grp-platform-eng"], tenantEnabled: true, order: 3,
   },
   {
@@ -109,7 +111,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     description: "Windows Server 2022 Standard with tenant domain join support.",
     icon: "windows", type: "vm", tags: ["windows"], published: true,
     templateRef: "vm-win2022",
-    fixedDefaults: { cpu: 4, memoryGib: 16, bootDiskSizeGib: 128, allowUserResize: true },
+    fixedDefaults: { instanceTypeId: "it-medium", cpu: 4, memoryGib: 16, bootDiskSizeGib: 128 },
     paramSchema: {
       type: "object",
       properties: {
@@ -126,7 +128,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     description: "Ubuntu 22.04 LTS tuned for data pipelines and processing jobs.",
     icon: "linux", type: "vm", workloadProfile: "data-processing", tags: ["data"], published: true,
     templateRef: "vm-ubuntu22",
-    fixedDefaults: { cpu: 16, memoryGib: 64, bootDiskSizeGib: 256, allowUserResize: true },
+    fixedDefaults: { instanceTypeId: "it-xlarge", cpu: 16, memoryGib: 64, bootDiskSizeGib: 512 },
     paramSchema: {
       type: "object",
       properties: {
@@ -161,7 +163,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     description: "Early-access Windows Server 2025 image — draft, not yet published.",
     icon: "windows", type: "vm", tags: ["windows", "preview"], published: false,
     templateRef: "vm-win2025",
-    fixedDefaults: { cpu: 4, memoryGib: 16, bootDiskSizeGib: 128, allowUserResize: true },
+    fixedDefaults: { instanceTypeId: "it-medium", cpu: 4, memoryGib: 16, bootDiskSizeGib: 128 },
     assignedGroups: [], tenantEnabled: true, order: 7,
   },
   {

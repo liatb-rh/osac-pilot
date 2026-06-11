@@ -2,16 +2,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader, Kpi } from "@/components/osac/Primitives";
 import {
   Button, Label, Modal, ModalVariant, ModalHeader, ModalBody, Wizard, WizardStep,
-  Form, FormGroup, TextInput, TextArea, NumberInput, Select, SelectOption, SelectList,
+  Form, FormGroup, TextInput, TextArea, NumberInput, Select, SelectOption, SelectList, SelectGroup,
   MenuToggle, Switch, Alert, Checkbox,
 } from "@patternfly/react-core";
 import { PlusCircleIcon } from "@patternfly/react-icons";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CatalogItemIcon } from "@/components/osac/CatalogItemPicker";
 import {
   CATALOG_ITEMS, TYPE_LABELS, TYPE_COLORS, USER_GROUPS,
   type CatalogItemType,
 } from "@/lib/catalog-data";
+import {
+  listInstanceTypes, findInstanceType, addInstanceType, formatInstanceType, CATEGORY_LABELS,
+  type InstanceTypeCategory,
+} from "@/lib/instance-types-data";
 
 export const Route = createFileRoute("/app/provider/catalog-items")({ component: CatalogItemsPage });
 
@@ -101,12 +105,12 @@ function PublishCatalogItemWizard({ onDone }: { onDone: () => void }) {
   const [tags, setTags] = useState("general, linux");
   const [template, setTemplate] = useState(TEMPLATES_BY_TYPE.vm[0]);
   const [tOpen, setTOpen] = useState(false);
-  const [cpu, setCpu] = useState(2);
-  const [ram, setRam] = useState(4);
-  const [disk, setDisk] = useState(64);
+  const [instanceTypeId, setInstanceTypeId] = useState<string>("it-small");
+  const [itOpen, setItOpen] = useState(false);
+  const [itVersion, setItVersion] = useState(0); // bump to refresh list after adding
+  const [createItOpen, setCreateItOpen] = useState(false);
   const [ocpVersion, setOcpVersion] = useState("4.17.3");
   const [nodeProfile, setNodeProfile] = useState("bm.gp1.large");
-  const [allowResize, setAllowResize] = useState(false);
   const [schemaText, setSchemaText] = useState(
     JSON.stringify(
       { type: "object", properties: { exampleParam: { type: "string", title: "Example parameter", default: "value" } } },
@@ -131,7 +135,15 @@ function PublishCatalogItemWizard({ onDone }: { onDone: () => void }) {
   const toggleGroup = (g: string) =>
     setGroups((prev) => (prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]));
 
+  const instanceTypes = useMemo(() => listInstanceTypes(), [itVersion]);
+  const selectedIt = findInstanceType(instanceTypeId) ?? instanceTypes[0];
+  const groupedIt = instanceTypes.reduce<Record<string, typeof instanceTypes>>((acc, it) => {
+    (acc[it.category] ||= []).push(it);
+    return acc;
+  }, {});
+
   return (
+    <>
     <Wizard onClose={onDone} onSave={onDone} height={540}>
       <WizardStep name="Identity" id="id">
         <Form>
@@ -208,38 +220,39 @@ function PublishCatalogItemWizard({ onDone }: { onDone: () => void }) {
       </WizardStep>
       <WizardStep name="Fixed defaults" id="fix">
         <Form>
-          {type !== "cluster" && type !== "baremetal" && (
+          {type === "vm" && (
             <>
-              <FormGroup label="Preset vCPU" fieldId="c">
-                <NumberInput
-                  value={cpu} min={1} max={64}
-                  onMinus={() => setCpu((n) => Math.max(1, n - 1))}
-                  onPlus={() => setCpu((n) => n + 1)}
-                  onChange={(e) => setCpu(Number((e.target as HTMLInputElement).value) || 1)}
-                />
+              <FormGroup label="Instance type" fieldId="it" isRequired>
+                <Select
+                  isOpen={itOpen} onOpenChange={setItOpen}
+                  toggle={(ref) => (
+                    <MenuToggle ref={ref} onClick={() => setItOpen((v) => !v)} isExpanded={itOpen} style={{ minWidth: 360 }}>
+                      {selectedIt ? formatInstanceType(selectedIt) : "Select instance type"}
+                    </MenuToggle>
+                  )}
+                  selected={instanceTypeId}
+                  onSelect={(_, v) => { setInstanceTypeId(String(v)); setItOpen(false); }}
+                >
+                  <SelectList>
+                    {Object.entries(groupedIt).map(([cat, list]) => (
+                      <SelectGroup key={cat} label={CATEGORY_LABELS[cat as InstanceTypeCategory]}>
+                        {list.map((it) => (
+                          <SelectOption key={it.id} value={it.id} description={it.description}>
+                            {formatInstanceType(it)}{!it.builtIn ? " · custom" : ""}
+                          </SelectOption>
+                        ))}
+                      </SelectGroup>
+                    ))}
+                  </SelectList>
+                </Select>
+                <div style={{ marginTop: 6 }}>
+                  <Button variant="link" isInline onClick={() => setCreateItOpen(true)}>+ Create new instance type</Button>
+                </div>
               </FormGroup>
-              <FormGroup label="Preset RAM (GiB)" fieldId="r">
-                <NumberInput
-                  value={ram} min={1} max={512}
-                  onMinus={() => setRam((n) => Math.max(1, n - 1))}
-                  onPlus={() => setRam((n) => n + 2)}
-                  onChange={(e) => setRam(Number((e.target as HTMLInputElement).value) || 1)}
-                />
-              </FormGroup>
-              <FormGroup label="Boot disk (GiB)" fieldId="bd">
-                <NumberInput
-                  value={disk} min={16} max={2048}
-                  onMinus={() => setDisk((n) => Math.max(16, n - 16))}
-                  onPlus={() => setDisk((n) => n + 16)}
-                  onChange={(e) => setDisk(Number((e.target as HTMLInputElement).value) || 16)}
-                />
-              </FormGroup>
-              <FormGroup fieldId="ar">
-                <Switch
-                  id="ar" label="Allow tenant users to override CPU / RAM at order time"
-                  isChecked={allowResize} onChange={(_, v) => setAllowResize(v)}
-                />
-              </FormGroup>
+              <Alert
+                variant="info" isInline isPlain
+                title="Tenant users pick from the instance type list at order time. CPU, memory, and boot disk come from the selected instance type."
+              />
             </>
           )}
           {type === "cluster" && (
@@ -304,7 +317,7 @@ function PublishCatalogItemWizard({ onDone }: { onDone: () => void }) {
           <div><strong>Title:</strong> {title} ({variant})</div>
           <div><strong>Slug:</strong> <code>{name}</code> · <strong>Type:</strong> {TYPE_LABELS[type]} · <strong>Icon:</strong> {icon}</div>
           <div><strong>Template:</strong> <code>{template}</code></div>
-          {type === "vm" && <div><strong>Defaults:</strong> {cpu} vCPU · {ram} GiB RAM · {disk} GiB disk · resize {allowResize ? "allowed" : "locked"}</div>}
+          {type === "vm" && <div><strong>Defaults:</strong> instance type <code>{selectedIt?.name ?? "—"}</code> · {selectedIt?.cpu} vCPU · {selectedIt?.memoryGib} GiB RAM · {selectedIt?.bootDiskGib} GiB disk</div>}
           {type === "cluster" && <div><strong>Defaults:</strong> OCP {ocpVersion}</div>}
           {type === "baremetal" && <div><strong>Defaults:</strong> node profile <code>{nodeProfile}</code></div>}
           <div><strong>Tags:</strong> {tags || "—"}</div>
@@ -313,5 +326,89 @@ function PublishCatalogItemWizard({ onDone }: { onDone: () => void }) {
         </div>
       </WizardStep>
     </Wizard>
+    <CreateInstanceTypeModal
+      isOpen={createItOpen}
+      onClose={() => setCreateItOpen(false)}
+      onCreated={(id) => { setItVersion((v) => v + 1); setInstanceTypeId(id); setCreateItOpen(false); }}
+    />
+    </>
+  );
+}
+
+function CreateInstanceTypeModal({
+  isOpen, onClose, onCreated,
+}: { isOpen: boolean; onClose: () => void; onCreated: (id: string) => void }) {
+  const [name, setName] = useState("custom-medium");
+  const [displayName, setDisplayName] = useState("Custom Medium");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState<InstanceTypeCategory>("general");
+  const [catOpen, setCatOpen] = useState(false);
+  const [cpu, setCpu] = useState(4);
+  const [memoryGib, setMemoryGib] = useState(16);
+  const [bootDiskGib, setBootDiskGib] = useState(128);
+
+  const submit = () => {
+    if (!name.trim()) return;
+    const created = addInstanceType({ name: name.trim(), displayName: displayName.trim() || name.trim(), description: description.trim() || undefined, category, cpu, memoryGib, bootDiskGib });
+    onCreated(created.id);
+  };
+
+  return (
+    <Modal variant={ModalVariant.small} isOpen={isOpen} onClose={onClose} aria-label="Create instance type">
+      <ModalHeader title="Create instance type" description="Define a new VM flavor available to all catalog items." />
+      <ModalBody>
+        <Form>
+          <FormGroup label="Name (slug)" isRequired fieldId="itn">
+            <TextInput id="itn" value={name} onChange={(_, v) => setName(v)} />
+          </FormGroup>
+          <FormGroup label="Display name" isRequired fieldId="itdn">
+            <TextInput id="itdn" value={displayName} onChange={(_, v) => setDisplayName(v)} />
+          </FormGroup>
+          <FormGroup label="Description" fieldId="itd">
+            <TextInput id="itd" value={description} onChange={(_, v) => setDescription(v)} />
+          </FormGroup>
+          <FormGroup label="Category" fieldId="itc">
+            <Select
+              isOpen={catOpen} onOpenChange={setCatOpen}
+              toggle={(ref) => (
+                <MenuToggle ref={ref} onClick={() => setCatOpen((v) => !v)} isExpanded={catOpen}>
+                  {CATEGORY_LABELS[category]}
+                </MenuToggle>
+              )}
+              selected={category}
+              onSelect={(_, v) => { setCategory(v as InstanceTypeCategory); setCatOpen(false); }}
+            >
+              <SelectList>
+                {(Object.keys(CATEGORY_LABELS) as InstanceTypeCategory[]).map((c) => (
+                  <SelectOption key={c} value={c}>{CATEGORY_LABELS[c]}</SelectOption>
+                ))}
+              </SelectList>
+            </Select>
+          </FormGroup>
+          <FormGroup label="vCPU" fieldId="itcpu">
+            <NumberInput value={cpu} min={1} max={128}
+              onMinus={() => setCpu((n) => Math.max(1, n - 1))}
+              onPlus={() => setCpu((n) => n + 1)}
+              onChange={(e) => setCpu(Number((e.target as HTMLInputElement).value) || 1)} />
+          </FormGroup>
+          <FormGroup label="Memory (GiB)" fieldId="itmem">
+            <NumberInput value={memoryGib} min={1} max={1024}
+              onMinus={() => setMemoryGib((n) => Math.max(1, n - 1))}
+              onPlus={() => setMemoryGib((n) => n + 2)}
+              onChange={(e) => setMemoryGib(Number((e.target as HTMLInputElement).value) || 1)} />
+          </FormGroup>
+          <FormGroup label="Boot disk (GiB)" fieldId="itdisk">
+            <NumberInput value={bootDiskGib} min={16} max={4096}
+              onMinus={() => setBootDiskGib((n) => Math.max(16, n - 16))}
+              onPlus={() => setBootDiskGib((n) => n + 16)}
+              onChange={(e) => setBootDiskGib(Number((e.target as HTMLInputElement).value) || 16)} />
+          </FormGroup>
+          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+            <Button variant="link" onClick={onClose}>Cancel</Button>
+            <Button variant="primary" onClick={submit}>Create</Button>
+          </div>
+        </Form>
+      </ModalBody>
+    </Modal>
   );
 }

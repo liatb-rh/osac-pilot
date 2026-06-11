@@ -7,9 +7,12 @@ import {
 } from "@/components/osac/CatalogItemPicker";
 import { tenantVisibleItems, type CatalogItem } from "@/lib/catalog-data";
 import {
+  listInstanceTypes, findInstanceType, formatInstanceType, CATEGORY_LABELS,
+} from "@/lib/instance-types-data";
+import {
   Button, SearchInput, ToggleGroup, ToggleGroupItem, Modal, ModalVariant,
   ModalHeader, ModalBody, Wizard, WizardStep, Form, FormGroup,
-  TextInput, NumberInput, Select, SelectOption, SelectList, MenuToggle, Label,
+  TextInput, Select, SelectOption, SelectList, SelectGroup, MenuToggle, Label,
 } from "@patternfly/react-core";
 import { Table, Thead, Tr, Th, Tbody, Td, ActionsColumn } from "@patternfly/react-table";
 import { PlusCircleIcon } from "@patternfly/react-icons";
@@ -144,25 +147,34 @@ function CreateVmWizard({ onDone, initialItemId }: { onDone: () => void; initial
   const [osOpen, setOsOpen] = useState(false);
   const [sshKey, setSshKey] = useState(SSH_KEYS[0]);
   const [sshOpen, setSshOpen] = useState(false);
-  const [cpu, setCpu] = useState(item?.fixedDefaults.cpu ?? 2);
-  const [ram, setRam] = useState(item?.fixedDefaults.memoryGib ?? 8);
-  const [disk, setDisk] = useState(item?.fixedDefaults.bootDiskSizeGib ?? 64);
+  const [instanceTypeId, setInstanceTypeId] = useState<string>(
+    item?.fixedDefaults.instanceTypeId ?? "it-small"
+  );
+  const [itOpen, setItOpen] = useState(false);
   const [dyn, setDyn] = useState<DynamicValues>(dynamicDefaults(item?.paramSchema));
   const [sgs, setSgs] = useState<string[]>(["sg-app-tier"]);
   const [sgOpen, setSgOpen] = useState(false);
   const [pubIp, setPubIp] = useState<PublicIpSelection | null>(null);
 
-  const resizable = item?.fixedDefaults.allowUserResize !== false;
+  const instanceTypes = listInstanceTypes();
+  const instanceType = findInstanceType(instanceTypeId) ?? instanceTypes[0];
+  const cpu = instanceType?.cpu ?? 2;
+  const ram = instanceType?.memoryGib ?? 8;
+  const disk = instanceType?.bootDiskGib ?? 64;
+
   const hasDyn = !!item?.paramSchema && Object.keys(item.paramSchema.properties).length > 0;
   const osLabel = OS_OPTIONS.find((o) => o.value === os)?.label ?? os;
 
   const selectItem = (i: CatalogItem) => {
     setItemId(i.id);
-    setCpu(i.fixedDefaults.cpu ?? 2);
-    setRam(i.fixedDefaults.memoryGib ?? 8);
-    setDisk(i.fixedDefaults.bootDiskSizeGib ?? 64);
+    if (i.fixedDefaults.instanceTypeId) setInstanceTypeId(i.fixedDefaults.instanceTypeId);
     setDyn(dynamicDefaults(i.paramSchema));
   };
+
+  const grouped = instanceTypes.reduce<Record<string, typeof instanceTypes>>((acc, it) => {
+    (acc[it.category] ||= []).push(it);
+    return acc;
+  }, {});
 
   const toggleSg = (v: string) =>
     setSgs((prev) => (prev.includes(v) ? prev.filter((s) => s !== v) : [...prev, v]));
@@ -208,37 +220,40 @@ function CreateVmWizard({ onDone, initialItemId }: { onDone: () => void; initial
           </FormGroup>
         </Form>
       </WizardStep>
-      <WizardStep name="Resources" id="res">
+      <WizardStep name="Instance type" id="res">
         <Form>
-          <FormGroup label="vCPU" fieldId="cpu">
-            <NumberInput
-              value={cpu} min={1} max={64} isDisabled={!resizable}
-              onMinus={() => setCpu((n) => Math.max(1, n - 1))}
-              onPlus={() => setCpu((n) => n + 1)}
-              onChange={(e) => setCpu(Number((e.target as HTMLInputElement).value) || 1)}
-            />
-          </FormGroup>
-          <FormGroup label="Memory (GiB)" fieldId="ram">
-            <NumberInput
-              value={ram} min={1} max={512} isDisabled={!resizable}
-              onMinus={() => setRam((n) => Math.max(1, n - 1))}
-              onPlus={() => setRam((n) => n + 2)}
-              onChange={(e) => setRam(Number((e.target as HTMLInputElement).value) || 1)}
-            />
-          </FormGroup>
-          <FormGroup label="Boot disk size (GiB)" fieldId="disk">
-            <NumberInput
-              value={disk} min={16} max={2048}
-              onMinus={() => setDisk((n) => Math.max(16, n - 16))}
-              onPlus={() => setDisk((n) => n + 16)}
-              onChange={(e) => setDisk(Number((e.target as HTMLInputElement).value) || 16)}
-            />
-          </FormGroup>
-          {!resizable && (
-            <div style={{ fontSize: 12, color: "#5b6b7c" }}>
-              CPU and memory are fixed by the selected catalog item.
+          <FormGroup label="Instance type" fieldId="it" isRequired>
+            <Select
+              isOpen={itOpen} onOpenChange={setItOpen}
+              toggle={(ref) => (
+                <MenuToggle ref={ref} onClick={() => setItOpen((v) => !v)} isExpanded={itOpen} style={{ minWidth: 360 }}>
+                  {instanceType ? formatInstanceType(instanceType) : "Select instance type"}
+                </MenuToggle>
+              )}
+              selected={instanceTypeId}
+              onSelect={(_, v) => { setInstanceTypeId(String(v)); setItOpen(false); }}
+            >
+              <SelectList>
+                {Object.entries(grouped).map(([cat, list]) => (
+                  <SelectGroup key={cat} label={CATEGORY_LABELS[cat as keyof typeof CATEGORY_LABELS]}>
+                    {list.map((it) => (
+                      <SelectOption key={it.id} value={it.id} description={it.description}>
+                        {formatInstanceType(it)}
+                      </SelectOption>
+                    ))}
+                  </SelectGroup>
+                ))}
+              </SelectList>
+            </Select>
+            <div style={{ fontSize: 12, color: "#5b6b7c", marginTop: 6 }}>
+              CPU, memory, and boot disk are determined by the selected instance type.
             </div>
-          )}
+          </FormGroup>
+          <div className="osac-panel" style={{ display: "flex", gap: 18, fontSize: 13 }}>
+            <div><strong>{cpu}</strong> vCPU</div>
+            <div><strong>{ram}</strong> GiB RAM</div>
+            <div><strong>{disk}</strong> GiB boot disk</div>
+          </div>
         </Form>
       </WizardStep>
       <WizardStep name="Dynamic parameters" id="dyn" isHidden={!hasDyn}>
@@ -286,7 +301,7 @@ function CreateVmWizard({ onDone, initialItemId }: { onDone: () => void; initial
           <div style={{ marginBottom: 8 }}><strong>Name:</strong> {name}</div>
           <div style={{ marginBottom: 8 }}><strong>Operating System:</strong> {osLabel}</div>
           <div style={{ marginBottom: 8 }}><strong>SSH key:</strong> {sshKey}</div>
-          <div style={{ marginBottom: 8 }}><strong>Resources:</strong> {cpu} vCPU · {ram} GiB RAM · {disk} GiB boot disk</div>
+          <div style={{ marginBottom: 8 }}><strong>Instance type:</strong> {instanceType?.displayName ?? "—"} · {cpu} vCPU · {ram} GiB RAM · {disk} GiB boot disk</div>
           {hasDyn && (
             <div style={{ marginBottom: 8 }}>
               <strong>Dynamic parameters:</strong>{" "}
