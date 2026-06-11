@@ -40,8 +40,8 @@ const ALL_LINKS: NavLink[] = [
   // Provider admin
   { to: "/app/provider", label: "Provider Overview", icon: ShieldAltIcon, perm: "view_provider_dashboard", group: "Platform" },
   { to: "/app/provider/tenants", label: "Tenant Organizations", icon: BuildingIcon, perm: "manage_tenants", group: "Platform" },
-  { to: "/app/provider/infrastructure", label: "Infrastructure", icon: NetworkIcon, perm: "view_infrastructure", group: "Platform" },
-  { to: "/app/provider/agents", label: "Infrastructure Agents", icon: CogIcon, perm: "view_agents", group: "Platform" },
+  { to: "/app/provider/infrastructure", label: "Infrastructure", icon: NetworkIcon, perm: "view_infrastructure", group: "Core Platform" },
+  { to: "/app/provider/agents", label: "Infrastructure Agents", icon: CogIcon, perm: "view_agents", group: "Core Platform" },
   { to: "/app/provider/storage-tiers", label: "Storage Tiers", icon: DatabaseIcon, perm: "view_storage_tiers", group: "Platform" },
   { to: "/app/provider/public-ip-pools", label: "Public IP Pools", icon: NetworkIcon, perm: "manage_public_ip_pools", group: "Platform" },
   
@@ -83,8 +83,9 @@ function AppShell() {
         if (l.to === "/app/vms" || l.to === "/app/bare-metal" || l.to === "/app/catalog") return false;
       }
       if (role === "providerAdmin") {
-        // Provider Admin: hide entire Workloads section
+        // Provider Admin: hide entire Workloads section, All Clusters, All Virtual Machines
         if (l.group === "Workloads") return false;
+        if (l.to === "/app/provider/clusters" || l.to === "/app/provider/vms") return false;
       }
       return true;
     })
