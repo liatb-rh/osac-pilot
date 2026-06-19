@@ -30,6 +30,10 @@ const ALL_LINKS: NavLink[] = [
   { to: "/app/public-ips", label: "Public IPs", icon: NetworkIcon, perm: "view_public_ips", group: "Workloads" },
   { to: "/app/catalog", label: "Catalog", icon: CubesIcon, perm: "view_catalog", group: "Workloads" },
   { to: "/app/clusters", label: "Clusters", icon: CloudIcon, perm: "view_clusters", group: "Workloads" },
+  // OSAC Core (role-aware overview)
+  { to: "/app/core", label: "OSAC Core Overview", icon: ShieldAltIcon, perm: "view_shell", group: "OSAC Core" },
+  { to: "/app/core/my-org", label: "My Organization & IdP", icon: BuildingIcon, perm: "view_tenant_admin_dashboard", group: "OSAC Core" },
+  { to: "/app/core/my-roles", label: "My Roles", icon: KeyIcon, perm: "view_shell", group: "OSAC Core" },
   // Tenant admin
   { to: "/app/admin", label: "Tenant Overview", icon: BuildingIcon, perm: "view_tenant_admin_dashboard", group: "Administration" },
   { to: "/app/admin/users", label: "Users & Access", icon: UsersIcon, perm: "manage_users", group: "Administration" },
@@ -44,7 +48,7 @@ const ALL_LINKS: NavLink[] = [
   { to: "/app/provider/agents", label: "Infrastructure Agents", icon: CogIcon, perm: "view_agents", group: "Core Platform" },
   { to: "/app/provider/storage-tiers", label: "Storage Tiers", icon: DatabaseIcon, perm: "view_storage_tiers", group: "Platform" },
   { to: "/app/provider/public-ip-pools", label: "Public IP Pools", icon: NetworkIcon, perm: "manage_public_ip_pools", group: "Platform" },
-  
+
   { to: "/app/provider/clusters", label: "All Clusters", icon: CloudIcon, perm: "view_clusters", group: "Platform" },
   { to: "/app/provider/vms", label: "All Virtual Machines", icon: ServerIcon, perm: "view_infrastructure", group: "Platform" },
   { to: "/app/provider/bare-metal", label: "Bare Metal Inventory", icon: ServerIcon, perm: "view_bare_metal_inventory", group: "Platform" },
