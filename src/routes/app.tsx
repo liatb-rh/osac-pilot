@@ -30,6 +30,10 @@ const ALL_LINKS: NavLink[] = [
   { to: "/app/public-ips", label: "Public IPs", icon: NetworkIcon, perm: "view_public_ips", group: "Workloads" },
   { to: "/app/catalog", label: "Catalog", icon: CubesIcon, perm: "view_catalog", group: "Workloads" },
   { to: "/app/clusters", label: "Clusters", icon: CloudIcon, perm: "view_clusters", group: "Workloads" },
+  // OSAC Core (role-aware overview)
+  { to: "/app/core", label: "OSAC Core Overview", icon: ShieldAltIcon, perm: "view_shell", group: "OSAC Core" },
+  { to: "/app/core/my-org", label: "My Organization & IdP", icon: BuildingIcon, perm: "view_tenant_admin_dashboard", group: "OSAC Core" },
+  { to: "/app/core/my-roles", label: "My Roles", icon: KeyIcon, perm: "view_shell", group: "OSAC Core" },
   // Tenant admin
   { to: "/app/admin", label: "Tenant Overview", icon: BuildingIcon, perm: "view_tenant_admin_dashboard", group: "Administration" },
   { to: "/app/admin/users", label: "Users & Access", icon: UsersIcon, perm: "manage_users", group: "Administration" },
@@ -44,7 +48,7 @@ const ALL_LINKS: NavLink[] = [
   { to: "/app/provider/agents", label: "Infrastructure Agents", icon: CogIcon, perm: "view_agents", group: "Core Platform" },
   { to: "/app/provider/storage-tiers", label: "Storage Tiers", icon: DatabaseIcon, perm: "view_storage_tiers", group: "Platform" },
   { to: "/app/provider/public-ip-pools", label: "Public IP Pools", icon: NetworkIcon, perm: "manage_public_ip_pools", group: "Platform" },
-  
+
   { to: "/app/provider/clusters", label: "All Clusters", icon: CloudIcon, perm: "view_clusters", group: "Platform" },
   { to: "/app/provider/vms", label: "All Virtual Machines", icon: ServerIcon, perm: "view_infrastructure", group: "Platform" },
   { to: "/app/provider/bare-metal", label: "Bare Metal Inventory", icon: ServerIcon, perm: "view_bare_metal_inventory", group: "Platform" },
@@ -81,15 +85,21 @@ function AppShell() {
       if (role === "tenantAdmin") {
         // Tenant Admin: hide workload-operator entries and catalog
         if (l.to === "/app/vms" || l.to === "/app/bare-metal" || l.to === "/app/catalog") return false;
+        // Hide tenant-user OSAC Core link
+        if (l.to === "/app/core/my-roles") return false;
       }
       if (role === "tenantUser") {
         // Tenant User: hide Public IPs, Clusters
         if (l.to === "/app/public-ips" || l.to === "/app/clusters") return false;
+        // Hide tenant-admin OSAC Core link
+        if (l.to === "/app/core/my-org") return false;
       }
       if (role === "providerAdmin") {
         // Provider Admin: hide entire Workloads section, All Clusters, All Virtual Machines
         if (l.group === "Workloads") return false;
         if (l.to === "/app/provider/clusters" || l.to === "/app/provider/vms") return false;
+        // Hide tenant-scoped OSAC Core links
+        if (l.to === "/app/core/my-org" || l.to === "/app/core/my-roles") return false;
       }
       return true;
     })
@@ -98,7 +108,7 @@ function AppShell() {
         return { ...l, group: "Administration" };
       }
       if (role === "tenantUser" && l.to === "/app/catalog") {
-        return { ...l, group: "Platform" };
+        return { ...l, group: "OSAC Core" };
       }
       if (role === "providerAdmin" && (l.to === "/app/provider/organizations" || l.to === "/app/provider/rbac" || l.to === "/app/provider/tenants")) {
         return { ...l, group: "Administration" };
