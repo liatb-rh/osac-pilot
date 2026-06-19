@@ -85,15 +85,21 @@ function AppShell() {
       if (role === "tenantAdmin") {
         // Tenant Admin: hide workload-operator entries and catalog
         if (l.to === "/app/vms" || l.to === "/app/bare-metal" || l.to === "/app/catalog") return false;
+        // Hide tenant-user OSAC Core link
+        if (l.to === "/app/core/my-roles") return false;
       }
       if (role === "tenantUser") {
         // Tenant User: hide Public IPs, Clusters
         if (l.to === "/app/public-ips" || l.to === "/app/clusters") return false;
+        // Hide tenant-admin OSAC Core link
+        if (l.to === "/app/core/my-org") return false;
       }
       if (role === "providerAdmin") {
         // Provider Admin: hide entire Workloads section, All Clusters, All Virtual Machines
         if (l.group === "Workloads") return false;
         if (l.to === "/app/provider/clusters" || l.to === "/app/provider/vms") return false;
+        // Hide tenant-scoped OSAC Core links
+        if (l.to === "/app/core/my-org" || l.to === "/app/core/my-roles") return false;
       }
       return true;
     })
@@ -102,7 +108,7 @@ function AppShell() {
         return { ...l, group: "Administration" };
       }
       if (role === "tenantUser" && l.to === "/app/catalog") {
-        return { ...l, group: "Platform" };
+        return { ...l, group: "OSAC Core" };
       }
       if (role === "providerAdmin" && (l.to === "/app/provider/organizations" || l.to === "/app/provider/rbac" || l.to === "/app/provider/tenants")) {
         return { ...l, group: "Administration" };
