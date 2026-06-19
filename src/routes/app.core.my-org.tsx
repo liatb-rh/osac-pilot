@@ -177,12 +177,7 @@ function MyOrgPage() {
     <>
       <PageHeader
         title={t.name}
-        subtitle={
-          <>
-            Organization <code>{org.id}</code> · realm <code>{org.realm}</code> ·{" "}
-            <span style={{ color: "#5b6b7c" }}>osac.iam.v1</span>
-          </>
-        }
+        subtitle={`Organization ${org.id} · realm ${org.realm} · osac.iam.v1`}
         actions={
           <>
             <Button variant="secondary">Test IdP connection</Button>

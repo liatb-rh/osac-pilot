@@ -80,12 +80,7 @@ function MyRolesPage() {
     <>
       <PageHeader
         title="My Roles"
-        subtitle={
-          <>
-            Effective access for <strong>{user?.name ?? "you"}</strong> in {t.name} ·{" "}
-            <span style={{ color: "#5b6b7c" }}>osac.iam.v1</span>
-          </>
-        }
+        subtitle={`Effective access for ${user?.name ?? "you"} in ${t.name} · osac.iam.v1`}
       />
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
